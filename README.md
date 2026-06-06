@@ -29,13 +29,15 @@ Two outputs being built in parallel:
 
 | Tier | Cluster | Repos | Analyzed | Status |
 |------|---------|-------|----------|--------|
-| 1 | Agentic & Outbound | 10 | 0 | 🔴 IN PROGRESS |
+| 1 | Agentic & Outbound | 10 | 5 ✅ | 🟡 IN PROGRESS |
 | 2 | Portfolio & Identity | 9 | 0 | 🔴 NEXT |
 | 3 | LocalCheck | 6 | 0 | 🔴 TODO |
 | 4 | OmniaVital | 7 | 0 | 🔴 TODO |
 | 5 | Trading & Finance | 6 | 0 | 🔴 TODO |
 | 6 | Voice & Conversational | 3 | 0 | 🔴 TODO |
-| — | **TOTAL** | **41** | **0** | — |
+| — | **TOTAL** | **41** | **5** | — |
+
+> **Analyzed:** GenJess_OS ✅ · outbound-studio (deliverables) ✅ · AgentAgency ✅ · career-ops ✅ · AgenticJess ✅
 
 > **Already done (pre-roadmap):** `jGPT-Automated/GenJess_OS` · `jGPT-Automated/outbound-studio` — see `analysis/` folder.
 
