@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jesse — Full-Stack AI Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     DESIGN SYSTEM — Vercel/Linear DNA + Taste-Skill
+     Accent: Emerald (#10b981) — singular, restrained
+     Base: Zinc/Slate neutrals (NO purple AI glows)
+     Typography: Geist + Geist Mono (NO Inter)
+     DESIGN_VARIANCE: 8 | MOTION_INTENSITY: 6 | VISUAL_DENSITY: 4
+  ============================================ */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #080808;
+    --bg-elevated: #111;
+    --bg-hover: #161616;
+    --border: #1f1f1f;
+    --border-subtle: #161616;
+    --text-primary: #ededed;
+    --text-secondary: #888;
+    --text-muted: #444;
+    --accent: #10b981;
+    --accent-dim: rgba(16,185,129,0.08);
+    --accent-border: rgba(16,185,129,0.2);
+    --font-sans: 'Geist', system-ui, sans-serif;
+    --font-mono: 'Geist Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== CANVAS HERO ===== */
+  #hero-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s, backdrop-filter 0.3s;
+  }
+  nav.scrolled {
+    border-color: var(--border);
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(12px);
+  }
+  .nav-brand {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-brand .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse-dot 2.5s ease-in-out infinite;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .nav-links a {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .nav-links a:hover { color: var(--text-primary); background: var(--bg-elevated); }
+  .nav-cta {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--text-primary);
+    text-decoration: none;
+    padding: 7px 16px;
+    border-radius: 6px;
+    transition: opacity 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* ===== SECTIONS ===== */
+  section { position: relative; z-index: 1; }
+
+  /* ===== HERO ===== */
+  #hero {
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 100px 48px 80px;
+    gap: 80px;
+  }
+  .hero-left { max-width: 580px; }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent-border);
+    background: var(--accent-dim);
+    padding: 5px 12px;
+    border-radius: 4px;
+    margin-bottom: 28px;
+    opacity: 0;
+    animation: fade-up 0.6s ease forwards 0.1s;
+  }
+  h1.hero-title {
+    font-size: clamp(44px, 5vw, 72px);
+    font-weight: 600;
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fade-up 0.6s ease forwards 0.2s;
+  }
+  h1.hero-title .dim { color: var(--text-muted); }
+  .hero-sub {
+    font-size: 16px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 480px;
+    margin-bottom: 40px;
+    border-left: 2px solid var(--border);
+    padding-left: 20px;
+    opacity: 0;
+    animation: fade-up 0.6s ease forwards 0.35s;
+  }
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fade-up 0.6s ease forwards 0.5s;
+  }
+  .btn-primary {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--text-primary);
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    letter-spacing: 0.01em;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+  .btn-secondary {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    letter-spacing: 0.01em;
+    transition: color 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .btn-secondary:hover { color: var(--text-primary); border-color: #333; transform: translateY(-1px); }
+
+  /* Hero stats */
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    opacity: 0;
+    animation: fade-up 0.6s ease forwards 0.65s;
+    margin-top: 48px;
+  }
+  .stat {
+    background: var(--bg);
+    padding: 18px 20px;
+    transition: background 0.15s;
+  }
+  .stat:hover { background: var(--bg-elevated); }
+  .stat-num {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-num .accent { color: var(--accent); }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Hero right — particle canvas placeholder */
+  .hero-right {
+    position: relative;
+    height: 500px;
+    opacity: 0;
+    animation: fade-in 1s ease forwards 0.4s;
+  }
+  #particle-canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+  }
+  .hero-right-label {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* ===== SECTION HEADERS ===== */
+  .section-wrap { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
+  .section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h2.section-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+    line-height: 1.1;
+  }
+  .section-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* ===== SKILLS MARQUEE ===== */
+  #skills {
+    padding: 64px 0;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    overflow: hidden;
+  }
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    width: max-content;
+    animation: marquee 28s linear infinite;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+  .skill-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 0 32px;
+    border-right: 1px solid var(--border-subtle);
+    transition: color 0.15s;
+  }
+  .skill-chip:hover { color: var(--text-primary); }
+  .skill-chip .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.5; }
+
+  /* ===== PROJECTS ===== */
+  #projects { padding: 100px 0; }
+
+  .project-filters {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 32px;
+  }
+  .filter-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    color: var(--text-primary);
+    border-color: var(--accent-border);
+    background: var(--accent-dim);
+    color: var(--accent);
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .project-card {
+    background: var(--bg);
+    padding: 28px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    display: block;
+  }
+  .project-card:hover { background: var(--bg-hover); }
+  .project-card.featured {
+    grid-column: span 2;
+  }
+  .project-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .project-tag .tag-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+  }
+  .tag-dot-teal { background: var(--accent); }
+  .tag-dot-amber { background: #f59e0b; }
+  .tag-dot-rose { background: #f43f5e; }
+  .tag-dot-violet { background: #8b5cf6; }
+  .tag-dot-sky { background: #0ea5e9; }
+
+  .project-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .project-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .project-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .project-stack {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .stack-chip {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+  .project-score {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    opacity: 0.6;
+  }
+  .project-arrow {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .project-card:hover .project-arrow { opacity: 1; transform: translate(2px, -2px); }
+  .project-arrow svg { width: 12px; height: 12px; stroke: var(--text-secondary); fill: none; stroke-width: 2; }
+
+  /* ===== ABOUT ===== */
+  #about { padding: 100px 0; border-top: 1px solid var(--border-subtle); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .about-left h2 {
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+  .about-left h2 .dim { color: var(--text-muted); }
+  .about-left p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.75;
+    margin-bottom: 16px;
+  }
+  .about-right { padding-top: 4px; }
+  .about-items { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .about-item {
+    background: var(--bg);
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: background 0.15s;
+  }
+  .about-item:hover { background: var(--bg-elevated); }
+  .about-item-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: var(--bg-elevated);
+  }
+  .about-item-icon svg { width: 16px; height: 16px; fill: none; stroke: var(--text-secondary); stroke-width: 1.5; }
+  .about-item-text .label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .about-item-text .sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+  }
+  .about-item-val {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ===== CONTACT ===== */
+  #contact { padding: 100px 0; border-top: 1px solid var(--border-subtle); }
+  .contact-inner {
+    max-width: 640px;
+  }
+  .contact-inner h2 {
+    font-size: 40px;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .contact-inner h2 .dim { color: var(--text-muted); }
+  .contact-inner p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 36px;
+    line-height: 1.7;
+  }
+  .contact-links { display: flex; gap: 10px; flex-wrap: wrap; }
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    letter-spacing: 0.01em;
+    transition: all 0.15s;
+  }
+  .contact-link:hover {
+    color: var(--text-primary);
+    border-color: #333;
+    transform: translateY(-1px);
+  }
+  .contact-link svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    padding: 32px 48px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  footer .left {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+  footer .right {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Scroll reveal */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    #hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 40px; }
+    .hero-right { height: 300px; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card.featured { grid-column: span 1; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .section-wrap { padding: 0 24px; }
+    nav { padding: 0 24px; }
+    .nav-links { display: none; }
+    footer { padding: 24px; flex-direction: column; gap: 8px; text-align: center; }
+  }
+
+  /* ===== PORTAL NAV BUTTON ===== */
+  .nav-portal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    margin-left: 4px;
+  }
+  .nav-portal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-dim);
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: 5px;
+  }
+  .nav-portal:hover::before { opacity: 1; }
+  .nav-portal:hover {
+    border-color: var(--accent-border);
+    color: var(--accent);
+    transform: rotate(30deg) scale(1.05);
+  }
+  .portal-icon { font-size: 14px; line-height: 1; transition: transform 0.3s; }
+</style>
+</head>
+<body>
+
+<!-- Background canvas -->
+<canvas id="hero-canvas"></canvas>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-brand">
+    <span class="status-dot"></span>
+    Jesse
+  </a>
+  <div class="nav-links">
+    <a href="#projects">Projects</a>
+    <a href="#about">About</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="#contact">Contact</a>
+    <a href="portal.html" class="nav-portal" id="portalBtn" title="Portal">
+      <span class="portal-icon">⬡</span>
+    </a>
+  </div>
+  <a href="mailto:Generative.jesse@gmail.com" class="nav-cta">Hire Me</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <span>Available for work</span>
+    </div>
+    <h1 class="hero-title">
+      Full-Stack<br>
+      <span class="dim">AI Builder.</span>
+    </h1>
+    <p class="hero-sub">
+      I build AI-native products — agents, trading systems, wellness platforms, voice interfaces. 
+      70+ shipped projects. From idea to deployed in days.
+    </p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn-primary">View Projects</a>
+      <a href="https://github.com/GenJess" target="_blank" class="btn-secondary">GitHub</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">70<span class="accent">+</span></div>
+        <div class="stat-label">Repos shipped</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Active products</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">11<span class="accent">K</span></div>
+        <div class="stat-label">Lines — OmniVital</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4.4<span class="accent">/5</span></div>
+        <div class="stat-label">Top project score</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <canvas id="particle-canvas"></canvas>
+    <div class="hero-right-label">Neural graph // v2.5.0</div>
+  </div>
+</section>
+
+<!-- SKILLS MARQUEE -->
+<section id="skills">
+  <div class="marquee-track" id="marquee">
+    <!-- JS fills this -->
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-wrap">
+    <div class="section-header reveal">
+      <div>
+        <div class="section-label">Selected Work</div>
+        <h2 class="section-title">Projects</h2>
+      </div>
+      <div class="section-count">12 / 70+</div>
+    </div>
+
+    <div class="project-filters reveal">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="ai">AI / Agents</button>
+      <button class="filter-btn" data-filter="health">Health Tech</button>
+      <button class="filter-btn" data-filter="finance">Fintech</button>
+      <button class="filter-btn" data-filter="portfolio">Portfolio</button>
+    </div>
+
+    <div class="projects-grid reveal" id="projects-grid">
+      <!-- JS rendered -->
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-wrap">
+    <div class="about-grid">
+      <div class="about-left reveal">
+        <h2>Builder by default.<br><span class="dim">Architect by design.</span></h2>
+        <p>
+          I'm Jesse — a full-stack AI engineer based in Texas. I've spent the last few years building at the intersection of AI, finance, and health tech, across 70+ repositories and three GitHub accounts.
+        </p>
+        <p>
+          My work spans AI agents with real memory and autonomous workflows, voice interfaces built on ElevenLabs and AssemblyAI, trading systems across crypto and options markets, and full-stack SaaS products from schema to deploy.
+        </p>
+        <p>
+          I don't prototype — I ship. OmniVital is a 11,000-line production wellness platform deployed on Vercel with a live Supabase database, GPT-4.1 advisor, and ElevenLabs voice agent. That's the standard I hold everything to.
+        </p>
+        <div style="margin-top:32px;">
+          <a href="mailto:Generative.jesse@gmail.com" class="btn-primary">Get in touch</a>
+        </div>
+      </div>
+      <div class="about-right reveal">
+        <div class="about-items">
+          <div class="about-item">
+            <div class="about-item-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <div class="about-item-text">
+              <div class="label">Stack</div>
+              <div class="sub">React · FastAPI · Supabase · Python</div>
+            </div>
+          </div>
+          <div class="about-item">
+            <div class="about-item-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            </div>
+            <div class="about-item-text">
+              <div class="label">Available</div>
+              <div class="sub">Full-time · Contract · Founding eng</div>
+            </div>
+            <div class="about-item-val">Now</div>
+          </div>
+          <div class="about-item">
+            <div class="about-item-icon">
+              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="about-item-text">
+              <div class="label">Location</div>
+              <div class="sub">Texas, US · Remote-first</div>
+            </div>
+          </div>
+          <div class="about-item">
+            <div class="about-item-icon">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+            </div>
+            <div class="about-item-text">
+              <div class="label">GitHub</div>
+              <div class="sub">GenJess · iJessCloud · jesseutexas</div>
+            </div>
+            <div class="about-item-val">70+ repos</div>
+          </div>
+          <div class="about-item">
+            <div class="about-item-icon">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            </div>
+            <div class="about-item-text">
+              <div class="label">Domains</div>
+              <div class="sub">AI agents · Fintech · Health · Voice</div>
+            </div>
+          </div>
+          <div class="about-item">
+            <div class="about-item-icon">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            </div>
+            <div class="about-item-text">
+              <div class="label">Contact</div>
+              <div class="sub">Generative.jesse@gmail.com</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-wrap">
+    <div class="contact-inner reveal">
+      <h2>Let's build<br><span class="dim">something real.</span></h2>
+      <p>Open to full-time roles, contract work, and founding engineer opportunities. If you're building something in AI, health tech, or fintech — let's talk.</p>
+      <div class="contact-links">
+        <a href="mailto:Generative.jesse@gmail.com" class="contact-link">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Email
+        </a>
+        <a href="https://github.com/GenJess" target="_blank" class="contact-link">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+          GitHub
+        </a>
+        <a href="https://linkedin.com" target="_blank" class="contact-link">
+          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          LinkedIn
+        </a>
+        <a href="https://github.com/GenJess/agentjess-portfolio" target="_blank" class="contact-link">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Voice Agent
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="left">Jesse · Full-Stack AI Builder · Texas</div>
+  <div class="right">Built with taste-skill · 2026</div>
+</footer>
+
+<script>
+  // ============================================
+  // DATA
+  // ============================================
+  const PROJECTS = [
+    {
+      id: 'omnivital',
+      name: 'OmniVital',
+      desc: 'Wellness OS — AI advisor, voice agent, ritual tracking, real-time community. 11K+ lines, live on Vercel.',
+      tags: ['health'],
+      stack: ['React 18', 'FastAPI', 'Supabase', 'GPT-4.1', 'ElevenLabs'],
+      score: '4.2',
+      dotClass: 'tag-dot-teal',
+      category: 'Health Tech',
+      featured: true,
+      url: 'https://github.com/GenJess/OmniVital'
+    },
+    {
+      id: 'teaims',
+      name: 'TEAIMS',
+      desc: 'AI talent intelligence platform. B2B agent armory for hiring, screening, and role automation.',
+      tags: ['ai'],
+      stack: ['Python', 'LLM', 'Agents', 'FastAPI'],
+      score: '4.4',
+      dotClass: 'tag-dot-amber',
+      category: 'AI / Agents',
+      url: 'https://github.com/JessTheGPT/TEAIMS'
+    },
+    {
+      id: 'propersona',
+      name: 'ProPersona',
+      desc: 'Live at pro-persona.lovable.app — AI-generated personas for branding, UX research, and go-to-market.',
+      tags: ['ai'],
+      stack: ['React', 'OpenAI', 'Lovable'],
+      score: '4.6',
+      dotClass: 'tag-dot-teal',
+      category: 'AI / Agents',
+      url: 'https://pro-persona.lovable.app'
+    },
+    {
+      id: 'agentjess',
+      name: 'AgentJess Portfolio',
+      desc: 'Voice-navigated portfolio with Three.js particle orb, ElevenLabs orb, and client-side navigation tools.',
+      tags: ['portfolio'],
+      stack: ['React', 'Three.js', 'ElevenLabs', 'Gemini'],
+      score: '4.0',
+      dotClass: 'tag-dot-violet',
+      category: 'Portfolio',
+      url: 'https://github.com/GenJess/agentjess-portfolio'
+    },
+    {
+      id: 'purpdex',
+      name: 'PurpDex Live',
+      desc: 'Live DEX analytics dashboard. Real-time crypto data, charting, and market intelligence for DeFi.',
+      tags: ['finance'],
+      stack: ['React', 'Web3', 'DeFi', 'APIs'],
+      score: '3.8',
+      dotClass: 'tag-dot-sky',
+      category: 'Fintech',
+      url: 'https://github.com/GenJess/PurpDex-live'
+    },
+    {
+      id: 'optiq',
+      name: 'OptIQ',
+      desc: 'Options intelligence — AI-driven options flow analysis and strategy recommendations.',
+      tags: ['finance'],
+      stack: ['Python', 'ML', 'Options API', 'React'],
+      score: '3.8',
+      dotClass: 'tag-dot-sky',
+      category: 'Fintech',
+      url: 'https://github.com/GenJess/OptIQ'
+    },
+    {
+      id: 'axonai',
+      name: 'AxonAI',
+      desc: 'Neural-style AI agent framework. Context-aware multi-step task execution with memory.',
+      tags: ['ai'],
+      stack: ['Python', 'LangChain', 'Agents', 'Vector DB'],
+      score: '3.6',
+      dotClass: 'tag-dot-amber',
+      category: 'AI / Agents',
+      url: 'https://github.com/GenJess/AxonAI'
+    },
+    {
+      id: 'omnivital-vision',
+      name: 'OmniVital Vision',
+      desc: 'Computer vision extension for OmniVital — biometric analysis from camera input.',
+      tags: ['health'],
+      stack: ['Python', 'OpenCV', 'FastAPI', 'React'],
+      score: '3.4',
+      dotClass: 'tag-dot-teal',
+      category: 'Health Tech',
+      url: 'https://github.com/GenJess/omnivital-vision'
+    },
+    {
+      id: 'careerops',
+      name: 'career-ops',
+      desc: 'DevOps principles applied to job hunting — automated pipeline for applications, follow-ups, and tracking.',
+      tags: ['ai'],
+      stack: ['Python', 'CLI', 'Automation', 'LLM'],
+      score: '4.4',
+      dotClass: 'tag-dot-amber',
+      category: 'AI / Agents',
+      url: 'https://github.com/GenJess/career-ops'
+    },
+    {
+      id: 'imagym',
+      name: 'ImaGym',
+      desc: 'AI fitness platform — computer vision form analysis, personalized workout generation, progress tracking.',
+      tags: ['health'],
+      stack: ['React', 'Python', 'CV', 'OpenAI'],
+      score: '3.6',
+      dotClass: 'tag-dot-teal',
+      category: 'Health Tech',
+      url: 'https://github.com/GenJess/Imagym'
+    },
+    {
+      id: 'stocktok',
+      name: 'StockTok',
+      desc: 'TikTok-style stock discovery feed. Short-form AI summaries of market movers served in a scroll interface.',
+      tags: ['finance'],
+      stack: ['React', 'Python', 'APIs', 'OpenAI'],
+      score: '3.6',
+      dotClass: 'tag-dot-sky',
+      category: 'Fintech',
+      url: 'https://github.com/GenJess/stocktok'
+    },
+    {
+      id: 'danielscuts',
+      name: "Daniel's Cuts",
+      desc: 'Barber shop booking and client management platform. Deployed for a real client.',
+      tags: ['portfolio'],
+      stack: ['React', 'Node.js', 'Booking API'],
+      score: '3.4',
+      dotClass: 'tag-dot-violet',
+      category: 'Client Work',
+      url: 'https://github.com/GenJess/DanielsBarberShop2.0'
+    },
+  ];
+
+  const SKILLS = [
+    'React 18', 'TypeScript', 'Python', 'FastAPI', 'Supabase', 'PostgreSQL',
+    'MongoDB', 'GPT-4.1', 'ElevenLabs', 'LangChain', 'Three.js', 'Vercel',
+    'Node.js', 'TailwindCSS', 'Vite', 'OpenAI API', 'Web3', 'DeFi',
+    'Docker', 'GitHub Actions', 'RAG', 'Vector DBs', 'WebRTC', 'AssemblyAI',
+    'React Native', 'Redis', 'Stripe', 'n8n', 'Framer Motion', 'ML/CV',
+  ];
+
+  // ============================================
+  // MARQUEE
+  // ============================================
+  const marquee = document.getElementById('marquee');
+  const skillsHtml = [...SKILLS, ...SKILLS].map(s =>
+    `<span class="skill-chip"><span class="dot"></span>${s}</span>`
+  ).join('');
+  marquee.innerHTML = skillsHtml;
+
+  // ============================================
+  // PROJECTS GRID
+  // ============================================
+  let activeFilter = 'all';
+  const grid = document.getElementById('projects-grid');
+
+  function renderProjects(filter) {
+    const filtered = filter === 'all' ? PROJECTS : PROJECTS.filter(p => p.tags.includes(filter));
+    grid.innerHTML = filtered.map((p, i) => `
+      <a class="project-card${p.featured && i === 0 ? ' featured' : ''}" href="${p.url}" target="_blank">
+        <div class="project-arrow">
+          <svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </div>
+        <div class="project-tag">
+          <span class="tag-dot ${p.dotClass}"></span>
+          ${p.category}
+        </div>
+        <div class="project-name">${p.name}</div>
+        <div class="project-desc">${p.desc}</div>
+        <div class="project-footer">
+          <div class="project-stack">${p.stack.map(s => `<span class="stack-chip">${s}</span>`).join('')}</div>
+          <div class="project-score">${p.score}</div>
+        </div>
+      </a>
+    `).join('');
+  }
+  renderProjects('all');
+
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.dataset.filter;
+      renderProjects(activeFilter);
+    });
+  });
+
+  // ============================================
+  // PARTICLE CANVAS (Three.js-style 2D)
+  // ============================================
+  const canvas = document.getElementById('particle-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], angle = 0;
+
+  function resizeCanvas() {
+    W = canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+    H = canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  }
+
+  function initParticles() {
+    particles = [];
+    const count = 120;
+    const r = Math.min(canvas.offsetWidth, canvas.offsetHeight) * 0.38;
+    for (let i = 0; i < count; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(Math.random() * 2 - 1);
+      const rad = r * (0.5 + Math.random() * 0.5);
+      particles.push({
+        x: rad * Math.sin(phi) * Math.cos(theta),
+        y: rad * Math.sin(phi) * Math.sin(theta),
+        z: rad * Math.cos(phi),
+        size: Math.random() * 1.5 + 0.3
+      });
+    }
+  }
+
+  let mouseX = 0, mouseY = 0;
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseX = ((e.clientX - r.left) / r.width) * 2 - 1;
+    mouseY = ((e.clientY - r.top) / r.height) * 2 - 1;
+  });
+
+  function drawParticles() {
+    const W2 = canvas.offsetWidth, H2 = canvas.offsetHeight;
+    ctx.clearRect(0, 0, W2, H2);
+    angle += 0.004 + mouseX * 0.002;
+    const angleX = mouseY * 0.3;
+
+    const proj = particles.map(p => {
+      let x = p.x * Math.cos(angle) - p.z * Math.sin(angle);
+      let z = p.x * Math.sin(angle) + p.z * Math.cos(angle);
+      let y = p.y * Math.cos(angleX) - z * Math.sin(angleX);
+      z = p.y * Math.sin(angleX) + z * Math.cos(angleX);
+      const fov = 400;
+      const scale = fov / (fov + z);
+      return { sx: x * scale + W2 / 2, sy: y * scale + H2 / 2, scale, z };
+    }).sort((a, b) => a.z - b.z);
+
+    // Draw connections
+    for (let i = 0; i < proj.length; i++) {
+      for (let j = i + 1; j < proj.length; j++) {
+        const dx = proj[i].sx - proj[j].sx;
+        const dy = proj[i].sy - proj[j].sy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 80) {
+          ctx.beginPath();
+          ctx.moveTo(proj[i].sx, proj[i].sy);
+          ctx.lineTo(proj[j].sx, proj[j].sy);
+          ctx.strokeStyle = `rgba(16, 185, 129, ${(1 - dist / 80) * 0.15})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw particles
+    proj.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.sx, p.sy, p.scale * 1.2, 0, Math.PI * 2);
+      const alpha = (p.z + 300) / 600;
+      ctx.fillStyle = `rgba(16, 185, 129, ${Math.max(0.08, Math.min(0.7, alpha))})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(drawParticles);
+  }
+
+  resizeCanvas();
+  initParticles();
+  drawParticles();
+  window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+
+  // ============================================
+  // NAV SCROLL
+  // ============================================
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ============================================
+  // SCROLL REVEAL
+  // ============================================
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal — Repo Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #080808;
+    --bg-elevated: #111;
+    --bg-hover: #161616;
+    --border: #1f1f1f;
+    --border-subtle: #161616;
+    --text-primary: #ededed;
+    --text-secondary: #888;
+    --text-muted: #444;
+    --accent: #10b981;
+    --accent-dim: rgba(16,185,129,0.08);
+    --accent-border: rgba(16,185,129,0.2);
+    --font-sans: 'Geist', system-ui, sans-serif;
+    --font-mono: 'Geist Mono', monospace;
+  }
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,8,8,0.9);
+    backdrop-filter: blur(12px);
+  }
+  .nav-brand {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--text-primary); text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-brand .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse-dot 2.5s ease-in-out infinite;
+  }
+  .nav-back {
+    font-family: var(--font-mono);
+    font-size: 11px; letter-spacing: 0.08em;
+    color: var(--text-muted); text-decoration: none;
+    display: flex; align-items: center; gap: 6px;
+    transition: color 0.15s;
+  }
+  .nav-back:hover { color: var(--text-secondary); }
+
+  /* PIN GATE */
+  #pin-gate {
+    min-height: 100dvh;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    padding: 80px 24px 40px;
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  #pin-gate.hidden { opacity: 0; transform: scale(0.97); pointer-events: none; }
+
+  .gate-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--bg-elevated);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 28px;
+    animation: float 4s ease-in-out infinite;
+  }
+  .gate-title {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.03em;
+    color: var(--text-primary); margin-bottom: 8px; text-align: center;
+  }
+  .gate-sub {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 36px; text-align: center;
+  }
+
+  .pin-input-row {
+    display: flex; gap: 12px; margin-bottom: 20px;
+  }
+  .pin-digit {
+    width: 52px; height: 60px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--font-mono);
+    font-size: 24px; font-weight: 500;
+    color: var(--text-primary);
+    text-align: center;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    caret-color: var(--accent);
+  }
+  .pin-digit:focus {
+    border-color: var(--accent-border);
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.08);
+  }
+  .pin-digit.filled { border-color: rgba(16,185,129,0.3); }
+  .pin-digit.error { border-color: rgba(239,68,68,0.5); animation: shake 0.4s ease; }
+
+  .pin-enter-btn {
+    width: 216px; height: 44px;
+    background: var(--text-primary);
+    color: var(--bg);
+    border: none; border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 13px; font-weight: 600;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    margin-top: 8px;
+  }
+  .pin-enter-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+  .pin-enter-btn:active { transform: translateY(0); }
+
+  .pin-error-msg {
+    font-family: var(--font-mono); font-size: 11px;
+    color: #f87171; letter-spacing: 0.08em;
+    margin-top: 14px; text-align: center;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .pin-error-msg.show { opacity: 1; }
+
+  /* PORTAL CONTENT */
+  #portal-content {
+    display: none;
+    padding-top: 80px;
+    min-height: 100dvh;
+    animation: fade-in 0.5s ease;
+  }
+  #portal-content.visible { display: block; }
+
+  .portal-header {
+    max-width: 1200px; margin: 0 auto;
+    padding: 48px 48px 0;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 48px;
+  }
+  .portal-eyebrow {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 12px;
+  }
+  .portal-title {
+    font-size: 32px; font-weight: 600; letter-spacing: -0.04em;
+    color: var(--text-primary); margin-bottom: 8px;
+  }
+  .portal-sub { font-size: 14px; color: var(--text-secondary); }
+  .portal-stats {
+    display: flex; gap: 32px; margin-top: 24px; flex-wrap: wrap;
+  }
+  .pstat { display: flex; flex-direction: column; gap: 2px; }
+  .pstat-num {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.03em;
+    color: var(--text-primary);
+  }
+  .pstat-num span { color: var(--accent); }
+  .pstat-label {
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  /* CLUSTER SECTIONS */
+  .clusters { max-width: 1200px; margin: 0 auto; padding: 0 48px 80px; }
+
+  .cluster { margin-bottom: 48px; }
+  .cluster-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cluster-count {
+    font-size: 10px; color: var(--text-muted);
+  }
+
+  .repo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .repo-card {
+    background: var(--bg);
+    padding: 22px 24px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    display: block;
+    position: relative;
+  }
+  .repo-card:hover { background: var(--bg-hover); }
+  .repo-card-top {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; margin-bottom: 10px;
+  }
+  .repo-name {
+    font-size: 14px; font-weight: 600;
+    color: var(--text-primary); letter-spacing: -0.01em;
+  }
+  .repo-badge {
+    font-family: var(--font-mono); font-size: 9px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 3px; white-space: nowrap;
+    flex-shrink: 0; margin-left: 8px;
+  }
+  .badge-high { background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+  .badge-medium { background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+  .badge-external { background: rgba(99,102,241,0.1); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
+  .badge-duplicate { background: rgba(107,114,128,0.1); color: #6b7280; border: 1px solid rgba(107,114,128,0.2); }
+  .badge-live { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+
+  .repo-desc {
+    font-size: 12px; color: var(--text-secondary); line-height: 1.55;
+    margin-bottom: 14px;
+  }
+  .repo-meta {
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .repo-meta-item {
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-muted); letter-spacing: 0.06em;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .repo-meta-item .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--accent); opacity: 0.5;
+  }
+
+  .repo-arrow {
+    position: absolute; top: 18px; right: 18px;
+    width: 24px; height: 24px; border-radius: 5px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.15s, transform 0.15s;
+  }
+  .repo-card:hover .repo-arrow { opacity: 1; transform: translate(2px,-2px); }
+  .repo-arrow svg { width: 10px; height: 10px; stroke: var(--text-secondary); fill: none; stroke-width: 2; }
+
+  /* ANALYSIS MODAL */
+  #analysis-modal {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  #analysis-modal.open { display: flex; animation: fade-in 0.2s ease; }
+  .modal-box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 100%; max-width: 800px;
+    max-height: 80dvh;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    animation: modal-up 0.25s ease;
+  }
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .modal-title { font-size: 16px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em; }
+  .modal-close {
+    width: 28px; height: 28px; border-radius: 6px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--text-muted); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .modal-close:hover { color: var(--text-primary); border-color: #333; }
+  .modal-body {
+    padding: 28px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .modal-body::-webkit-scrollbar { width: 4px; }
+  .modal-body::-webkit-scrollbar-track { background: transparent; }
+  .modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ANALYSIS CONTENT STYLES */
+  .analysis-section { margin-bottom: 28px; }
+  .analysis-label {
+    font-family: var(--font-mono); font-size: 9px;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 10px;
+  }
+  .analysis-text {
+    font-size: 13px; color: var(--text-secondary); line-height: 1.7;
+  }
+  .analysis-text strong { color: var(--text-primary); font-weight: 600; }
+  .analysis-code {
+    font-family: var(--font-mono); font-size: 12px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px; margin-top: 10px;
+    color: #a3e7c9; line-height: 1.6; white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .analysis-table {
+    width: 100%; border-collapse: collapse; margin-top: 10px;
+  }
+  .analysis-table th {
+    font-family: var(--font-mono); font-size: 9px;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); text-align: left;
+    padding: 8px 12px; border-bottom: 1px solid var(--border);
+  }
+  .analysis-table td {
+    font-size: 12px; color: var(--text-secondary);
+    padding: 10px 12px; border-bottom: 1px solid var(--border-subtle);
+    line-height: 1.5;
+  }
+  .analysis-table tr:last-child td { border: none; }
+  .analysis-table tr:hover td { background: var(--bg); }
+  .tag-list { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .tag {
+    font-family: var(--font-mono); font-size: 9px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); background: var(--bg);
+    border: 1px solid var(--border); padding: 2px 8px; border-radius: 3px;
+  }
+  .verdict-box {
+    padding: 14px 16px; border-radius: 6px;
+    border-left: 2px solid var(--accent);
+    background: var(--accent-dim);
+    font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    margin-bottom: 24px;
+  }
+  .verdict-box strong { color: var(--text-primary); }
+  .action-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .action-list li {
+    font-size: 12px; color: var(--text-secondary); line-height: 1.5;
+    display: flex; gap: 8px; align-items: baseline;
+  }
+  .action-list li::before { content: '→'; color: var(--accent); font-size: 11px; flex-shrink: 0; }
+  .gh-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--accent); text-decoration: none;
+    border: 1px solid var(--accent-border);
+    background: var(--accent-dim);
+    padding: 6px 12px; border-radius: 4px;
+    transition: all 0.15s; margin-top: 4px;
+  }
+  .gh-link:hover { background: rgba(16,185,129,0.15); }
+
+  /* ANIMATIONS */
+  @keyframes fade-up { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fade-in { from { opacity:0; } to { opacity:1; } }
+  @keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.85); } }
+  @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+  @keyframes shake { 0%,100% { transform:translateX(0); } 25% { transform:translateX(-6px); } 75% { transform:translateX(6px); } }
+  @keyframes modal-up { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+  @media (max-width: 768px) {
+    .portal-header, .clusters { padding-left: 24px; padding-right: 24px; }
+    .repo-grid { grid-template-columns: 1fr; }
+    nav { padding: 0 24px; }
+    .portal-stats { gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-brand">
+    <span class="status-dot"></span>
+    Jesse
+  </a>
+  <a href="index.html" class="nav-back">
+    ← Back to portfolio
+  </a>
+</nav>
+
+<!-- PIN GATE -->
+<div id="pin-gate">
+  <div class="gate-icon">⬡</div>
+  <div class="gate-title">Repo Atlas</div>
+  <div class="gate-sub">Internal access only</div>
+  <div class="pin-input-row">
+    <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" id="d0" autofocus>
+    <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" id="d1">
+    <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" id="d2">
+    <input class="pin-digit" type="password" maxlength="1" inputmode="numeric" id="d3">
+  </div>
+  <button class="pin-enter-btn" onclick="checkPin()">Enter</button>
+  <div class="pin-error-msg" id="pinError">Incorrect PIN</div>
+</div>
+
+<!-- PORTAL CONTENT -->
+<div id="portal-content">
+  <div class="portal-header">
+    <div class="portal-eyebrow">Repo Atlas · Internal</div>
+    <h1 class="portal-title">Repository Intelligence</h1>
+    <p class="portal-sub">Deep analysis of every repo across agenticjess-star and GenJess. Updated daily by the cron agent.</p>
+    <div class="portal-stats">
+      <div class="pstat">
+        <div class="pstat-num">9<span>/41</span></div>
+        <div class="pstat-label">Analyzed</div>
+      </div>
+      <div class="pstat">
+        <div class="pstat-num">22<span>%</span></div>
+        <div class="pstat-label">Complete</div>
+      </div>
+      <div class="pstat">
+        <div class="pstat-num">3<span>⭐⭐⭐</span></div>
+        <div class="pstat-label">HIGH value repos</div>
+      </div>
+      <div class="pstat">
+        <div class="pstat-num">Jun 6</div>
+        <div class="pstat-label">Last update</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="clusters">
+
+    <!-- CLUSTER: AGENTIC & OUTBOUND -->
+    <div class="cluster">
+      <div class="cluster-label">
+        Agentic &amp; Outbound
+        <span class="cluster-count">7 / 10 analyzed</span>
+      </div>
+      <div class="repo-grid">
+
+        <div class="repo-card" onclick="openModal('genjess-os')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">GenJess_OS</div>
+            <span class="repo-badge badge-high">HIGH ⭐⭐⭐</span>
+          </div>
+          <div class="repo-desc">Outbound Studio monorepo — 7-agent autonomous sales system, 25 skill modules, 6 live client sites, 31 integrations.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>jGPT-Automated</span>
+            <span class="repo-meta-item">5.2MB</span>
+            <span class="repo-meta-item">May 26</span>
+          </div>
+        </div>
+
+        <div class="repo-card" onclick="openModal('outbound-deliverables')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">outbound-studio (deliverables)</div>
+            <span class="repo-badge badge-live">LIVE</span>
+          </div>
+          <div class="repo-desc">Real client sites delivered: B&R Power Washing, Alkemy Barber, Blawgy (A/B/C), Ventura, Ottine. AEO-native with llms.txt.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>jGPT-Automated</span>
+            <span class="repo-meta-item">6.1MB</span>
+            <span class="repo-meta-item">May 30</span>
+          </div>
+        </div>
+
+        <div class="repo-card" onclick="openModal('teaims')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">TEAIMS</div>
+            <span class="repo-badge badge-high">HIGH ⭐⭐⭐</span>
+          </div>
+          <div class="repo-desc">9-agent startup launch system. Adversarial debate between agents, HITL checkpoints, decision logging, context file system.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>GenJess</span>
+            <span class="repo-meta-item">399KB</span>
+            <span class="repo-meta-item">Mar 28</span>
+          </div>
+        </div>
+
+        <div class="repo-card" onclick="openModal('context-canvas')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">context-canvas</div>
+            <span class="repo-badge badge-high">HIGH ⭐⭐⭐</span>
+          </div>
+          <div class="repo-desc">Multi-user SaaS — context/prompt management with Vault, public sharing, Supabase auth, billing. Full product lifecycle.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>agenticjess-star</span>
+            <span class="repo-meta-item">464KB</span>
+            <span class="repo-meta-item">May 19</span>
+          </div>
+        </div>
+
+        <div class="repo-card" onclick="openModal('agenticjess')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">AgenticJess</div>
+            <span class="repo-badge badge-medium">MEDIUM ⭐⭐</span>
+          </div>
+          <div class="repo-desc">Gemini Live voice-navigated portfolio SPA. 3D audio-reactive particle orb + function calling to navigate the site. Needs content refresh.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>GenJess</span>
+            <span class="repo-meta-item">138KB</span>
+            <span class="repo-meta-item">May 8</span>
+          </div>
+        </div>
+
+        <div class="repo-card" onclick="openModal('agentarena')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">agentarena</div>
+            <span class="repo-badge badge-medium">MEDIUM ⭐⭐</span>
+          </div>
+          <div class="repo-desc">Multi-agent debate/simulation UI. Design canvas for agent interaction patterns — no backend, polished prototype.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>GenJess</span>
+            <span class="repo-meta-item">73KB</span>
+            <span class="repo-meta-item">Mar 13</span>
+          </div>
+        </div>
+
+        <div class="repo-card" onclick="openModal('agencydup')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">AgentAgency</div>
+            <span class="repo-badge badge-duplicate">DUPLICATE</span>
+          </div>
+          <div class="repo-desc">Earlier snapshot of GenJess_OS (frozen May 11). Identical codebase — points to GenJess_OS as canonical. Consider archiving.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>agenticjess-star</span>
+            <span class="repo-meta-item">5.1MB</span>
+            <span class="repo-meta-item">May 11</span>
+          </div>
+        </div>
+
+        <div class="repo-card" onclick="openModal('careerops')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">career-ops</div>
+            <span class="repo-badge badge-external">EXTERNAL</span>
+          </div>
+          <div class="repo-desc">Open-source job search pipeline by Santiago Fernández (santifer.io). Forked — not Jesse's original work. Claude Code + Playwright + Go TUI.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>GenJess</span>
+            <span class="repo-meta-item">8.5MB</span>
+            <span class="repo-meta-item">Apr 6</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CLUSTER: LOCALCHECK -->
+    <div class="cluster">
+      <div class="cluster-label">
+        LocalCheck
+        <span class="cluster-count">1 / 6 analyzed</span>
+      </div>
+      <div class="repo-grid">
+
+        <div class="repo-card" onclick="openModal('localchecklive')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">LocalCheckLive</div>
+            <span class="repo-badge badge-high">HIGH ⭐⭐⭐</span>
+          </div>
+          <div class="repo-desc">Expo native mobile app — feature-complete. ELO system, Mapbox courts, game matchmaking, real-time presence. Built in 6 days.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>agenticjess-star</span>
+            <span class="repo-meta-item">12.5MB</span>
+            <span class="repo-meta-item">May 26</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CLUSTER: TRADING & FINANCE -->
+    <div class="cluster">
+      <div class="cluster-label">
+        Trading &amp; Finance
+        <span class="cluster-count">1 / 6 analyzed</span>
+      </div>
+      <div class="repo-grid">
+
+        <div class="repo-card" onclick="openModal('alphagauge')">
+          <div class="repo-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></div>
+          <div class="repo-card-top">
+            <div class="repo-name">alpha-gauge</div>
+            <span class="repo-badge badge-medium">MEDIUM ⭐⭐</span>
+          </div>
+          <div class="repo-desc">Polymarket dashboard + WebSocket price feeds + Particle Filter edge detection. 1 GitHub star. Stalled May 24.</div>
+          <div class="repo-meta">
+            <span class="repo-meta-item"><span class="dot"></span>agenticjess-star</span>
+            <span class="repo-meta-item">513KB</span>
+            <span class="repo-meta-item">May 24</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- UPCOMING -->
+    <div class="cluster">
+      <div class="cluster-label">
+        Coming Soon — Portfolio, OmniaVital, Voice, Finance
+        <span class="cluster-count">0 / 26 analyzed</span>
+      </div>
+      <div class="repo-grid">
+        <div class="repo-card" style="opacity:0.4; cursor:default;">
+          <div class="repo-card-top"><div class="repo-name">GenerativeJesse-LIVE</div><span class="repo-badge badge-duplicate">PENDING</span></div>
+          <div class="repo-desc">Portfolio · GenJess · 9.3MB</div>
+        </div>
+        <div class="repo-card" style="opacity:0.4; cursor:default;">
+          <div class="repo-card-top"><div class="repo-name">OmniVital</div><span class="repo-badge badge-duplicate">PENDING</span></div>
+          <div class="repo-desc">Health Tech · GenJess · 843KB</div>
+        </div>
+        <div class="repo-card" style="opacity:0.4; cursor:default;">
+          <div class="repo-card-top"><div class="repo-name">localcheck (web)</div><span class="repo-badge badge-duplicate">PENDING</span></div>
+          <div class="repo-desc">LocalCheck · agenticjess-star · 1.1MB</div>
+        </div>
+        <div class="repo-card" style="opacity:0.4; cursor:default;">
+          <div class="repo-card-top"><div class="repo-name">OptIQ</div><span class="repo-badge badge-duplicate">PENDING</span></div>
+          <div class="repo-desc">Trading · GenJess · 842KB</div>
+        </div>
+        <div class="repo-card" style="opacity:0.4; cursor:default;">
+          <div class="repo-card-top"><div class="repo-name">Medical-Voice-Agent</div><span class="repo-badge badge-duplicate">PENDING</span></div>
+          <div class="repo-desc">Voice · GenJess · 2.3MB</div>
+        </div>
+        <div class="repo-card" style="opacity:0.4; cursor:default;">
+          <div class="repo-card-top"><div class="repo-name">+26 more...</div><span class="repo-badge badge-duplicate">PENDING</span></div>
+          <div class="repo-desc">See roadmap.html for full schedule</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ANALYSIS MODAL -->
+<div id="analysis-modal" onclick="closeOnBackdrop(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Analysis</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ============================================
+// PIN GATE
+// ============================================
+const PIN = '7787';
+const digits = ['d0','d1','d2','d3'];
+
+// Auto-advance between inputs
+digits.forEach((id, i) => {
+  const el = document.getElementById(id);
+  el.addEventListener('input', () => {
+    el.classList.toggle('filled', el.value !== '');
+    if (el.value && i < 3) document.getElementById(digits[i+1]).focus();
+    if (i === 3 && el.value) checkPin();
+  });
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById(digits[i-1]).focus();
+    if (e.key === 'Enter') checkPin();
+  });
+});
+
+function checkPin() {
+  const entered = digits.map(id => document.getElementById(id).value).join('');
+  if (entered === PIN) {
+    document.getElementById('pin-gate').classList.add('hidden');
+    setTimeout(() => {
+      document.getElementById('pin-gate').style.display = 'none';
+      document.getElementById('portal-content').classList.add('visible');
+    }, 400);
+  } else {
+    const errorEl = document.getElementById('pinError');
+    errorEl.classList.add('show');
+    digits.forEach(id => {
+      const el = document.getElementById(id);
+      el.classList.add('error');
+      el.value = '';
+      el.classList.remove('filled');
+      setTimeout(() => el.classList.remove('error'), 500);
+    });
+    setTimeout(() => errorEl.classList.remove('show'), 2000);
+    document.getElementById('d0').focus();
+  }
+}
+
+// ============================================
+// ANALYSIS DATA
+// ============================================
+const ANALYSES = {
+  'genjess-os': {
+    title: 'GenJess_OS — Deep Analysis',
+    badge: 'HIGH ⭐⭐⭐',
+    badgeClass: 'badge-high',
+    account: 'jGPT-Automated',
+    github: 'https://github.com/jGPT-Automated/GenJess_OS',
+    deployed: 'https://ios-launch-plan.vercel.app',
+    verdict: '<strong>GenJess_OS is Outbound Studio\'s operating system</strong> — the full production monorepo for the 7-agent autonomous outbound sales system. 25 skill modules, 31 connected integrations, contract-first API, dual-theme frontend (dark landing / light dashboard). Real clients, real money.',
+    sections: [
+      { label: 'Stack', content: 'pnpm workspaces · Express 5 + Clerk auth · PostgreSQL + Drizzle ORM · OpenAPI → Zod → React Query codegen · React 18 + Vite + Tailwind · esbuild CJS bundle' },
+      { label: 'DB Schema', content: '3 tables: <code>leads</code> (businessName, domain, status, opportunityTag, siteUrl) · <code>pipeline_runs</code> (leadId FK, currentAgent, agentLogs, emailDraft, auditScore) · <code>activity</code> (type, businessName, leadId, runId)' },
+      { label: 'The Skills Library', content: '25 skill modules in .agents/skills/ — structured for AI agent consumption. Standout: ui-ux-pro-max (44KB, 50+ styles, 161 palettes, 57 font pairings, 99 UX guidelines). Load these at start of any design/iOS analysis session.' },
+      { label: 'Client Deliverables', content: 'B&R Power Washing · Alkemy Barber Studio · Blawgy (A/B/C variants — active A/B testing) · Ventura · Ottine Mineral Springs. All AEO-native with llms.txt.' },
+      { label: 'Actions', type: 'actions', items: ['Point all portfolio references here — this is canonical', 'Load ui-ux-pro-max skill before design work', 'Consider making the skills library public as a standalone resource'] }
+    ]
+  },
+  'outbound-deliverables': {
+    title: 'outbound-studio (deliverables)',
+    badge: 'LIVE CLIENT WORK',
+    badgeClass: 'badge-live',
+    account: 'jGPT-Automated',
+    github: 'https://github.com/jGPT-Automated/outbound-studio',
+    verdict: '<strong>Real client work — 6 production spec sites</strong> delivered to SMB clients. Active as of May 30, 2026. AEO-native design is ahead of market — including llms.txt in client sites makes businesses citable by AI search engines.',
+    sections: [
+      { label: 'Clients', content: 'B&R Power Washing · Alkemy Barber Studio · Blawgy (3 variants: main, B, persona) · Ventura · Ottine Mineral Springs' },
+      { label: 'AEO Signal', content: 'llms.txt included in spec sites — this is Answer Engine Optimization. Businesses become citable by AI search (ChatGPT, Perplexity, Claude). Almost nobody is doing this at the client site level yet.' },
+      { label: 'A/B Testing', content: 'Blawgy has 3 active variants. Alkemy has demo vs. main. This maps directly to the Persona Tester agent in Outbound Studio — the system is actually being used in production.' },
+      { label: 'Note', content: 'jGPT-Automated is canonical (agenticjess-star mirror is 2 days behind). Active pipeline — last commit May 30.' },
+      { label: 'Actions', type: 'actions', items: ['Feature in portfolio as "real client work" — not demo', 'AEO differentiation angle is worth calling out explicitly', 'Consider case study: Outbound Studio → client delivered → result'] }
+    ]
+  },
+  'teaims': {
+    title: 'TEAIMS (Agent Armory) — Deep Analysis',
+    badge: 'HIGH ⭐⭐⭐',
+    badgeClass: 'badge-high',
+    account: 'GenJess',
+    github: 'https://github.com/GenJess/TEAIMS',
+    verdict: '<strong>Production-grade multi-agent orchestration system for startup launch automation.</strong> 9 specialized agents with adversarial debate, HITL checkpoints, decision logging, and a context file system (Soul.md, Skills.md, Judgements.md). Scored 4.4/5 in Jesse\'s own portfolio audit.',
+    sections: [
+      { label: 'The 9-Agent Crew', content: 'Market Strategist (A1) → Visionary PM (A2) → Architect (A3) → Implementation Lead (A4) → Security Auditor (A5) → Growth Strategist (A6) → Compliance Officer (A7) → Launch Director (A8) → Chief of Staff (A9 — orchestrator)' },
+      { label: 'Key Mechanics', content: 'Adversarial debate between agents before finalizing decisions · HITL framework captures uncertain decisions → codified into reusable Judgements.md · Context file system stores organizational identity (shareable via tokenized URLs) · Rejection at any stage resets the pipeline' },
+      { label: 'Stack', content: 'React 18 · TypeScript · Python (agent logic) · FastAPI · LLM (Claude/GPT) · Vector storage for context files' },
+      { label: 'Actions', type: 'actions', items: ['Feature as Tier 1 portfolio piece — this is the capstone', 'README needs overhaul — current docs are sparse', 'Need a deployed URL for demo access', 'Roadmap: B2B go-to-market, API access tier'] }
+    ]
+  },
+  'context-canvas': {
+    title: 'context-canvas — Deep Analysis',
+    badge: 'HIGH ⭐⭐⭐',
+    badgeClass: 'badge-high',
+    account: 'agenticjess-star',
+    github: 'https://github.com/agenticjess-star/context-canvas',
+    verdict: '<strong>Multi-user context/prompt management SaaS platform — live, shipped, full product lifecycle.</strong> Auth, billing, Vault, public sharing via slugged URLs, real-time Supabase. Last production fix: May 19, 2026.',
+    sections: [
+      { label: 'Stack', content: 'React 18 + React Router · TypeScript + Vite · Tailwind + shadcn/ui (Radix UI) · React Hook Form + Zod · TanStack Query · Supabase (auth + DB + realtime) · Stripe billing' },
+      { label: 'Core Flows', content: 'Create context → Edit + refine → Save to Vault → Share publicly (/@username/:slug) → Manage profile → Upgrade to premium' },
+      { label: 'Portfolio Angle', content: 'Full SaaS lifecycle: schema → auth → billing → deploy → production fixes. This proves product ownership, not just feature shipping.' },
+      { label: 'Actions', type: 'actions', items: ['Feature in portfolio as "full SaaS product" — not a project', 'Get user count / retention data if available', 'Add to Tier 1 portfolio case studies alongside LocalCheck'] }
+    ]
+  },
+  'agenticjess': {
+    title: 'AgenticJess — Deep Analysis',
+    badge: 'MEDIUM ⭐⭐',
+    badgeClass: 'badge-medium',
+    account: 'GenJess',
+    github: 'https://github.com/GenJess/AgenticJess',
+    verdict: '<strong>Gemini-powered personal portfolio SPA where the portfolio itself is agentic.</strong> 3D audio-reactive particle orb + Gemini Live voice session + function calls to navigate the site. Strong concept, stale content — needs LocalCheck/TEAIMS/OmniaVital added.',
+    sections: [
+      { label: 'The Standout: Assistant.tsx (13KB)', content: '120 3D particles on Canvas (no Three.js) · Audio-reactive: voice level drives particle expansion · Gemini Live API (real-time bidirectional audio) · FunctionDeclaration tool calls navigate the app UI · Portfolio-aware: seeded with Jesse\'s project data' },
+      { label: 'Stack', content: 'React 18 + TypeScript + Vite · @google/genai (Gemini Live) · Hash router (no framework dependency) · 22 modular components · geminiService.ts decoupled from UI' },
+      { label: 'What\'s Missing', content: 'index.css is 0 bytes · No deployed URL · No LocalCheck/TEAIMS/OmniVital/OWS×x402 in constants.ts · Product grid not wired to payments' },
+      { label: 'Actions', type: 'actions', items: ['Extract Assistant.tsx — the 3D orb is reusable for any portfolio site', 'Update constants.ts with current projects before any portfolio use', 'Compare to GenerativeJesse-LIVE (Day 5) to determine which has better UI'] }
+    ]
+  },
+  'agentarena': {
+    title: 'agentarena — Deep Analysis',
+    badge: 'MEDIUM ⭐⭐',
+    badgeClass: 'badge-medium',
+    account: 'GenJess',
+    github: 'https://github.com/GenJess/agentarena',
+    verdict: '<strong>Interactive UI for designing multi-agent debates/simulations.</strong> Clean React/TypeScript, good interaction design. No backend, no model integration — a polished prototype/playground, not a full product.',
+    sections: [
+      { label: 'What It Does', content: 'Pick event type (debate/panel/tournament/brainstorm) → Build agent roster (name, perspective, communication style, memory type, guardrails) → Run simulation → See multi-round conversation flow visualization' },
+      { label: 'Stack', content: 'React 18 + TypeScript + Vite · Tailwind CSS + Lucide React · No backend · No real LLM integration' },
+      { label: 'Relationship to TEAIMS', content: 'agentarena is the interaction design prototype. TEAIMS is the full realization. Feature TEAIMS — agentarena shows the design thinking behind it.' },
+      { label: 'Actions', type: 'actions', items: ['Do NOT feature separately from TEAIMS', 'Reference as "the design exploration that led to TEAIMS"', 'The interaction patterns here (memory types, communication styles) are worth borrowing into TEAIMS docs'] }
+    ]
+  },
+  'agencydup': {
+    title: 'AgentAgency — Analysis',
+    badge: 'DUPLICATE',
+    badgeClass: 'badge-duplicate',
+    account: 'agenticjess-star',
+    github: 'https://github.com/agenticjess-star/AgentAgency',
+    verdict: '<strong>Earlier snapshot of GenJess_OS</strong> pushed to agenticjess-star. Frozen at May 11 — 2 weeks behind GenJess_OS. Missing ios-launch-plan artifact.',
+    sections: [
+      { label: 'Difference', content: 'GenJess_OS: last commit May 26, has ios-launch-plan artifact. AgentAgency: frozen May 11, missing ios-launch-plan.' },
+      { label: 'Actions', type: 'actions', items: ['Do NOT use as reference — always point to GenJess_OS', 'Do NOT feature separately in portfolio', 'Consider archiving this repo to reduce confusion'] }
+    ]
+  },
+  'careerops': {
+    title: 'career-ops — Analysis',
+    badge: 'EXTERNAL (not Jesse\'s)',
+    badgeClass: 'badge-external',
+    account: 'GenJess',
+    github: 'https://github.com/GenJess/career-ops',
+    verdict: '<strong>Open-source tool by Santiago Fernández (santifer.io)</strong> — not Jesse\'s original work. Jesse forked it and added a Buy Me a Coffee badge. Licensed MIT. Original: github.com/santifer/career-ops.',
+    sections: [
+      { label: 'What It Is (the tool)', content: 'Claude Code-powered job search pipeline. A-F scoring on 10 dimensions · ATS PDF generation · Playwright scraping (Greenhouse/Ashby/Lever) · Batch processing with sub-agents · Go TUI dashboard · Interview story bank' },
+      { label: 'Jesse\'s Contribution', content: 'Added FUNDING.yml + Buy Me a Coffee badge. That\'s it.' },
+      { label: 'Actions', type: 'actions', items: ['Do NOT include in portfolio as Jesse\'s work', 'Do NOT reference in cover letters or case studies', 'Consider removing from GenJess account to avoid attribution confusion'] }
+    ]
+  },
+  'localchecklive': {
+    title: 'LocalCheckLive — Deep Analysis',
+    badge: 'HIGH ⭐⭐⭐',
+    badgeClass: 'badge-high',
+    account: 'agenticjess-star',
+    github: 'https://github.com/agenticjess-star/LocalCheckLive',
+    verdict: '<strong>Feature-complete Expo native mobile app — built in 6 days (May 20–26).</strong> ELO ranking, Mapbox courts, game matchmaking, real-time presence. Ready for Expo Go testing. Production-quality mobile architecture.',
+    sections: [
+      { label: 'Stack', content: 'Expo (React Native) · TypeScript · Supabase (auth + realtime) · Mapbox GL · ELO algorithm · Zustand state · Custom design system — Brutal Minimalism' },
+      { label: 'Feature Set', content: 'Court discovery (Mapbox) · Check-in + presence · ELO skill ranking · Game creation + matchmaking · Player profiles · Invite system · Real-time game status' },
+      { label: 'Design System', content: '"Brutal Minimalism" — tight grid, heavy contrast, no decoration. Consistent with LocalCheck web app visual identity.' },
+      { label: 'Actions', type: 'actions', items: ['Test on Expo Go immediately — this is ready', 'Submit to App Store when ready (not blocked on code)', 'Feature prominently in portfolio — mobile + web story complete'] }
+    ]
+  },
+  'alphagauge': {
+    title: 'alpha-gauge — Deep Analysis',
+    badge: 'MEDIUM ⭐⭐',
+    badgeClass: 'badge-medium',
+    account: 'agenticjess-star',
+    github: 'https://github.com/agenticjess-star/alpha-gauge',
+    verdict: '<strong>Polymarket dashboard with WebSocket real-time price feeds and Particle Filter edge detection.</strong> 1 GitHub star. Stalled May 24 (53+ days). Good integration work but needs deployment to unlock full value.',
+    sections: [
+      { label: 'Stack', content: 'React 18 · TypeScript · WebSocket (Polymarket live data) · Particle Filter algorithm · Custom charting · Vercel deploy config' },
+      { label: 'What It Does', content: 'Live Polymarket market browser · Real-time price feeds via WebSocket · Particle Filter = Bayesian edge detection (finds where market price diverges from estimated true probability) · Historical patterns + momentum signals' },
+      { label: 'Why It\'s Stalled', content: 'Likely waiting on a key to unlock full Polymarket API or a decision on the trading strategy. The code is done — no deploy URL found.' },
+      { label: 'Actions', type: 'actions', items: ['Deploy to Vercel — config already present, should be 1 command', 'Feature as "trading intelligence tool" in fintech section', 'Pair with OWS×x402 for a fintech narrative (prediction markets + payments)'] }
+    ]
+  }
+};
+
+// ============================================
+// MODAL
+// ============================================
+function openModal(id) {
+  const data = ANALYSES[id];
+  if (!data) return;
+
+  document.getElementById('modal-title').textContent = data.title;
+
+  const badgeHtml = `<span class="repo-badge ${data.badgeClass}" style="display:inline-block;margin-bottom:16px;">${data.badge}</span>`;
+  const metaHtml = `<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">Account: <span style="color:var(--text-secondary)">${data.account}</span></span>
+    ${data.deployed ? `<a href="${data.deployed}" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);text-decoration:none;">↗ Live</a>` : ''}
+    <a href="${data.github}" target="_blank" class="gh-link">↗ GitHub</a>
+  </div>`;
+  const verdictHtml = `<div class="verdict-box">${data.verdict}</div>`;
+
+  const sectionsHtml = data.sections.map(s => {
+    if (s.type === 'actions') {
+      return `<div class="analysis-section">
+        <div class="analysis-label">${s.label}</div>
+        <ul class="action-list">${s.items.map(i => `<li>${i}</li>`).join('')}</ul>
+      </div>`;
+    }
+    return `<div class="analysis-section">
+      <div class="analysis-label">${s.label}</div>
+      <div class="analysis-text">${s.content}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modal-body').innerHTML = badgeHtml + metaHtml + verdictHtml + sectionsHtml;
+  document.getElementById('analysis-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('analysis-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeOnBackdrop(e) {
+  if (e.target === document.getElementById('analysis-modal')) closeModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+</body>
+</html>

@@ -1,135 +1,123 @@
 # 🗺️ Repo Atlas
 
 **Owner:** Jesse Harrick  
-**Managed by:** jGPT-Automated  
-**Focus accounts:** [agenticjess-star](https://github.com/agenticjess-star) · [GenJess](https://github.com/GenJess)  
-**Mission:** Deep inventory, analysis, and synthesis of Jesse's GitHub work. One truth. No assumptions.
+**Managed by:** jGPT-Automated (cron agent, daily at 10am CST)  
+**Focus accounts:** [agenticjess-star](https://github.com/agenticjess-star) · [GenJess](https://github.com/GenJess)
 
 ---
 
 ## What This Is
 
-A systematic, methodical deep-dive across two primary accounts:
+This repo is a **website** — not just a collection of files.
 
-- **[agenticjess-star](https://github.com/agenticjess-star)** — 26 repos
-- **[GenJess](https://github.com/GenJess)** — 74 repos
+The agent maintains three layers:
 
-**Roadmap scope:** 41 repos (after excluding external clones and stubs)  
-**Pace:** 2–5 repos per day depending on size  
-**Est. completion:** ~3 weeks  
-**Already analyzed:** GenJess_OS · outbound-studio (deliverables)
+| Layer | File | Audience | Auth |
+|-------|------|----------|------|
+| Public landing | `index.html` | Hiring managers, clients | None |
+| Roadmap | `roadmap.html` | Public | None |
+| Internal portal | `portal.html` | Jesse only (pin: private) | PIN gate |
 
-Two outputs being built in parallel:
-- **Internal tracker** — detailed analysis, code snippets, architecture notes, linked to source (for Jesse + agents)
-- **External portfolio surface** — curated, concise, public-facing (for hiring managers + clients)
+Each repo analysis lives inside the portal as a stylized HTML view — click any repo card to open a rich detail modal with verdict, stack breakdown, architecture notes, and action items.
 
 ---
 
-## Current Status
+## Site Pages
 
-| Tier | Cluster | Repos | Analyzed | Status |
-|------|---------|-------|----------|--------|
-| 1 | Agentic & Outbound | 10 | 8 ✅ | ✅ COMPLETE |
-| 2 | Portfolio & Identity | 9 | 0 | 🔴 NEXT |
-| 3 | LocalCheck | 6 | 0 | 🔴 TODO |
-| 4 | OmniaVital | 7 | 0 | 🔴 TODO |
-| 5 | Trading & Finance | 6 | 0 | 🔴 TODO |
-| 6 | Voice & Conversational | 3 | 0 | 🔴 TODO |
-| — | **TOTAL** | **41** | **5** | — |
-
-> **Analyzed:** GenJess_OS ✅ · outbound-studio ✅ · AgentAgency ✅ · career-ops ✅ · AgenticJess ✅ · TEAIMS ✅ · agentarena ✅ · context-canvas ✅
-
-**Cluster 1 Summary:**
-- TEAIMS: ⭐⭐⭐ HIGH — foundational multi-agent orchestration (9-agent startup crew)
-- context-canvas: ⭐⭐⭐ HIGH — full-stack SaaS with billing + real users
-- agentarena: ⭐⭐ MEDIUM — agent design playground (UI only, no backend)
-
-> **Already done (pre-roadmap):** `jGPT-Automated/GenJess_OS` · `jGPT-Automated/outbound-studio` — see `analysis/` folder.
+- **`index.html`** — Public-facing portfolio landing. Particle canvas, project grid, skills marquee, about, contact. Emerald accent, Geist/Geist Mono typography, Vercel/Linear DNA.
+- **`roadmap.html`** — Visual project roadmap. All active priorities, blockers, and next actions in card form.
+- **`portal.html`** — Internal repo intelligence portal. PIN-gated. All analyzed repos displayed as interactive cards with expandable detail modals.
 
 ---
 
-## 📋 Full Roadmap — 41 Repos
+## Agent Workflow (Daily Cron)
 
-### TIER 1 — Agentic & Outbound *(Week 1)*
+Each day at 10am CST, the cron agent:
 
-| Day | Repo | Account | Size | What It Is |
-|-----|------|---------|------|-----------|
-| Day 2 | [AgentAgency](https://github.com/agenticjess-star/AgentAgency) | agenticjess-star | 5.1MB | Agent fleet dashboard — Replit-built |
-| Day 2 | [career-ops](https://github.com/GenJess/career-ops) | GenJess | 8.5MB | 14-skill AI job search system, Go dashboard |
-| Day 2 | [AgenticJess](https://github.com/GenJess/AgenticJess) | GenJess | 138KB | Portfolio/identity for the agentic persona |
-| Day 3 | [TEAIMS](https://github.com/GenJess/TEAIMS) | GenJess | 399KB | Multi-agent adversarial debate system |
-| Day 3 | [agentarena](https://github.com/GenJess/agentarena) | GenJess | 73KB | Competitive multi-agent UI |
-| Day 3 | [context-canvas](https://github.com/agenticjess-star/context-canvas) | agenticjess-star | 464KB | Context management tool |
-| Day 4 | [context-weaver](https://github.com/agenticjess-star/context-weaver) | agenticjess-star | 1.9MB | Context/knowledge weaving tool |
-| Day 4 | [instruction-hub](https://github.com/agenticjess-star/instruction-hub) | agenticjess-star | 421KB | Centralized instruction/prompt hub |
-| Day 4 | [phone-lookup-mcp](https://github.com/GenJess/phone-lookup-mcp) | GenJess | 24KB | Reverse phone MCP + x402 micropayments |
-| Day 4 | [phone-lookup-mcp](https://github.com/agenticjess-star/phone-lookup-mcp) | agenticjess-star | 11KB | Mirror — compare to GenJess version |
+1. **Reads** `meta/progress-log.md` to find exactly where it left off
+2. **Scans** for any new repos or pushes across agenticjess-star + GenJess (last 24h)
+3. **Analyzes** the next 3 repos from the roadmap queue — reads actual code via GitHub API (file tree, key source files, commit history, not just README)
+4. **Writes** analysis to `analysis/<cluster>/<repo>.md`
+5. **Updates** `portal.html` — adds new repo cards + analysis data to the ANALYSES object
+6. **Updates** `meta/progress-log.md` CURRENT POSITION and portal stats
+7. **Commits + pushes** all changes to this repo
+8. **Telegrams** Jesse a summary of what was found
+
+> **The output is the website, not the markdown files.** The .md files in `analysis/` are the raw source. The portal is the presentation layer.
 
 ---
+
+## Roadmap — 41 Repos, 6 Tiers
+
+### TIER 1 — Agentic & Outbound *(Days 1–4, mostly done)*
+
+| Status | Repo | Account | Size | What It Is |
+|--------|------|---------|------|-----------|
+| ✅ | [GenJess_OS](https://github.com/jGPT-Automated/GenJess_OS) | jGPT-Automated | 5.2MB | Outbound Studio monorepo — canonical |
+| ✅ | [outbound-studio](https://github.com/jGPT-Automated/outbound-studio) | jGPT-Automated | 6.1MB | Real client deliverables (6 sites) |
+| ✅ | [AgentAgency](https://github.com/agenticjess-star/AgentAgency) | agenticjess-star | 5.1MB | GenJess_OS mirror (DUPLICATE) |
+| ✅ | [career-ops](https://github.com/GenJess/career-ops) | GenJess | 8.5MB | OSS job search tool (EXTERNAL) |
+| ✅ | [AgenticJess](https://github.com/GenJess/AgenticJess) | GenJess | 138KB | Gemini voice portfolio SPA |
+| ✅ | [TEAIMS](https://github.com/GenJess/TEAIMS) | GenJess | 399KB | 9-agent startup launch system |
+| ✅ | [agentarena](https://github.com/GenJess/agentarena) | GenJess | 73KB | Agent debate UI prototype |
+| ✅ | [context-canvas](https://github.com/agenticjess-star/context-canvas) | agenticjess-star | 464KB | Multi-user context SaaS |
+| 🔴 | [context-weaver](https://github.com/agenticjess-star/context-weaver) | agenticjess-star | 1.9MB | Next |
+| 🔴 | [instruction-hub](https://github.com/agenticjess-star/instruction-hub) | agenticjess-star | 421KB | Next |
 
 ### TIER 2 — Portfolio & Identity *(Week 1–2)*
 
-| Day | Repo | Account | Size | What It Is |
-|-----|------|---------|------|-----------|
-| Day 5 | [GenerativeJesse-LIVE](https://github.com/GenJess/GenerativeJesse-LIVE) | GenJess | 9.3MB | Production portfolio — generativejesse.com |
-| Day 5 | [GenJess.github.io](https://github.com/GenJess/GenJess.github.io) | GenJess | 36KB | GitHub Pages — AI PM case studies |
-| Day 5 | [agentjess-portfolio](https://github.com/GenJess/agentjess-portfolio) | GenJess | 71KB | ElevenLabs voice agent portfolio |
-| Day 6 | [GenJess-v1](https://github.com/GenJess/GenJess-v1) | GenJess | 67KB | Voice agent portfolio v1 |
-| Day 6 | [JessesPortfolio](https://github.com/GenJess/JessesPortfolio) | GenJess | 53KB | WIP portfolio |
-| Day 6 | [Scrolling-Portfolio](https://github.com/GenJess/Scrolling-Portfolio) | GenJess | 81KB | Scroll-based portfolio |
-| Day 7 | [AgentInvesting](https://github.com/GenJess/AgentInvesting) | GenJess | 38KB | Angel investing AI platform |
-| Day 7 | [AreaScanner-Pro](https://github.com/GenJess/AreaScanner-Pro) | GenJess | 65KB | Location scanner |
-| Day 7 | [Promptry](https://github.com/GenJess/Promptry) | GenJess | 522KB | Image prompting skill builder |
-
----
+| Status | Repo | Account | Size |
+|--------|------|---------|------|
+| 🔴 | GenerativeJesse-LIVE | GenJess | 9.3MB |
+| 🔴 | GenJess.github.io | GenJess | 36KB |
+| 🔴 | agentjess-portfolio | GenJess | 71KB |
+| 🔴 | GenJess-v1 | GenJess | 67KB |
+| 🔴 | JessesPortfolio | GenJess | 53KB |
+| 🔴 | Scrolling-Portfolio | GenJess | 81KB |
+| 🔴 | AgentInvesting | GenJess | 38KB |
+| 🔴 | AreaScanner-Pro | GenJess | 65KB |
+| 🔴 | Promptry | GenJess | 522KB |
 
 ### TIER 3 — LocalCheck *(Week 2)*
 
-| Day | Repo | Account | Size | What It Is |
-|-----|------|---------|------|-----------|
-| Day 8 | [localcheck](https://github.com/agenticjess-star/localcheck) | agenticjess-star | 1.1MB | Web app — Next.js, Supabase, 76 commits |
-| Day 8 | [LocalCheck-IOS](https://github.com/agenticjess-star/LocalCheck-IOS) | agenticjess-star | 282KB | Swift native iOS |
-| Day 9 | [LocalCheckLive](https://github.com/agenticjess-star/LocalCheckLive) | agenticjess-star | 12.6MB | Live deployed version |
-| Day 9 | [CourtCheck](https://github.com/GenJess/CourtCheck) | GenJess | 80KB | Court-finding precursor |
-| Day 9 | [Pool-Hall](https://github.com/GenJess/Pool-Hall) | GenJess | 11KB | Billiards variant |
-| Day 9 | [localcheck-nike](https://github.com/GenJess/localcheck-nike) | GenJess | 0KB | Nike-themed variant — likely stub |
-
----
+| Status | Repo | Account | Size |
+|--------|------|---------|------|
+| ✅ | LocalCheckLive | agenticjess-star | 12.5MB |
+| 🔴 | localcheck | agenticjess-star | 1.1MB |
+| 🔴 | LocalCheck-IOS | agenticjess-star | 282KB |
+| 🔴 | CourtCheck | GenJess | 80KB |
+| 🔴 | Pool-Hall | GenJess | 11KB |
+| 🔴 | localcheck-nike | GenJess | 0KB |
 
 ### TIER 4 — OmniaVital *(Week 2)*
 
-| Day | Repo | Account | Size | What It Is |
-|-----|------|---------|------|-----------|
-| Day 10 | [OmniVital](https://github.com/GenJess/OmniVital) | GenJess | 843KB | Main OmniVital repo |
-| Day 10 | [omnivital-vision](https://github.com/GenJess/omnivital-vision) | GenJess | 1.3MB | Vision/strategy site |
-| Day 10 | [omniavital-v3](https://github.com/agenticjess-star/omniavital-v3) | agenticjess-star | 652KB | v3 |
-| Day 11 | [omniavital_v1](https://github.com/GenJess/omniavital_v1) | GenJess | 309KB | Original v1 |
-| Day 11 | [omniavital-v3](https://github.com/GenJess/omniavital-v3) | GenJess | 594KB | Mirror — compare to agenticjess-star v3 |
-| Day 11 | [OMNIVITAL-BUSINESS](https://github.com/agenticjess-star/OMNIVITAL-BUSINESS) | agenticjess-star | 120KB | Business-facing build |
-| Day 11 | [omnivital-pitch](https://github.com/agenticjess-star/omnivital-pitch) | agenticjess-star | 0KB | Pitch site |
-
----
+| Status | Repo | Account | Size |
+|--------|------|---------|------|
+| 🔴 | OmniVital | GenJess | 843KB |
+| 🔴 | omnivital-vision | GenJess | 1.3MB |
+| 🔴 | omniavital-v3 | agenticjess-star | 652KB |
+| 🔴 | omniavital_v1 | GenJess | 309KB |
+| 🔴 | OMNIVITAL-BUSINESS | agenticjess-star | 120KB |
+| 🔴 | omnivital-pitch | agenticjess-star | 0KB |
 
 ### TIER 5 — Trading & Finance *(Week 3)*
 
-| Day | Repo | Account | Size | What It Is |
-|-----|------|---------|------|-----------|
-| Day 12 | [alpha-gauge](https://github.com/agenticjess-star/alpha-gauge) | agenticjess-star | 513KB | Financial signal/gauge tool — 1 star |
-| Day 12 | [OptIQ](https://github.com/GenJess/OptIQ) | GenJess | 842KB | Options intelligence platform |
-| Day 12 | [stocktok](https://github.com/GenJess/stocktok) | GenJess | 643KB | Stock + TikTok content tool |
-| Day 13 | [polygo-up-or-down-live](https://github.com/agenticjess-star/polygo-up-or-down-live) | agenticjess-star | 3.2MB | Polymarket prediction live |
-| Day 13 | [polyupgrade](https://github.com/agenticjess-star/polyupgrade) | agenticjess-star | 3.1MB | Polymarket upgrade |
-| Day 13 | [crypto-ml](https://github.com/GenJess/crypto-ml) | GenJess | 16KB | Crypto ML experiment |
-
----
+| Status | Repo | Account | Size |
+|--------|------|---------|------|
+| ✅ | alpha-gauge | agenticjess-star | 513KB |
+| 🔴 | OptIQ | GenJess | 842KB |
+| 🔴 | stocktok | GenJess | 643KB |
+| 🔴 | polygo-up-or-down-live | agenticjess-star | 3.2MB |
+| 🔴 | polyupgrade | agenticjess-star | 3.1MB |
+| 🔴 | crypto-ml | GenJess | 16KB |
 
 ### TIER 6 — Voice & Conversational *(Week 3)*
 
-| Day | Repo | Account | Size | What It Is |
-|-----|------|---------|------|-----------|
-| Day 14 | [yeflow](https://github.com/GenJess/yeflow) | GenJess | 17KB | Yep — conversational life organizer |
-| Day 14 | [yep](https://github.com/GenJess/yep) | GenJess | 0KB | Yep v1 |
-| Day 14 | [Medical-Voice-Agent-AssemblyAI](https://github.com/GenJess/Medical-Voice-Agent-AssemblyAI) | GenJess | 2.3MB | Medical voice agent — AssemblyAI/Manus |
+| Status | Repo | Account | Size |
+|--------|------|---------|------|
+| 🔴 | yeflow | GenJess | 17KB |
+| 🔴 | yep | GenJess | 0KB |
+| 🔴 | Medical-Voice-Agent-AssemblyAI | GenJess | 2.3MB |
 
 ---
 
@@ -137,10 +125,10 @@ Two outputs being built in parallel:
 
 | Repo | Reason |
 |------|--------|
-| `agenticjess-star/openclaw` | External clone (243MB) — not Jesse's original work |
-| `GenJess/cua` | External clone (207MB) — open-source infra repo |
-| `jGPT-Automated/JAW` | Per Jesse's direction — skip |
-| `2025-07-26 batch repos` | Mass import date — likely external or very early experiments; will revisit if needed |
+| agenticjess-star/openclaw | External clone (243MB) |
+| GenJess/cua | External clone (207MB) |
+| jGPT-Automated/JAW | Per Jesse's direction |
+| 2025-07-26 batch | Mass import — likely external/old |
 
 ---
 
@@ -148,17 +136,17 @@ Two outputs being built in parallel:
 
 ```
 repo-atlas/
-├── README.md                  ← This file. Status board + full roadmap.
+├── index.html            ← PUBLIC landing page
+├── portal.html           ← INTERNAL portal (PIN-gated, all analysis)
+├── roadmap.html          ← Visual roadmap page
+├── README.md             ← This file
 ├── meta/
-│   ├── master-inventory.md    ← All repos, status, cluster, priority
-│   ├── progress-log.md        ← Agent working memory. READ THIS FIRST each run.
-│   └── synthesis-notes.md     ← Cross-repo patterns + discoveries
-└── analysis/
-    ├── agent-infra/           ← GenJess_OS ✅, JAW (skip), AgentAgency, career-ops...
-    ├── bnr-client/            ← outbound-studio deliverables ✅
-    ├── portfolio/             ← GenerativeJesse-LIVE, GenJess.github.io...
-    ├── localcheck/            ← localcheck, LocalCheck-IOS, LocalCheckLive...
-    ├── omniavital/            ← OmniVital, v1–v3, pitch, vision...
-    ├── trading-finance/       ← alpha-gauge, OptIQ, polygo...
-    └── voice-agents/          ← yeflow, yep, Medical-Voice-Agent...
+│   ├── progress-log.md   ← Agent working memory (READ FIRST each run)
+│   ├── master-inventory.md
+│   └── synthesis-notes.md
+└── analysis/             ← Raw .md source files (agent writes here first)
+    ├── agent-infra/
+    ├── bnr-client/
+    ├── localcheck/
+    └── trading/
 ```

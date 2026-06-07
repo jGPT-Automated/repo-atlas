@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jesse — Project Roadmap</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; background: #080808; color: #d4d4d4; min-height: 100vh; padding: 48px 24px; }
+  .page { max-width: 900px; margin: 0 auto; }
+  .top { margin-bottom: 48px; }
+  .eyebrow { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #0d9488; margin-bottom: 10px; }
+  h1 { font-size: 32px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .sub { font-size: 14px; color: #555; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .full { grid-column: 1 / -1; }
+
+  .card { background: #111; border: 1px solid #1f1f1f; border-radius: 6px; padding: 24px; }
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+  .card-title-group { display: flex; align-items: center; gap: 10px; }
+  .card-icon { font-size: 18px; }
+  .card-title { font-size: 14px; font-weight: 700; color: #fff; }
+  .card-sub { font-size: 11px; color: #555; margin-top: 2px; }
+  .badge { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; padding: 3px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+  .badge-red { background: #2a1010; color: #f87171; border: 1px solid #3d1a1a; }
+  .badge-teal { background: #0a2020; color: #0d9488; border: 1px solid #0d9488; }
+  .badge-yellow { background: #2a2000; color: #d4a017; border: 1px solid #3d3000; }
+  .badge-gray { background: #1a1a1a; color: #666; border: 1px solid #2a2a2a; }
+  .badge-green { background: #0a2010; color: #34d399; border: 1px solid #0d3020; }
+
+  .task-list { list-style: none; }
+  .task { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #161616; }
+  .task:last-child { border: none; }
+  .task-box { width: 14px; height: 14px; border: 1px solid #333; border-radius: 3px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; }
+  .task-box.done { background: #0d9488; border-color: #0d9488; }
+  .task-box.done::after { content: '✓'; font-size: 9px; color: #fff; font-weight: 700; }
+  .task-text { font-size: 13px; color: #bbb; line-height: 1.5; }
+  .task-text.done { color: #444; text-decoration: line-through; }
+  .task-note { display: block; font-size: 11px; color: #555; margin-top: 2px; }
+
+  .section-divider { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #0d9488; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1a1a1a; }
+
+  .progress-bar { background: #1a1a1a; border-radius: 20px; height: 6px; margin-top: 14px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 20px; background: #0d9488; }
+
+  .infra-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .infra-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #888; padding: 7px 0; border-bottom: 1px solid #141414; }
+  .infra-item:last-child { border: none; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green { background: #0d9488; }
+  .dot-red { background: #f87171; }
+
+  .blocker { background: #1a0e0e; border: 1px solid #3d1a1a; border-radius: 4px; padding: 12px 14px; margin-top: 12px; font-size: 12px; color: #f87171; line-height: 1.6; }
+  .blocker strong { color: #f87171; }
+
+  .cta { background: #0d9488; border-radius: 6px; padding: 20px 24px; text-align: center; margin-top: 24px; }
+  .cta-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.65); margin-bottom: 6px; }
+  .cta-text { font-size: 16px; font-weight: 700; color: #fff; }
+
+  .links { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .link-pill { font-size: 11px; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 20px; padding: 4px 12px; color: #0d9488; text-decoration: none; }
+
+  @media (max-width: 600px) {
+    .grid, .grid-3 { grid-template-columns: 1fr; }
+    .infra-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <div class="eyebrow">Chief of Staff · April 2026</div>
+    <h1>Project Roadmap</h1>
+    <div class="sub">Everything in flight — priorities, blockers, and next actions</div>
+  </div>
+
+  <!-- ROW 1 -->
+  <div class="section-divider">Active Priorities</div>
+  <div class="grid">
+
+    <!-- OMNIVITAL -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="card-icon">🔥</span>
+          <div>
+            <div class="card-title">OmniVital</div>
+            <div class="card-sub">github.com/GenJess/OmniVital</div>
+          </div>
+        </div>
+        <span class="badge badge-red">Ship This Week</span>
+      </div>
+      <ul class="task-list">
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Full-stack platform built (11K+ lines)<span class="task-note">React 18, FastAPI, Supabase, MongoDB, ElevenLabs</span></span></li>
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Supabase schema live (8 ov_ tables, RLS, realtime)</span></li>
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Vercel deploy config ready</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Send env vars → I deploy same day<span class="task-note">EMERGENT_LLM_KEY · MONGO_URL · Supabase anon key · Stripe key</span></span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Wire Stripe checkout + subscription webhook</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Register domain (omnivital.co)</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Port v3 voice orb + ElevenLabs agent ID</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Supplier decision: Supliful vs private label</span></li>
+      </ul>
+      <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+      <div class="blocker">⛔ <strong>Blocked on:</strong> env vars. Drop them and this ships.</div>
+      <div class="links">
+        <a class="link-pill" href="https://github.com/GenJess/OmniVital" target="_blank">Codebase</a>
+        <a class="link-pill" href="https://v0-omnivital-business.vercel.app" target="_blank">Business Case</a>
+        <a class="link-pill" href="https://deepwiki.com/GenJess/OmniVital" target="_blank">DeepWiki</a>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="card-icon">📁</span>
+          <div>
+            <div class="card-title">Portfolio</div>
+            <div class="card-sub">Personal brand + job applications</div>
+          </div>
+        </div>
+        <span class="badge badge-teal">Priority 2</span>
+      </div>
+      <ul class="task-list">
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Full portfolio audit complete (38 projects scored)</span></li>
+        <li class="task"><div class="task-box done"></div><span class="task-text done">RAG docs written for all Tier 1 + 2 projects</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Pick main portfolio site<span class="task-note">agentjess-portfolio? GenJess-v1? GenerativeJesse-LIVE?</span></span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Define target role<span class="task-note">AI engineer · founding engineer · full-stack?</span></span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Rebuild + write copy (I handle this)</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">README overhaul — top 5 repos</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Connect voice agent to portfolio site</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Launch on Product Hunt + LinkedIn</span></li>
+      </ul>
+      <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="grid">
+
+    <!-- TEAIMS -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="card-icon">⚡</span>
+          <div>
+            <div class="card-title">TEAIMS / Agent Armory</div>
+            <div class="card-sub">Capstone launch — after OmniVital</div>
+          </div>
+        </div>
+        <span class="badge badge-yellow">Priority 3</span>
+      </div>
+      <ul class="task-list">
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Audit complete — scored 4.4/5</span></li>
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Launch plan written</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">README overhaul</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Full build + B2B go-to-market</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Outreach + launch</span></li>
+      </ul>
+      <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+    </div>
+
+    <!-- ROCLIST -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="card-icon">⏰</span>
+          <div>
+            <div class="card-title">ROCLIST</div>
+            <div class="card-sub">Farcaster migration — window closing</div>
+          </div>
+        </div>
+        <span class="badge badge-red">Urgent</span>
+      </div>
+      <ul class="task-list">
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Audit complete</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Migrate off Farcaster<span class="task-note">Base dropped spec April 9 — window closing</span></span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Reposition + README update</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Redeploy</span></li>
+      </ul>
+      <div class="progress-bar"><div class="progress-fill" style="width:15%"></div></div>
+    </div>
+
+  </div>
+
+  <!-- ROW 3 -->
+  <div class="section-divider">Active Outreach</div>
+  <div class="grid">
+
+    <!-- MANI -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="card-icon">📧</span>
+          <div>
+            <div class="card-title">Mani — Retainer Outreach</div>
+            <div class="card-sub">manisoodan@gmail.com</div>
+          </div>
+        </div>
+        <span class="badge badge-teal">Awaiting Reply</span>
+      </div>
+      <ul class="task-list">
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Initial pitch sent</span></li>
+        <li class="task"><div class="task-box done"></div><span class="task-text done">Revised (shorter, CTA up front)</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Monitor for reply</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">If he sends a task → I execute + deliver</span></li>
+        <li class="task"><div class="task-box"></div><span class="task-text">Close retainer deal</span></li>
+      </ul>
+    </div>
+
+    <!-- INFRA -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title-group">
+          <span class="card-icon">🤖</span>
+          <div>
+            <div class="card-title">Agent Infrastructure</div>
+            <div class="card-sub">Live systems</div>
+          </div>
+        </div>
+        <span class="badge badge-green">Live</span>
+      </div>
+      <div class="infra-grid">
+        <div class="infra-item"><div class="dot dot-green"></div>AgentMail (ov@agentmail.to)</div>
+        <div class="infra-item"><div class="dot dot-green"></div>Telegram (@OmniVital_bot)</div>
+        <div class="infra-item"><div class="dot dot-green"></div>iMessage (1-on-1)</div>
+        <div class="infra-item"><div class="dot dot-green"></div>WhatsApp</div>
+        <div class="infra-item"><div class="dot dot-green"></div>GitHub PAT (jGPT-Automated)</div>
+        <div class="infra-item"><div class="dot dot-green"></div>Portfolio DB (38 projects)</div>
+        <div class="infra-item"><div class="dot dot-red"></div>Google Docs (not connected)</div>
+        <div class="infra-item"><div class="dot dot-red"></div>Group iMessage (not supported)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="cta">
+    <div class="cta-label">The one thing to do today</div>
+    <div class="cta-text">Send the OmniVital env vars → ships same day</div>
+  </div>
+
+</div>
+</body>
+</html>
