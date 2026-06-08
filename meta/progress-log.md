@@ -140,3 +140,41 @@ Commit messages with "Replit-Commit-Author: Agent" suggest Jesse is building in 
 
 **Pattern 4: Multiple variants = A/B testing workflow**
 Blawgy has 3 variants. Alkemy has a demo + main. This maps directly to Outbound Studio's Persona Tester agent. The system is actually being used.
+
+---
+
+### Session 5 — 2026-06-08 · Day 5 Analysis  
+**Repos analyzed:** polyupgrade, yeflow, omniavital-v3  
+**Time:** ~30 min (token-limited, rapid analysis)  
+
+**polyupgrade findings:**
+- Polymarket prediction UI upgrade
+- 72 React components, Supabase backend
+- TypeScript + Vite (production-ready)
+- **Status:** Feature-complete but NOT deployed
+- **Tier:** MEDIUM (needs live demo to portfolio-worthy)
+- **Action:** Deploy to Vercel or consolidate with other trading projects
+
+**yeflow findings:**
+- "Yep — Talk through your life" conversational AI
+- Voice-first interface (Whisper → Claude → ElevenLabs)
+- Recent push May 14 (very active)
+- **Tier:** HIGH (voice agents are 2026 trend)
+- **Action:** Clarify differentiation from ChatGPT + voice, get public demo link
+
+**omniavital-v3 findings:**
+- Full-stack wellness platform (onboarding → checkout → retention)
+- 72 React components, Supabase, Apple Watch integration
+- Real business model: recurring supplement sales
+- Last push March 9 (3 months old — shelved or slow-rolling?)
+- **Tier:** HIGH (full product lifecycle)
+- **Challenge:** 6 OmniVital versions across 3 accounts need consolidation/clarity
+- **Action:** Clarify canonical version, deploy to Vercel with demo
+
+**Emerging Pattern:**
+Projects are feature-complete but many lack public demos/deployments. High tier work isn't portfolio-ready without live URL. Need consolidation strategy for multi-version repos (OmniVital, LocalCheck, etc.).
+
+**Next Queue (Day 6):** Context tools (context-canvas, context-weaver) → Dating AI cluster (DatingData, HingeAnalytics) → More wellness variants
+
+**Repos analyzed cumulative:** 14 / 41 roadmap (34%)
+
