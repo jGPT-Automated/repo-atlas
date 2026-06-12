@@ -6,11 +6,11 @@
 
 ## CURRENT POSITION
 
-**Date:** 2026-06-11
-**Day:** 8
-**Repos analyzed:** 21 / ~50 total
+**Date:** 2026-06-12
+**Day:** 9
+**Repos analyzed:** 26 / ~50 total
 **Auth status:** FIXED — use GITHUB_TOKEN_3 for all API calls. FIRECRAWL_API_KEY_2 for scraping. GITHUB_ACCESS_TOKEN is dead, never use it.
-**Next repos:** DatingData → LocalCheck-IOS → pro-persona → AxonAI → OmniVital (v4/v5) → AgentInvesting → Pool-Hall
+**Next repos:** Pool-Hall → OmniVital-v4 → AgentArena (revisit) → SmartResumeAI → Persona-Framework
 
 ---
 
@@ -56,22 +56,50 @@
 - mya / JAW / Sovereign Architecture (4.6/5 — TOP PICK, deploy this)
 - BNR_Project_Hub (3.2/5 — client artifacts)
 
+### Day 9 — 2026-06-12 ✓ COMPLETE
+- **Hingesight** (4.3/5) — Full-stack dating data analytics. Privacy-first. Not live yet.
+- **LocalCheck-IOS** (4.1/5) — Native iOS app. TestFlight beta. Lead portfolio piece. Needs App Store submission.
+- **ProPersona** (4.4/5) — Interactive voice resume. LIVE at pro-persona.lovable.app. Good hiring signal.
+- **AxonAI / TeamAgent** (4.5/5) — Autonomous teammate architecture. White paper quality. Dual-context innovation.
+- **Alignment Council** (4.6/5 ⭐) — Multi-agent deliberation engine. **TOP PICK: Ship immediately.** Clear founder problem + minimal tech debt.
+
 ---
 
 ## TOP PICKS SO FAR (deploy-worthy)
 
-1. **mya/JAW — Sovereign Architecture** (4.6/5) — Lead portfolio piece. Full-stack, manifesto design, live agent dashboard. DEPLOY NOW.
-2. **context-weaver / ParsePad** (4.2/5) — Real pain point, clean arch. Needs domain + production deploy.
-3. **GenerativeJesse-LIVE** (4.4/5) — Already live on Vercel. Keep maintained.
-4. **TEAIMS** (4.4/5) — Multi-agent governance. Strong PM/safety narrative.
-5. **LocalCheckLive** (4.2/5) — ELO sports. Mobile blocker only.
-6. **yeflow** (4.1/5) — Voice AI life coach. Strong 2026 trend alignment.
+1. **Alignment Council** (4.6/5) ⭐ **URGENT DEPLOY** — Multi-agent deliberation for decisions. Founder use case. MVP in 2 weeks.
+2. **mya/JAW — Sovereign Architecture** (4.6/5) — Full-stack agent + manifesto. Live agent dashboard.
+3. **AxonAI / TeamAgent** (4.5/5) — Autonomous teammate for team collab. Architectural innovation.
+4. **ProPersona** (4.4/5) — Voice interactive resume. LIVE. Good hiring narrative.
+5. **GenerativeJesse-LIVE** (4.4/5) — Already live on Vercel. Maintain.
+6. **Hingesight / DatingData** (4.3/5) — Dating analytics. Needs public deploy.
+7. **TEAIMS** (4.4/5) — Multi-agent governance.
+8. **LocalCheckLive** (4.2/5) — ELO sports. Live web. Mobile needs polish.
 
 ---
 
-## NEXT QUEUE (Day 9)
-1. DatingData (agenticjess-star)
-2. LocalCheck-IOS (agenticjess-star)
-3. pro-persona (GenJess)
-4. AxonAI (GenJess)
-5. AgentInvesting (GenJess)
+## PORTFOLIO STRATEGY (UPDATED)
+
+**Tier 1 — Deploy NOW (next 30 days):**
+1. Alignment Council (hiring tool + founder positioning)
+2. LocalCheck iOS (App Store submission)
+3. ProPersona (already live, iterate)
+
+**Tier 2 — Polish & Deploy (60 days):**
+1. AxonAI / TeamAgent (finish PoC, launch as framework)
+2. Hingesight (public deploy + monetization)
+3. mya/JAW (ensure live, polish UX)
+
+**Tier 3 — Monitor (ongoing):**
+1. TEAIMS (strong but niche)
+2. GenerativeJesse-LIVE (maintain)
+3. yeflow (voice trend)
+
+---
+
+## NEXT QUEUE (Day 10 — 2026-06-13)
+1. Pool-Hall (OmniVital companion app?)
+2. OmniVital-v4 (re-analysis, check status)
+3. SmartResumeAI (if exists)
+4. Persona-Framework (if exists)
+5. Remaining misc repos
