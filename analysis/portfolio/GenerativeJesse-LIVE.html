@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenerativeJesse-LIVE — Portfolio Site</title>
+<style>
+  :root{--bg:#080808;--bg2:#111;--border:#1f1f1f;--text:#ededed;--muted:#666;--accent:#10b981;--amber:#f59e0b;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--bg);color:var(--text);padding:32px 24px;max-width:720px;margin:0 auto;line-height:1.6}
+  .score{display:inline-block;background:#10b98122;color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;border:1px solid #10b98144;margin-bottom:20px}
+  .score-live{display:inline-block;background:#22c55e22;color:#22c55e;font-weight:700;font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid #22c55e44;margin-left:8px}
+  h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+  .tagline{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .links{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+  .link-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:opacity .15s}
+  .link-live{background:var(--accent);color:#000}
+  .link-gh{background:var(--bg2);color:var(--text);border:1px solid var(--border)}
+  .link-btn:hover{opacity:.8}
+  section{margin-bottom:28px}
+  h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px}
+  p{font-size:14px;color:#ccc;margin-bottom:10px}
+  .tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:4px;background:#1f1f1f;color:#aaa;margin:3px 3px 3px 0}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .stat{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+  .stat-val{font-size:20px;font-weight:700;color:var(--amber)}
+  .stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+</style>
+</head>
+<body>
+
+<div class="score">4.4 / 5 — HIGH</div><span class="score-live">✓ LIVE</span>
+<h1>GenerativeJesse-LIVE</h1>
+<p class="tagline">Production portfolio site — Spline Ocean intro, React 18, 68 components</p>
+
+<div class="links">
+  <a class="link-btn link-live" href="https://generative-jesse-live-x.vercel.app" target="_blank">🌐 Live Site</a>
+  <a class="link-btn link-gh" href="https://github.com/GenJess/GenerativeJesse-LIVE" target="_blank">GitHub → GenJess/GenerativeJesse-LIVE</a>
+</div>
+
+<div class="stat-row">
+  <div class="stat"><div class="stat-val">157</div><div class="stat-lbl">Total files</div></div>
+  <div class="stat"><div class="stat-val">68</div><div class="stat-lbl">Components</div></div>
+  <div class="stat"><div class="stat-val">May 26</div><div class="stat-lbl">Last updated</div></div>
+</div>
+
+<br>
+<section>
+  <h2>What It Is</h2>
+  <p>Production-grade personal portfolio with a Spline Ocean 3D intro animation, seamless page transitions, and a full Radix + Shadcn UI system. Not a template — 68 custom components, maintained and updated regularly.</p>
+</section>
+
+<section>
+  <h2>Stack</h2>
+  <div>
+    <span class="tag">React 18</span><span class="tag">TypeScript</span><span class="tag">Shadcn UI</span>
+    <span class="tag">Radix</span><span class="tag">Spline 3D</span><span class="tag">Vercel</span><span class="tag">Tailwind</span>
+  </div>
+</section>
+
+<section>
+  <h2>Status</h2>
+  <p>Live and maintained. Strong deployment signal — this is the public face. Gap: projects section needs updating to reflect current work (JAW, TEAIMS, LocalCheck).</p>
+</section>
+
+</body>
+</html>
