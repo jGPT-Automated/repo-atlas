@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>alpha-gauge — Polymarket Monte Carlo OS</title>
+<style>
+  :root{--bg:#080808;--bg2:#111;--border:#1f1f1f;--text:#ededed;--muted:#666;--accent:#10b981;--amber:#f59e0b;--red:#ef4444;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--bg);color:var(--text);padding:32px 24px;max-width:720px;margin:0 auto;line-height:1.6}
+  .score{display:inline-block;background:#f59e0b22;color:var(--amber);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;border:1px solid #f59e0b44;margin-bottom:20px}
+  .score-warn{display:inline-block;background:#ef444422;color:var(--red);font-weight:700;font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid #ef444444;margin-left:8px}
+  h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+  .tagline{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .links{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+  .link-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:opacity .15s}
+  .link-gh{background:var(--bg2);color:var(--text);border:1px solid var(--border)}
+  .link-btn:hover{opacity:.8}
+  section{margin-bottom:28px}
+  h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px}
+  p{font-size:14px;color:#ccc;margin-bottom:10px}
+  .tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:4px;background:#1f1f1f;color:#aaa;margin:3px 3px 3px 0}
+  .highlight{background:#f59e0b10;border:1px solid #f59e0b30;border-radius:8px;padding:16px;font-size:13px;color:#ccc}
+  .highlight strong{color:var(--amber)}
+  .action{background:#10b98110;border:1px solid #10b98130;border-radius:8px;padding:16px;font-size:13px;color:#ccc;margin-top:16px}
+  .action strong{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="score">3.9 / 5 — FLYING UNDER THE RADAR</div><span class="score-warn">⚠ UNDEPLOYED</span>
+<h1>alpha-gauge</h1>
+<p class="tagline">Monte Carlo Polymarket OS — real-time prediction market intelligence dashboard</p>
+
+<div class="links">
+  <a class="link-btn link-gh" href="https://github.com/agenticjess-star/alpha-gauge" target="_blank">GitHub → agenticjess-star/alpha-gauge</a>
+</div>
+
+<section>
+  <h2>What It Is</h2>
+  <p>A real-time crypto/prediction market intelligence dashboard. Streams live Polymarket CLOB order book data via WebSocket, calculates implied probabilities, runs Monte Carlo edge modeling on UP/DOWN binary options. Not a toy — this is a production-grade trading tool.</p>
+  <div class="highlight"><strong>The take:</strong> Alpha-gauge flying under the radar in this portfolio is genuinely criminal. The combination of live order book WebSocket + Monte Carlo simulation + Polymarket API is a rare technical stack that signals serious quantitative thinking. Nobody else is building this as a portfolio piece.</div>
+</section>
+
+<section>
+  <h2>Architecture</h2>
+  <p>React 18 + Vite + Tailwind + Shadcn. Polymarket Gamma API for live order books. CLOB WebSocket for real-time streaming. Recharts for visualization. Pure client-side (no server required). Last commit April 17, 2026.</p>
+  <div>
+    <span class="tag">React 18</span><span class="tag">Vite</span><span class="tag">Polymarket API</span>
+    <span class="tag">CLOB WebSocket</span><span class="tag">Monte Carlo</span><span class="tag">Recharts</span>
+  </div>
+</section>
+
+<section>
+  <h2>The Gap</h2>
+  <p>No live URL. README says "Ready for deployment" — it's a <code>vercel deploy</code> away. This is the one that should be deployed immediately. The undeployed state is the only thing keeping the score from 4.5+.</p>
+  <div class="action"><strong>Action:</strong> Deploy to Vercel (static build, zero backend). 10 minutes. Then link from portfolio as "Live Polymarket Dashboard."</div>
+</section>
+
+</body>
+</html>
