@@ -177,3 +177,38 @@
 - TrAide stall is frustrating — architecture is solid, just needs public face + polish
 
 
+### Day 13 — 2026-07-03 (DAILY DIVE)
+
+**Repos analyzed (3):**
+- **GenJess-OS v2** (4.3/5) — Production multi-agent OS. Active infrastructure. Not a portfolio piece — operational proof. Agents, MCP, Supabase, structured workflows.
+- **ShellSync** (3.7/5) — Multi-account GitHub shell orchestrator. React + Vite. Shipped MVP, no auth/persistence yet. Utility tool, low portfolio signal.
+- **Hingesight / DatingData** (4.3/5) — Dating analytics + AI coaching. Full-stack app. Strong product positioning (data layer vs. platform). Needs production deployment to hit 4.6+.
+
+**Repos skipped (empty/shell):**
+- kai-lennox-studio — 4 files only (stub)
+- yep — empty repo
+
+**Activity scan (24h):**
+- LocalCheck_Expo — 2026-07-02 push (tracked in prior session)
+- repo-atlas — 2026-07-02 push (self)
+
+**Next queue (unanalyzed, by recency):**
+1. improved-ui-design-skills (2026-06-23) — design skills collection
+2. TeleTok_2026 (2026-05-21) — unknown
+3. HingeDatAI (2026-05-20) — alt dating AI (track vs. Hingesight)
+4. OutboundStudio (2026-05-27) — BNR-related
+5. schwab-countdown (2026-06-13) — GenJess/schwab integration
+6. textback-landing (2026-06-06) — TextBack app landing
+7. Imagym (2026-05-08) — fitness app (guess)
+
+**Progress to date:**
+- 29 repos analyzed / ~50 total (58%)
+- TOP 5 unchanged: JAW (4.6) | TEAIMS (4.4) | GenerativeJesse-LIVE (4.4) | ProPersona (4.4) | LocalCheck_Expo (4.1)
+- NEW tier 2: GenJess-OS-v2 (4.3), Hingesight-v2 (4.3), AxonAI (4.5)
+
+**Deploy priorities (unchanged):**
+1. **Alignment Council** (4.6) — URGENT (2-week MVP)
+2. **JAW** (4.6) — Consolidate mya+JAW, set homepage on GitHub
+3. **AxonAI** (4.5) — Ship white paper + live demo
+4. **Hingesight** (4.3→4.6 pending deploy) — Vercel + landing page
+5. **alpha-gauge** (3.9→4.5 pending deploy) — Vercel static build
