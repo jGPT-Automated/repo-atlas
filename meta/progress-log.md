@@ -212,3 +212,54 @@
 3. **AxonAI** (4.5) — Ship white paper + live demo
 4. **Hingesight** (4.3→4.6 pending deploy) — Vercel + landing page
 5. **alpha-gauge** (3.9→4.5 pending deploy) — Vercel static build
+---
+
+## Session 14 — 2026-07-04 (Saturday, Daily Dive)
+
+**4 repos analyzed:**
+
+✅ **LocalCheck_Expo** (4.2/5) — Full-stack native sports app. Expo + React Native, 9 screens, dark brutalism design, ELO + social graph, ready for TestFlight. **TODAY PUSH — priority update.** Everything works. Just needs geolocation fine-tuning + Payment integration.
+
+⚠️ **improved-ui-design-skills** (3.4/5) — Agent skill pack (design-foundation + design-ui-variants). Infrastructure work, not a product. Live on Vercel demo. Useful for internal agent workflows but zero portfolio signal. Deprioritize.
+
+❌ **schwab-countdown** (1.9/5) — Countdown timer to Schwab Monday 4AM clearing. Vanilla HTML, 1KB. Utility for one person. Delete or rebrand as multi-broker SaaS.
+
+❌ **textback-landing** (1.5/5) — Stub landing page. No product definition. Placeholder only.
+
+**Activity scan (24h):**
+- LocalCheck_Expo — pushed today (major update)
+- mya — pushed 2026-06-28
+- GenJess-OS — pushed 2026-06-28
+- Others (no new pushes)
+
+**TOP 5 UNCHANGED:**
+1. JAW (4.6) — Sovereign Architecture
+2. TEAIMS (4.4) — 9-agent org OS
+3. GenerativeJesse-LIVE (4.4) — Portfolio site
+4. ProPersona (4.4) — Voice resume
+5. LocalCheck_Expo (4.2) — NEW ENTRY (moved up from 4.1)
+
+**Portfolio tier 2:**
+- LocalCheck_Expo (4.2) — NEW
+- GenJess-OS-v2 (4.3)
+- Hingesight (4.3)
+- AxonAI (4.5)
+
+**Progress to date:**
+- 33/50 repos analyzed (66%)
+- No new top-5 entrants
+- LocalCheck_Expo replaces LocalCheckLive in top 5 (fresh push, more polished)
+
+**Next queue (unanalyzed, by recency):**
+1. OutboundStudio (2026-05-27) — BNR-related
+2. HingeDatAI (2026-05-20) — alt dating AI
+3. TeleTok_2026 (2026-05-21) — unknown
+4. Imagym (2026-05-08) — fitness app
+5. More misc repos (GenJess_OS_variants, AgenticJess, etc.)
+
+**Deploy priorities (UPDATED):**
+1. **JAW** (4.6) — URGENT — consolidate mya+JAW, set homepage
+2. **TEAIMS** (4.4) — Live, maintained
+3. **LocalCheck_Expo** (4.2) — TestFlight + real geolocation
+4. **AxonAI** (4.5) — Ship white paper + demo
+5. **Hingesight** (4.3→4.6 pending) — Vercel + landing page
