@@ -263,3 +263,63 @@
 3. **LocalCheck_Expo** (4.2) — TestFlight + real geolocation
 4. **AxonAI** (4.5) — Ship white paper + demo
 5. **Hingesight** (4.3→4.6 pending) — Vercel + landing page
+
+## Session 15 — 2026-07-05 (Sunday, Daily Dive)
+
+**Time:** 10:01 AM Chicago  
+**Repos analyzed:** 4 (+ 1 new from push activity)  
+**Status:** Complete
+
+### Analyses pushed:
+1. **instruction-hub** (agenticjess-star) — 4.2/5 — Instruction OS: version control + optimization loop for custom AI instructions. Lovable + Supabase MVP. NOT DEPLOYED — this is the highest-upside uninvested product this week. Needs: deploy + domain + Stripe pricing ($4.99/mo freemium). Can ship in 4 weeks.
+
+2. **HingeDatAI** (agenticjess-star) — 4.4/5 — Privacy-first dating analytics. React + Replit + Stripe. Full-stack SaaS with AI coaching. Not deployed but ready. Path to 4.6+: deploy + ProductHunt + Reddit dating subs. 2 weeks to market.
+
+3. **OutboundStudio** (agenticjess-star) — 2.8/5 — Framework + documentation only. Federated agent spec for client acquisition. No working MVP, no proof of concept. Archive or pivot. Low portfolio value.
+
+4. **smart-inbox** (jGPT-Automated) — 2.2/5 — Blank Lovable template. README is TODO. Stub project, 47 days stale. Skip or delete.
+
+### Activity scan (24h):
+- **instruction-hub pushed TODAY (2026-07-04)** — Active development, WIP on MCP auth.
+- LocalCheck_Expo previous day (covered in session 14)
+- No other new pushes in jGPT-Automated or GenJess accounts.
+
+### Key Findings
+
+**High-signal undeployed:** 
+- Instruction OS (4.2/5) — Market-ready, needs visibility
+- HingeDatAI (4.4/5) — Ready to ship, needs promotion
+
+**Stale + should be archived:**
+- OutboundStudio (2.8/5) — Framework without implementation
+- smart-inbox (2.2/5) — Template without product
+
+### Top 5 (UNCHANGED from prior)
+1. JAW (4.6) | 2. TEAIMS (4.4) | 3. GenerativeJesse-LIVE (4.4) | 4. ProPersona (4.4) | 5. LocalCheck_Expo (4.1)
+
+### Tier 2 Notable (New)
+- **Instruction OS** (4.2/5) — Highest upside this batch
+- **HingeDatAI** (4.4/5) — Shipping-ready
+- **AxonAI** (4.5/5) — From prior session, still tier 2
+
+### Deploy Action Items (NEW PRIORITY)
+1. ⭐ **Instruction OS** — Deploy + domain + Stripe (4 weeks, highest ROI)
+2. **HingeDatAI** — Deploy + ProductHunt (2 weeks)
+3. **alpha-gauge** — Deploy (1 week, static build)
+
+### Next Queue
+- TeleTok_2026 (no README, 240 files — likely agent skill pack, deprioritize)
+- yep_v1 (jGPT-Automated)
+- Imagym (GenJess)
+- Remaining misc repos
+
+### Session Notes
+- Instruction OS is the "sleeper" this month — it's built, it works, zero marketing yet. Most likely to gain traction if deployed + shared with Anthropic + OpenAI communities.
+- Dating analytics pattern emerging: HingeDatAI + Hingesight both undeployed at 4.3-4.4. Both are viable 2-week ships.
+- Stale repos cleanup needed: Remove OutboundStudio, smart-inbox from active portfolio.
+- MCP integration showing up in instruction-hub (Lovable MCP auth). Pattern: newer repos have platform integration, older repos don't.
+
+### Progress Meter
+- **Analyzed:** 38 / ~50 total (76%)
+- **Ready to deploy:** 3 (Instruction OS, HingeDatAI, alpha-gauge)
+- **Top 5 quality avg:** 4.36/5
