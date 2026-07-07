@@ -697,10 +697,17 @@
 
 <script>
 // ============================================
-// PIN GATE
+// PIN GATE — hash-based comparison (PIN never stored in plaintext)
 // ============================================
-const PIN = '7787';
+const PIN_HASH = '2672c5e0b4b0aa159c51aca55e56c467b5c4596908e17b247178d44f29a82e76';
 const digits = ['d0','d1','d2','d3'];
+
+async function hashPin(pin) {
+  const msgBuffer = new TextEncoder().encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 // Auto-advance between inputs
 digits.forEach((id, i) => {
@@ -716,16 +723,37 @@ digits.forEach((id, i) => {
   });
 });
 
-function checkPin() {
+let failedAttempts = 0;
+let lockoutUntil = 0;
+
+async function checkPin() {
+  if (Date.now() < lockoutUntil) {
+    const secs = Math.ceil((lockoutUntil - Date.now()) / 1000);
+    const errorEl = document.getElementById('pinError');
+    errorEl.textContent = `Locked out — try again in ${secs}s`;
+    errorEl.classList.add('show');
+    setTimeout(() => errorEl.classList.remove('show'), 2000);
+    return;
+  }
+
   const entered = digits.map(id => document.getElementById(id).value).join('');
-  if (entered === PIN) {
+  const enteredHash = await hashPin(entered);
+  if (enteredHash === PIN_HASH) {
+    failedAttempts = 0;
     document.getElementById('pin-gate').classList.add('hidden');
     setTimeout(() => {
       document.getElementById('pin-gate').style.display = 'none';
       document.getElementById('portal-content').classList.add('visible');
     }, 400);
   } else {
+    failedAttempts++;
+    if (failedAttempts >= 5) {
+      lockoutUntil = Date.now() + 30000;
+    }
     const errorEl = document.getElementById('pinError');
+    errorEl.textContent = failedAttempts >= 5
+      ? 'Too many attempts — locked for 30s'
+      : 'Incorrect PIN';
     errorEl.classList.add('show');
     digits.forEach(id => {
       const el = document.getElementById(id);
@@ -897,8 +925,8 @@ function openModal(id) {
   const badgeHtml = `<span class="repo-badge ${data.badgeClass}" style="display:inline-block;margin-bottom:16px;">${data.badge}</span>`;
   const metaHtml = `<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
     <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);">Account: <span style="color:var(--text-secondary)">${data.account}</span></span>
-    ${data.deployed ? `<a href="${data.deployed}" target="_blank" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);text-decoration:none;">↗ Live</a>` : ''}
-    <a href="${data.github}" target="_blank" class="gh-link">↗ GitHub</a>
+    ${data.deployed ? `<a href="${data.deployed}" target="_blank" rel="noopener noreferrer" style="font-family:var(--font-mono);font-size:11px;color:var(--accent);text-decoration:none;">↗ Live</a>` : ''}
+    <a href="${data.github}" target="_blank" rel="noopener noreferrer" class="gh-link">↗ GitHub</a>
   </div>`;
   const verdictHtml = `<div class="verdict-box">${data.verdict}</div>`;
 
