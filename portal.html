@@ -705,37 +705,50 @@ const digits = ['d0','d1','d2','d3'];
 // Auto-advance between inputs
 digits.forEach((id, i) => {
   const el = document.getElementById(id);
+  if (!el) {
+    console.error(`PIN gate: input element "${id}" is missing from the DOM; gate cannot initialize correctly.`);
+    return;
+  }
   el.addEventListener('input', () => {
     el.classList.toggle('filled', el.value !== '');
-    if (el.value && i < 3) document.getElementById(digits[i+1]).focus();
+    if (el.value && i < 3) document.getElementById(digits[i+1])?.focus();
     if (i === 3 && el.value) checkPin();
   });
   el.addEventListener('keydown', (e) => {
-    if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById(digits[i-1]).focus();
+    if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById(digits[i-1])?.focus();
     if (e.key === 'Enter') checkPin();
   });
 });
 
 function checkPin() {
-  const entered = digits.map(id => document.getElementById(id).value).join('');
+  const entered = digits.map(id => document.getElementById(id)?.value ?? '').join('');
   if (entered === PIN) {
-    document.getElementById('pin-gate').classList.add('hidden');
+    const gate = document.getElementById('pin-gate');
+    const content = document.getElementById('portal-content');
+    if (!gate || !content) {
+      console.error('PIN gate: cannot reveal portal — #pin-gate or #portal-content is missing.');
+      return;
+    }
+    gate.classList.add('hidden');
     setTimeout(() => {
-      document.getElementById('pin-gate').style.display = 'none';
-      document.getElementById('portal-content').classList.add('visible');
+      gate.style.display = 'none';
+      content.classList.add('visible');
     }, 400);
   } else {
     const errorEl = document.getElementById('pinError');
-    errorEl.classList.add('show');
+    if (errorEl) {
+      errorEl.classList.add('show');
+      setTimeout(() => errorEl.classList.remove('show'), 2000);
+    }
     digits.forEach(id => {
       const el = document.getElementById(id);
+      if (!el) return;
       el.classList.add('error');
       el.value = '';
       el.classList.remove('filled');
       setTimeout(() => el.classList.remove('error'), 500);
     });
-    setTimeout(() => errorEl.classList.remove('show'), 2000);
-    document.getElementById('d0').focus();
+    document.getElementById('d0')?.focus();
   }
 }
 
@@ -890,9 +903,20 @@ const ANALYSES = {
 // ============================================
 function openModal(id) {
   const data = ANALYSES[id];
-  if (!data) return;
+  if (!data) {
+    console.error(`openModal: no analysis found for id "${id}". A repo card is pointing at a missing ANALYSES entry.`);
+    return;
+  }
 
-  document.getElementById('modal-title').textContent = data.title;
+  const titleEl = document.getElementById('modal-title');
+  const bodyEl = document.getElementById('modal-body');
+  const modalEl = document.getElementById('analysis-modal');
+  if (!titleEl || !bodyEl || !modalEl) {
+    console.error('openModal: modal markup is missing (#modal-title, #modal-body, or #analysis-modal).');
+    return;
+  }
+
+  titleEl.textContent = data.title;
 
   const badgeHtml = `<span class="repo-badge ${data.badgeClass}" style="display:inline-block;margin-bottom:16px;">${data.badge}</span>`;
   const metaHtml = `<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
@@ -915,13 +939,13 @@ function openModal(id) {
     </div>`;
   }).join('');
 
-  document.getElementById('modal-body').innerHTML = badgeHtml + metaHtml + verdictHtml + sectionsHtml;
-  document.getElementById('analysis-modal').classList.add('open');
+  bodyEl.innerHTML = badgeHtml + metaHtml + verdictHtml + sectionsHtml;
+  modalEl.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
-  document.getElementById('analysis-modal').classList.remove('open');
+  document.getElementById('analysis-modal')?.classList.remove('open');
   document.body.style.overflow = '';
 }
 
