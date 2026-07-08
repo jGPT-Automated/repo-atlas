@@ -1068,10 +1068,13 @@
   // MARQUEE
   // ============================================
   const marquee = document.getElementById('marquee');
-  const skillsHtml = [...SKILLS, ...SKILLS].map(s =>
-    `<span class="skill-chip"><span class="dot"></span>${s}</span>`
-  ).join('');
-  marquee.innerHTML = skillsHtml;
+  if (marquee) {
+    marquee.innerHTML = [...SKILLS, ...SKILLS].map(s =>
+      `<span class="skill-chip"><span class="dot"></span>${s}</span>`
+    ).join('');
+  } else {
+    console.warn('index: #marquee not found; skipping skills marquee.');
+  }
 
   // ============================================
   // PROJECTS GRID
@@ -1080,6 +1083,7 @@
   const grid = document.getElementById('projects-grid');
 
   function renderProjects(filter) {
+    if (!grid) return;
     const filtered = filter === 'all' ? PROJECTS : PROJECTS.filter(p => p.tags.includes(filter));
     grid.innerHTML = filtered.map((p, i) => `
       <a class="project-card${p.featured && i === 0 ? ' featured' : ''}" href="${p.url}" target="_blank">
@@ -1099,6 +1103,7 @@
       </a>
     `).join('');
   }
+  if (!grid) console.warn('index: #projects-grid not found; project grid will not render.');
   renderProjects('all');
 
   document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -1114,7 +1119,7 @@
   // PARTICLE CANVAS (Three.js-style 2D)
   // ============================================
   const canvas = document.getElementById('particle-canvas');
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas && canvas.getContext('2d');
   let W, H, particles = [], angle = 0;
 
   function resizeCanvas() {
@@ -1141,11 +1146,13 @@
   }
 
   let mouseX = 0, mouseY = 0;
-  canvas.addEventListener('mousemove', e => {
-    const r = canvas.getBoundingClientRect();
-    mouseX = ((e.clientX - r.left) / r.width) * 2 - 1;
-    mouseY = ((e.clientY - r.top) / r.height) * 2 - 1;
-  });
+  if (canvas) {
+    canvas.addEventListener('mousemove', e => {
+      const r = canvas.getBoundingClientRect();
+      mouseX = ((e.clientX - r.left) / r.width) * 2 - 1;
+      mouseY = ((e.clientY - r.top) / r.height) * 2 - 1;
+    });
+  }
 
   function drawParticles() {
     const W2 = canvas.offsetWidth, H2 = canvas.offsetHeight;
@@ -1192,16 +1199,20 @@
     requestAnimationFrame(drawParticles);
   }
 
-  resizeCanvas();
-  initParticles();
-  drawParticles();
-  window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+  if (ctx) {
+    resizeCanvas();
+    initParticles();
+    drawParticles();
+    window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+  } else {
+    console.warn('index: particle canvas unavailable (missing element or 2D context); skipping particle animation.');
+  }
 
   // ============================================
   // NAV SCROLL
   // ============================================
   window.addEventListener('scroll', () => {
-    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+    document.getElementById('navbar')?.classList.toggle('scrolled', window.scrollY > 20);
   });
 
   // ============================================
