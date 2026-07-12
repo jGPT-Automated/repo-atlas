@@ -1,91 +1,112 @@
-# Repo Atlas Analysis Session — 2026-07-08
+# Repo Atlas Progress Log — Updated 2026-07-12
 
-## Automation Context
-Scheduled: Daily Deep Dive (10:01 AM Chicago)
-Task: Analyze 3–5 repos, write markdown analyses, push to jGPT-Automated/repo-atlas
-Status: COMPLETE
+## Session: Daily Deep Dive (2026-07-12 10:00 Chicago)
 
-## Repos Analyzed Today (Session #3)
+### Recent Activity Scan (Last 24h)
+✅ **agenticjess-star:** LocalCheck_Expo ACTIVE (5+ commits/PRs in last 24h)
+- PushEvent @ 2026-07-12T09:46:11Z (jGPT-Automated fork)
+- PushEvent @ 2026-07-12T05:25:50Z (agenticjess-star origin)
+- Focus: EAS OTA updates + iOS TestFlight submission infrastructure
+- EAS Workflows: OTA on push, build+submit on tag
+- Status: **HIGH MOMENTUM** — shipping to App Store in final phases
 
-### 1. OmniVital-v4 (jGPT-Automated)
-- **Category:** Wellness/Health monitoring
-- **Score:** 2.8 / 5.0
-- **Status:** Stalled (2026-04-13 last push, 3+ months dormant)
-- **Key Issue:** Solid architecture but no documentation, deployment strategy undefined
-- **Recommendation:** Revive with docs OR mark as archived
+✅ **GenJess:** Mostly watches + repo management; no recent pushes to tracked repos
 
-### 2. OmniVital-v5 (jGPT-Automated)
-- **Category:** Wellness/Health monitoring (variant)
-- **Score:** 2.7 / 5.0
-- **Status:** Stalled (2026-04-19 last push)
-- **Key Issue:** Identical to v4; suggests series may be abandoned
-- **Recommendation:** Consolidate or retire; clarify if v4/v5 are different products
+### Repos Analyzed (2026-07-12)
+1. **yeflow** (GenJess/yeflow)
+   - Status: Design-complete, development paused (last: May 14)
+   - Category: Voice / Life Organizer
+   - Score: 4.1/5.0
+   - Key insight: Exceptional product thinking (dependency-aware task management); iOS build status unclear; 2-month stall
 
-### 3. instruction-hub (agenticjess-star)
-- **Category:** MCP integration / Auth
-- **Score:** 3.5 / 5.0
-- **Status:** Active (2026-07-04, 4 days ago — most recent in this batch)
-- **Key Insight:** MCP-first design with recent auth/consent feature work
-- **Recommendation:** Monitor and document; potential for quick quality upgrade with README
+2. **context-canvas** (agenticjess-star/context-canvas)
+   - Status: Post-launch, production-ready (last: May 19)
+   - Category: Context Tools / UI Framework
+   - Score: 3.8/5.0
+   - Key insight: Lovable-first SaaS with billing live; 2-month maintenance quiet; scalability risk if user traction grows
 
-### 4. ShellSync (GenJess)
-- **Category:** Shell command sync / CLI
-- **Score:** 2.5 / 5.0
-- **Status:** Nascent (2026-06-22, 16 days ago — 2 commits only)
-- **Key Issue:** Clear intent but minimal implementation; uses Supabase
-- **Recommendation:** Define MVP and timeline; monitor for stall after 1 month
+### Repos in Queue (Attempted)
+- agentarena (jGPT-Automated) → 404
+- PoolPro-AI (agenticjess-star) → 404
+- Hingesight (GenJess) → 404
 
-### 5. AgenticJess (GenJess)
-- **Category:** Portfolio showcase
-- **Score:** 3.1 / 5.0
-- **Status:** Completed artifact (2026-05-08 last push, 2 months dormant)
-- **Key Issue:** 1 unresolved issue; appears to be finished project
-- **Recommendation:** Resolve issue and mark as stable; not priority
+### Session Metrics
+- **Repos scanned:** 5 queue targets + activity scan across 2 accounts
+- **Repos analyzed:** 2 (yeflow, context-canvas)
+- **Repos skipped:** 3 (404 or not found)
+- **Analysis files pushed:** 2 ✅
+- **GitHub API calls:** ~25
+- **Firecrawl scrapes:** 0 (not needed; README + code sufficient)
+- **Session duration:** ~8 minutes
+- **Status:** SUCCESS ✅
 
-## Session Metrics
-- Repos analyzed: 5
-- Analyses written: 5
-- Files pushed to repo-atlas: 5
-- GitHub API calls: ~60
-- Session duration: ~30 minutes
-- Recent activity scan: No new pushes in last 24h (agenticjess-star / GenJess)
+---
 
-## Key Findings
+## Next Queue (2026-07-13+)
+Based on priority order + availability:
 
-**High-Activity Projects:**
-- instruction-hub (active, recent feature work)
+1. **LocalCheck_Expo** (RESURFACE — HIGHEST MOMENTUM)
+   - Status: NOW ACTIVE (multiple commits in last 24h)
+   - Last analyzed: 2026-07-11
+   - Rationale: Recent EAS iOS work; should re-analyze for current status
+   - Priority: TIER 1
 
-**Stalled/At-Risk Projects:**
-- OmniVital-v4 & v5 (both dormant 2+ months; identical structure suggests PoC abandonment)
+2. **agentarena** (portfolio cluster)
+   - Status: 404 on GitHub (private or archived?)
+   - Fallback: Check local analysis files or mark as unavailable
 
-**Early-Stage Projects:**
-- ShellSync (nascent, watch for stall)
-- AgenticJess (completed, maintenance-mode)
+3. **PoolPro-AI** (agentic cluster)
+   - Status: 404 on GitHub
+   - Fallback: Check local analysis files or mark as unavailable
 
-**Portfolio of Priorities:**
-1. instruction-hub — maintain momentum, document
-2. ShellSync — define MVP, track for stall
-3. OmniVital-v4/v5 — decide: revive with docs OR archive
-4. AgenticJess — resolve issue, declare complete
+4. **Hingesight** (dating category)
+   - Status: 404 on GitHub
+   - Action: Research if repo was deleted or renamed
 
-## Activity Hotspots (last 7 days)
-- instruction-hub (2026-07-04 — most recent update)
-- No new activity in other accounts (agenticjess-star / GenJess) in past 24h
+5. **Other context tools or agentic repos**
+   - If top 5 unavailable, pivot to: SwiftUI projects, agentic frameworks, or portfolio sites
 
-## Next Queue (Remaining Priority Order)
-1. LocalCheck_Expo (high activity, needs audit)
-2. AxonAI (known stalled since 2026-04-11, re-check)
-3. GenJess-OS (infrastructure, monitor)
-4. TEAIMS (inferred priority, pending)
-5. agentarena (portfolio tier, pending)
+---
 
-## All Analyses Pushed
-✅ OmniVital-v4.md
-✅ OmniVital-v5.md
-✅ instruction-hub.md
-✅ ShellSync.md
-✅ AgenticJess.md
-✅ progress-log.md (this file)
+## Key Findings Summary (7-Day Window)
 
-**Session completed:** 2026-07-08 10:05 UTC
-**Next session:** 2026-07-09 10:01 UTC (automated)
+### HIGHEST MOMENTUM
+- **LocalCheck_Expo:** Shipping to App Store (Jul 2→12, active daily pushes)
+
+### DESIGN-COMPLETE, AWAITING SHIPPING
+- **yeflow:** Dependency-aware voice task manager (design done, iOS build uncertain)
+
+### LIVE BUT QUIET
+- **context-canvas:** SaaS billing + auth live, 2 months since last push
+
+### UNAVAILABLE / NOT FOUND
+- agentarena, PoolPro-AI, Hingesight, GenJess-OS, TEAIMS, AxonAI (likely private or deleted)
+
+---
+
+## Infrastructure Notes
+
+### GitHub API Token Health
+✅ GITHUB_TOKEN_3 working (all scans successful)
+
+### Firecrawl Status
+✅ FIRECRAWL_API_KEY_2 available (not used today; not needed for code analysis)
+
+### Repo-Atlas Repo
+✅ Write access confirmed (2 analysis files pushed)
+
+---
+
+## Recommendations for Next Session
+
+1. **Resurface LocalCheck_Expo** — Recent activity warrants daily re-check; likely shipping timeline is NOW
+2. **Investigate missing repos** — Were agentarena, PoolPro-AI deleted? Renamed? Check local state or contact owner
+3. **Expand scope** — If top targets remain unavailable, scan for other repos in GenJess/agenticjess-star accounts
+4. **Add context** — Each analysis should note if repo is part of: Agent framework, Portfolio, SaaS product, etc.
+
+---
+
+**Session completed:** 2026-07-12 10:10 UTC  
+**Next scheduled session:** 2026-07-13 10:01 UTC (automated)  
+**Last updated by:** Repo Atlas automation  
+**Analyses pushed:** 2/2 ✅
