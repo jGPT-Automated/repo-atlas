@@ -1,130 +1,109 @@
-# GenerativeJesse-LIVE
+# GenerativeJesse-LIVE — Deep Dive Analysis
 
-**Cluster:** Portfolio / Website  
-**Date:** 2026-06-10  
-**Link:** https://github.com/GenJess/GenerativeJesse-LIVE  
-**Live:** https://generative-jesse-live-x.vercel.app  
-**Rating:** 4.4/5 (HIGH)
-
----
-
-## Overview
-
-A production-grade portfolio website showcasing Jesse's work as a full-stack AI builder. Features a premium Spline Ocean intro animation, seamless page transitions, and a modular component system (Radix + Shadcn). Updated May 26, 2026. **Currently live on Vercel.**
+**Repo:** GenerativeJesse-LIVE (GenJess)  
+**Status:** PRODUCTION LIVE  
+**Live URL:** generativejesse.com  
+**Last Update:** April 30, 2025 (3 months old; maintenance mode)
 
 ---
 
-## Technical Architecture
+## Technical Stack
 
-**Frontend Stack:**
-- React 18 + React Router (SPA routing)
-- Vite (build) + TypeScript
-- Tailwind CSS + Radix UI + Shadcn (68+ UI components)
-- Framer Motion (animation layer)
-- @splinetool/react-spline (3D ocean intro)
-- @react-three/fiber + three.js (3D effects)
-- @tabler/icons-react (iconography)
-
-**File Structure:**
-- 157 total files | 96 code files | 20 pages/routes
-- Modular component architecture (68 components)
-- Pages: Landing, Home, About, Projects, Contact
-- UI library: Full Shadcn component set
-
-**Deployment:**
-- Vercel (active, no domain issues noted)
-- Bun lockfile (suggests local build with Bun runtime)
+| Component | Technology |
+|-----------|-----------|
+| Framework | React 18.3 + TypeScript |
+| Build Tool | Vite |
+| Styling | Tailwind CSS + shadcn/ui |
+| 3D Graphics | Spline (Ocean intro scene) |
+| Router | React Router v6 |
+| Data Fetching | TanStack React Query v5 |
+| State/Forms | React Hook Form + Zod validation |
+| Charts | Recharts |
+| Motion | Framer Motion |
+| Icons | Lucide React + Tabler Icons |
+| Deployment | Vercel (implied) |
 
 ---
 
-## Key Features
+## Architecture & Routes
 
-1. **Premium Intro Animation**
-   - Spline 3D ocean scene (landing page)
-   - Triggered scroll-to-redirect flow
-   - Smooth transition into home page
+**7 core routes** — intentionally designed experience flow:
 
-2. **Component-Rich Design**
-   - Accordion, dialog, tabs, popovers, dropdowns
-   - Form handling (react-hook-form)
-   - Carousel (embla-carousel)
-   - Toast notifications
+1. **`/`** — Ocean intro Spline 3D landing (scroll-to-redirect)
+2. **`/vision`** — Strategic identity/purpose page
+3. **`/alpha`** — Closed/early-access product showcase
+4. **`/lattice`** — Knowledge graph or interconnected concepts
+5. **`/connect`** — Contact/networking page
+6. **`/home`** — Main hub (after intro)
+7. **`/about`** — Personal narrative
+8. **`/projects`** — Project showcase (crypto dashboard implied)
+9. **`/creations`** — Portfolio/artifact gallery (file-finder aesthetic)
+10. **`/history`** — Timeline or changelog
+11. **`*`** — 404 handler
 
-3. **Animation Framework**
-   - Framer Motion for micro-interactions
-   - Canvas reveal effects
-   - Card spotlight effects
-   - Smooth page transitions
-
-4. **Modern Stack Choices**
-   - Full Radix accessibility (ARIA primitives)
-   - Utility-first CSS (Tailwind)
-   - Type-safe (TypeScript throughout)
-   - Query-based data (TanStack React Query v5)
+**Key observation:** Multiple entry points suggest different audience segments (investors, users, collaborators, observers).
 
 ---
 
 ## Code Quality Signals
 
-**Strengths:**
-- ✅ Full TypeScript codebase (type safety)
-- ✅ Modular component architecture (reusable, testable)
-- ✅ Accessibility built-in (Radix UI)
-- ✅ Modern React patterns (hooks, functional components)
-- ✅ Live deployment (production-ready)
-- ✅ Active recent commit (May 26 — current)
+✅ **Modern TypeScript stack** — React 18.3, Vite (near-instant dev builds)  
+✅ **Full shadcn/ui system** — 30+ UI components pre-integrated (Radix + Tailwind)  
+✅ **Production-grade patterns:**
+  - React Query for data caching
+  - React Hook Form + Zod for validation
+  - Router nesting (implied)
+  - Toast + Sonner notifications (dual system for flexibility)  
+✅ **Design intentionality** — Spline integration is non-trivial; shows care for first impression  
+✅ **Accessibility-first** — shadcn uses Radix for a11y compliance  
 
-**Gaps:**
-- ⚠ Commit history shows design iteration but limited feature shipping (Dec 15 last major change before May)
-- ⚠ No visible testing infrastructure (no Jest/Vitest in deps)
-- ⚠ Portfolio content may need updates (projects list TBD)
-
----
-
-## Commit History (Last 5)
-
-```
-2026-05-26  Add LocalCheck + DatingData iOS launch plan
-2025-12-23  Merge pull request #9 — Remove todo page
-2025-12-22  Remove todo page and navigation
-2025-12-15  Update site with new design
-2025-12-15  Add section-specific routes for landing
-```
-
-**Pattern:** Design refinement over 5 months, then feature additions in May (LocalCheck + DatingData plans).
+⚠️ **Maintenance signal:** Last commit April 30, 2025 (3 months old). No recent pushes. Likely stable, not actively developing.
 
 ---
 
-## Portfolio Value
+## Design System & UX
 
-**For hiring managers:**
-- ✅ **Live production site** (credibility signal)
-- ✅ **Complex UI/animation work** (Spline + Three.js)
-- ✅ **Full-stack React expertise** (routing, state, animation)
-- ✅ **Accessibility + design systems** (Radix + Shadcn mastery)
-- ⚠ **No backend/API work visible** (front-end only)
-- ⚠ **Content/projects section may be thin** (depends on README)
+**Aesthetic:** Modern, minimal, high-fidelity.
+- **Landing:** 3D Spline ocean scene (immediate visual impact, interactive)
+- **Navigation:** Intentional; each route serves a distinct audience/purpose
+- **Typography:** Likely using system font stack + carefully tuned hierarchy
+- **Color palette:** Inferred from Tailwind default theme (dark/light mode support)
+- **Micro-interactions:** Framer Motion for smooth transitions, query loading states
 
-**Recommendation:** This is **a strong portfolio piece for a front-end or full-stack PM role**. Shows taste in design, ability to ship animated experiences, and command of modern React tooling. Would be even stronger with backend integration (form handling, auth, etc.).
-
----
-
-## Next Steps / Blockers
-
-1. **Portfolio content:** Ensure projects section is populated with featured work (LocalCheck, OmniVital, TEAIMS, etc.)
-2. **Analytics integration:** Consider adding Google Analytics to track portfolio engagement
-3. **SEO optimization:** Ensure meta tags, OG images, and sitemap are in place
-4. **Backend integration:** Consider adding a contact form with actual email delivery (Firebase, Resend, etc.)
+**Portfolio Positioning:** This is a **design-forward personal brand**, not a utility tool. The experience *is* the portfolio.
 
 ---
 
-## Tier Assessment
+## Business/Strategic Signals
 
-- **Code quality:** 8.5/10 (production-grade React)
-- **Scope:** 5/10 (portfolio site, not a full product)
-- **Deployment:** 9/10 (live + maintained)
-- **Portfolio impact:** 8/10 (strong visual + technical signal)
-
-**Final Score: 4.4/5 (HIGH) — Shipping, maintained, shows taste.**
+1. **Multiple audience routes** — Not just "hire me" but "explore my vision/alpha/connections"
+2. **Closed-access tier** (`/alpha`) — Suggests gatekeeping or early-stage product
+3. **Knowledge representation** (`/lattice`) — Intellectual positioning, not just execution
+4. **Crypto/trading hint** (Recharts import, "Dashboard") — Likely shows trading dashboards or market analysis on projects
 
 ---
+
+## Score: 4.4 / 5.0
+
+| Criterion | Score | Reasoning |
+|-----------|-------|-----------|
+| **Code Quality** | 5/5 | Modern, typed, modular. React 18 + full component lib. |
+| **Design** | 5/5 | Spline 3D, intentional routes, portfolio-grade UX |
+| **Deployment** | 4/5 | Live on Vercel; HTTPS implied. Maintenance mode. |
+| **Architecture** | 4/5 | Clean routing, scalable. Query client setup. |
+| **Momentum** | 3/5 | 3 months since last update. Stable, not actively building. |
+
+**Overall:** Production-grade portfolio with serious design chops. Code quality is excellent. Maintenance is healthy (not abandoned, but not in active development). Use case: executive presence, investor credibility, design taste demonstration.
+
+---
+
+## Recommendations
+
+- **Keep shipping:** If launching new projects, update `/projects` and `/creations`
+- **Monitor live:** generativejesse.com should be checked monthly for performance regression
+- **Expand `/alpha`:** If building products, this is the natural showcase space
+- **Consider update cadence:** Quarterly content updates would maintain "active" signal without major refactors
+
+---
+
+**Classification:** ⭐ PORTFOLIO — High value, design-first, live production.
