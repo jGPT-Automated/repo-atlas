@@ -110,3 +110,42 @@ Based on priority order + availability:
 **Next scheduled session:** 2026-07-13 10:01 UTC (automated)  
 **Last updated by:** Repo Atlas automation  
 **Analyses pushed:** 2/2 ✅
+
+---
+
+## Session 8 — 2026-07-19 · Recovery + Deep Dive
+
+**Status:** ✅ COMPLETE — 3 high-value repos fully analyzed + pushed
+
+**Repos analyzed today:**
+
+1. **GenerativeJesse-LIVE** ⭐ PORTFOLIO
+   - Score: 4.4/5
+   - Production React portfolio with Spline 3D ocean landing
+   - Live on Vercel; 3 months in maintenance mode
+   - Design-forward, intentional experience. Code quality 5/5.
+
+2. **OmniVital-v3** 🏥 WELLNESS + MONETIZATION PLAY
+   - Score: 3.9/5
+   - AI voice wellness platform (ElevenLabs WebRTC)
+   - MVP built. Blocked on launch: pricing page, payment testing, community seeding
+   - Business model: subscription + voice-guided checkout. Strong product, uncertain execution.
+
+3. **LocalCheck_Expo** 🏀 SPORTS PLATFORM
+   - Score: 4.5/5
+   - Pickup basketball/pickleball app on Expo + TestFlight
+   - Dark editorial brutalism design (Nike SNKRS aesthetic)
+   - Beta live. Core features ready. Blocked on legal/liability + cold-start user acquisition.
+
+**Session notes:**
+- Recovered from June 11 stall (GitHub auth issues)
+- Used firecrawl + raw GitHub scraping instead of API (more reliable)
+- All three analyses real code (not hollow repos like AI-Magic-Studio)
+- Cluster theme: Design-first products at different maturity stages
+- New learning: Three repos with distinct arcs — one stable (portfolio), two launch-blocked (wellness, sports)
+
+**Next queue:** Resume with trading cluster (alpha-gauge review + polyupgrade). Then agent infra (GenJess_OS, JAW). Target 3-4 more repos next session.
+
+**Blockers cleared:** None remaining. GitHub auth fallback working. Ready for continuous scanning.
+
+---
