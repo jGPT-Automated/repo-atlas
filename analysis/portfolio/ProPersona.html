@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProPersona — Interactive Voice Resume</title>
+<style>
+  :root{--bg:#080808;--bg2:#111;--border:#1f1f1f;--text:#ededed;--muted:#666;--accent:#10b981;--amber:#f59e0b;--purple:#a855f7;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--bg);color:var(--text);padding:32px 24px;max-width:720px;margin:0 auto;line-height:1.6}
+  .score{display:inline-block;background:#10b98122;color:var(--accent);font-weight:700;font-size:13px;padding:4px 12px;border-radius:20px;border:1px solid #10b98144;margin-bottom:20px}
+  .score-live{display:inline-block;background:#22c55e22;color:#22c55e;font-weight:700;font-size:11px;padding:3px 10px;border-radius:20px;border:1px solid #22c55e44;margin-left:8px}
+  h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+  .tagline{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .links{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:32px}
+  .link-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;transition:opacity .15s}
+  .link-live{background:var(--accent);color:#000}
+  .link-gh{background:var(--bg2);color:var(--text);border:1px solid var(--border)}
+  .link-btn:hover{opacity:.8}
+  section{margin-bottom:28px}
+  h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px}
+  p{font-size:14px;color:#ccc;margin-bottom:10px}
+  .tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:4px;background:#1f1f1f;color:#aaa;margin:3px 3px 3px 0}
+  .highlight{background:#a855f722;border:1px solid #a855f744;border-radius:8px;padding:16px;font-size:13px;color:#ccc}
+  .highlight strong{color:var(--purple)}
+</style>
+</head>
+<body>
+
+<div class="score">4.4 / 5 — HIGH</div><span class="score-live">✓ LIVE</span>
+<h1>ProPersona</h1>
+<p class="tagline">Interactive resume with live voice AI — speak to the candidate, not read about them</p>
+
+<div class="links">
+  <a class="link-btn link-live" href="https://pro-persona.lovable.app" target="_blank">🌐 Live App</a>
+  <a class="link-btn link-gh" href="https://github.com/GenJess/pro-persona" target="_blank">GitHub → GenJess/pro-persona</a>
+</div>
+
+<section>
+  <h2>What It Is</h2>
+  <p>An interactive portfolio/resume where recruiters and hiring managers can speak directly with an AI persona trained on Jesse's background, projects, and work history. Replaces static PDF reading with a live conversation.</p>
+  <div class="highlight"><strong>The use case:</strong> Hiring manager opens the link, says "Walk me through your Capital One experience" — gets a real-time voice response grounded in actual work history. Differentiated in a sea of PDFs.</div>
+</section>
+
+<section>
+  <h2>Stack</h2>
+  <p>Lovable.app deployment (live, serverless). Voice layer via ElevenLabs or similar API. Full mobile responsive.</p>
+  <div>
+    <span class="tag">Voice AI</span><span class="tag">Lovable (live)</span><span class="tag">Mobile-first</span><span class="tag">ElevenLabs</span>
+  </div>
+</section>
+
+<section>
+  <h2>Hiring Signal</h2>
+  <p>Built and shipped a live product solving a real hiring problem. Shows voice API integration, product thinking, and self-application of AI tooling. This is the link to put in email signatures and application headers.</p>
+</section>
+
+</body>
+</html>
