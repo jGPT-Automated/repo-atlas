@@ -149,3 +149,118 @@ Based on priority order + availability:
 **Blockers cleared:** None remaining. GitHub auth fallback working. Ready for continuous scanning.
 
 ---
+
+---
+
+## Session 9 — 2026-07-21 · Dating + Client Work Cluster
+
+**Status:** ✅ COMPLETE — 3 repos analyzed + pushed to repo-atlas
+
+### Key Finding: Two Dating Products, Same Market
+
+**1. Hingesight (DatingData)** 📊 DATING ANALYTICS + AI COACHING
+- Repository: agenticjess-star/DatingData
+- Score: 4.2/5.0
+- Tech: React 18 + Node.js + PostgreSQL + Gemini 2.5 Flash
+- Model: Full-stack SaaS ($9.99/mo premium)
+- Status: MVP complete; legal review + beta phase next
+- Key mechanic: Upload Hinge data export → AI coaching in 6 categories
+- Differentiation: Server-side processing (data stored), convenience-first
+- Market: 60M Hinge users, $5B+ TAM
+
+**2. Hinge Insights (HingeDatAI)** 🔐 DATING ANALYTICS (PRIVACY-FIRST)
+- Repository: agenticjess-star/HingeDatAI
+- Score: 4.3/5.0
+- Tech: React 18 + Node.js + Browser Local Storage + Gemini
+- Model: SaaS ($9.99/mo premium)
+- Status: MVP complete; production-ready
+- Key mechanic: Same as Hingesight, BUT 100% browser-side processing
+- Differentiation: Privacy moat (data never leaves browser), zero DB scale cost
+- Market: Same TAM as Hingesight
+- **Winner (long-term):** Hinge Insights (privacy + scalability advantage)
+
+### Head-to-Head Comparison
+| Criterion | Hingesight | Hinge Insights | Winner |
+|-----------|-----------|-----------|--------|
+| Privacy | Server DB | Browser Local Storage | Insights |
+| Scale cost | Neon DB growth | Zero | Insights |
+| Feature completeness | 4.2/5 | 4.3/5 | Insights |
+| Launch readiness | High (auth + payments) | High (same) | Insights (slight) |
+| GTM | Same SEO path | Same SEO path | Tie |
+
+**Strategic question for owner:** Two products, one market. Consolidate or compete?
+
+**3. BNR Associates Phase 1** 🏗️ B2B CLIENT WORK (POWER WASHING)
+- Repository: agenticjess-star/bnr-work
+- Score: 4.1/5.0 (different category; this is strategy + delivery docs, not a SaaS)
+- Type: Project intelligence hub (SEO audit, client portal, territory map, pricing guide)
+- Status: Phase 1 complete (site live on Vercel)
+- Key mechanic: Instant AI quote tool + booking flow
+- Business model: Local service business digital transformation
+- Live site: bnr-power-washing-jgpts-projects.vercel.app
+- Key insight: This is a **template for B2B client work** — not just a website handoff, but full strategy docs
+
+### Dating Cluster Insights
+- **Problem identified:** Hinge (and Tinder/Bumble) give engagement metrics, NOT outcome metrics
+- **Opportunity:** AI coaches users via their actual conversation data
+- **TAM:** 60M+ Hinge users globally; US-only TAM ~20M (5% penetration = 1M users)
+- **Unit economics:** $9.99/mo, 4–6 month dating windows (high churn), CAC $5–15 (organic/SEO)
+- **Moat:** Privacy (Hinge Insights) or convenience + data science (Hingesight)
+
+### B2B Client Work Pattern
+The BNR engagement demonstrates a **repeatable model:**
+1. Audit phase (SEO + competitive analysis)
+2. Strategy phase (build business case)
+3. Design phase (high-fidelity mockups)
+4. Build phase (React + Tailwind + Stripe)
+5. Delivery phase (includes intelligence docs + client portal)
+
+This is **higher-value than typical agency work** because it includes strategy artifacts.
+
+---
+
+## Repos Remaining to Analyze (Master Inventory)
+
+**High-value remaining:**
+- AgentAgency (infrastructure)
+- TEAIMS (multi-agent debate)
+- AxonAI (group connective tissue)
+- Agent infra cluster (JAW, GenJess_OS)
+- Trading cluster (more options-harvester, perp-trader analysis)
+
+**Next session target:** Agent infrastructure (JAW, GenJess_OS, career-ops) + trading tools
+
+---
+
+## Session Metrics (2026-07-21)
+
+- **Repos analyzed:** 3 (Hingesight, Hinge Insights, BNR Associates)
+- **Analysis files pushed:** 3 ✅
+- **Code quality verified:** All 3 (no hollow repos like AI Magic Studio)
+- **GitHub API calls:** ~15 (token issues, fallback to raw GitHub scraping)
+- **Session duration:** ~35 minutes
+- **Status:** SUCCESS ✅
+
+---
+
+## Key Learning (Meta-Observation)
+
+The dating cluster reveals a **pattern in startup thinking:**
+- When you see two nearly-identical products from the same founder, it usually means:
+  1. **Exploration phase** — testing which architecture wins
+  2. **Insurance policy** — hedging market bet with two variants
+  3. **Accidental fork** — duplicate effort (should be caught earlier)
+
+For Jesse's case, these are likely **intentional variants** being tested:
+- **Hingesight:** "What if we go for convenience + features?"
+- **Hinge Insights:** "What if we go for privacy + simplicity?"
+
+One will likely win; the other becomes a template or gets sunset. This is a good pattern to see early.
+
+---
+
+**Session completed:** 2026-07-21 10:35 UTC  
+**Next scheduled session:** 2026-07-22 10:01 UTC (automated)  
+**Analyses pushed:** 3/3 ✅  
+**Last updated by:** Repo Atlas automation
+
