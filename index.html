@@ -593,6 +593,7 @@
       <button class="filter-btn" data-filter="ai">AI / Agents</button>
       <button class="filter-btn" data-filter="health">Health Tech</button>
       <button class="filter-btn" data-filter="finance">Fintech</button>
+      <button class="filter-btn" data-filter="sports">Sports</button>
       <button class="filter-btn" data-filter="portfolio">Portfolio</button>
     </div>
 
@@ -725,27 +726,71 @@
   // ============================================
   const PROJECTS = [
     {
+      id: 'localcheck',
+      name: 'LocalCheck',
+      desc: 'Street sports app — find active courts, check in, play, rank up. 5,734 courts mapped, 25+ TestFlight users, shipping.',
+      tags: ['sports'],
+      stack: ['Expo SDK 54', 'React Native', 'Supabase', 'Mapbox', 'ELO'],
+      score: '4.7',
+      dotClass: 'tag-dot-amber',
+      category: 'Sports · Mobile',
+      featured: true,
+      page: 'projects/localcheck.html',
+      github: 'https://github.com/agenticjess-star/LocalCheck_Expo',
+      live: 'https://localcheck.lovable.app'
+    },
+    {
+      id: 'teaims',
+      name: 'TEAIMS',
+      desc: 'Multi-agent AI operating system — 9 specialized agents with adversarial debates, HITL judgement, and persistent context.',
+      tags: ['ai'],
+      stack: ['React 18', 'Vite', 'shadcn/ui', 'Framer Motion', 'LangGraph'],
+      score: '4.1',
+      dotClass: 'tag-dot-amber',
+      category: 'AI / Agents',
+      featured: true,
+      page: 'projects/teaims.html',
+      github: 'https://github.com/GenJess/TEAIMS',
+      live: null
+    },
+    {
       id: 'omnivital',
       name: 'OmniVital',
-      desc: 'Wellness OS — AI advisor, voice agent, ritual tracking, real-time community. 11K+ lines, live on Vercel.',
+      desc: 'AI wellness platform — voice-first consultant, 6 precision formulas, biometric tracking, privacy-first community. 11K+ lines, live.',
       tags: ['health'],
       stack: ['React 18', 'FastAPI', 'Supabase', 'GPT-4.1', 'ElevenLabs'],
       score: '4.2',
       dotClass: 'tag-dot-teal',
       category: 'Health Tech',
-      featured: true,
-      url: 'https://github.com/GenJess/OmniVital'
+      page: 'projects/omnivital.html',
+      github: 'https://github.com/GenJess/omnivital-v3',
+      live: 'https://omnivital.lovable.app'
     },
     {
-      id: 'teaims',
-      name: 'TEAIMS',
-      desc: 'AI talent intelligence platform. B2B agent armory for hiring, screening, and role automation.',
-      tags: ['ai'],
-      stack: ['Python', 'LLM', 'Agents', 'FastAPI'],
+      id: 'alpha-gauge',
+      name: 'Alpha-Gauge',
+      desc: 'Real-time Polymarket trading dashboard — particle filter probability models, Monte Carlo analysis, governance audit trail.',
+      tags: ['finance'],
+      stack: ['React 18', 'Vite', 'TypeScript', 'Polymarket API', 'WebSocket'],
+      score: '4.2',
+      dotClass: 'tag-dot-sky',
+      category: 'Fintech',
+      page: 'projects/alpha-gauge.html',
+      github: 'https://github.com/agenticjess-star/alpha-gauge',
+      live: null
+    },
+    {
+      id: 'generativejesse',
+      name: 'GenerativeJesse',
+      desc: 'Live portfolio — Spline 3D ocean landing, interactive navigation, crypto dashboard. Production at generativejesse.com.',
+      tags: ['portfolio'],
+      stack: ['Vite', 'React', 'Spline 3D', 'shadcn/ui', 'Vercel'],
       score: '4.4',
-      dotClass: 'tag-dot-amber',
-      category: 'AI / Agents',
-      url: 'https://github.com/JessTheGPT/TEAIMS'
+      dotClass: 'tag-dot-violet',
+      category: 'Portfolio',
+      page: 'projects/generativejesse.html',
+      github: 'https://github.com/GenJess/GenerativeJesse-LIVE',
+      live: 'https://generativejesse.com'
     },
     {
       id: 'propersona',
@@ -756,7 +801,22 @@
       score: '4.6',
       dotClass: 'tag-dot-teal',
       category: 'AI / Agents',
-      url: 'https://pro-persona.lovable.app'
+      page: null,
+      github: null,
+      live: 'https://pro-persona.lovable.app'
+    },
+    {
+      id: 'careerops',
+      name: 'CareerOps',
+      desc: 'DevOps principles applied to job hunting — automated pipeline for applications, follow-ups, and tracking.',
+      tags: ['ai'],
+      stack: ['Python', 'CLI', 'Automation', 'LLM'],
+      score: '4.4',
+      dotClass: 'tag-dot-amber',
+      category: 'AI / Agents',
+      page: null,
+      github: 'https://github.com/GenJess/career-ops',
+      live: null
     },
     {
       id: 'agentjess',
@@ -767,7 +827,9 @@
       score: '4.0',
       dotClass: 'tag-dot-violet',
       category: 'Portfolio',
-      url: 'https://github.com/GenJess/agentjess-portfolio'
+      page: null,
+      github: 'https://github.com/GenJess/agentjess-portfolio',
+      live: null
     },
     {
       id: 'purpdex',
@@ -778,18 +840,9 @@
       score: '3.8',
       dotClass: 'tag-dot-sky',
       category: 'Fintech',
-      url: 'https://github.com/GenJess/PurpDex-live'
-    },
-    {
-      id: 'optiq',
-      name: 'OptIQ',
-      desc: 'Options intelligence — AI-driven options flow analysis and strategy recommendations.',
-      tags: ['finance'],
-      stack: ['Python', 'ML', 'Options API', 'React'],
-      score: '3.8',
-      dotClass: 'tag-dot-sky',
-      category: 'Fintech',
-      url: 'https://github.com/GenJess/OptIQ'
+      page: null,
+      github: 'https://github.com/GenJess/PurpDex-live',
+      live: null
     },
     {
       id: 'axonai',
@@ -800,40 +853,9 @@
       score: '3.6',
       dotClass: 'tag-dot-amber',
       category: 'AI / Agents',
-      url: 'https://github.com/GenJess/AxonAI'
-    },
-    {
-      id: 'omnivital-vision',
-      name: 'OmniVital Vision',
-      desc: 'Computer vision extension for OmniVital — biometric analysis from camera input.',
-      tags: ['health'],
-      stack: ['Python', 'OpenCV', 'FastAPI', 'React'],
-      score: '3.4',
-      dotClass: 'tag-dot-teal',
-      category: 'Health Tech',
-      url: 'https://github.com/GenJess/omnivital-vision'
-    },
-    {
-      id: 'careerops',
-      name: 'career-ops',
-      desc: 'DevOps principles applied to job hunting — automated pipeline for applications, follow-ups, and tracking.',
-      tags: ['ai'],
-      stack: ['Python', 'CLI', 'Automation', 'LLM'],
-      score: '4.4',
-      dotClass: 'tag-dot-amber',
-      category: 'AI / Agents',
-      url: 'https://github.com/GenJess/career-ops'
-    },
-    {
-      id: 'imagym',
-      name: 'ImaGym',
-      desc: 'AI fitness platform — computer vision form analysis, personalized workout generation, progress tracking.',
-      tags: ['health'],
-      stack: ['React', 'Python', 'CV', 'OpenAI'],
-      score: '3.6',
-      dotClass: 'tag-dot-teal',
-      category: 'Health Tech',
-      url: 'https://github.com/GenJess/Imagym'
+      page: null,
+      github: 'https://github.com/GenJess/AxonAI',
+      live: null
     },
     {
       id: 'stocktok',
@@ -844,7 +866,9 @@
       score: '3.6',
       dotClass: 'tag-dot-sky',
       category: 'Fintech',
-      url: 'https://github.com/GenJess/stocktok'
+      page: null,
+      github: 'https://github.com/GenJess/stocktok',
+      live: null
     },
     {
       id: 'danielscuts',
@@ -855,7 +879,9 @@
       score: '3.4',
       dotClass: 'tag-dot-violet',
       category: 'Client Work',
-      url: 'https://github.com/GenJess/DanielsBarberShop2.0'
+      page: null,
+      github: 'https://github.com/GenJess/DanielsBarberShop2.0',
+      live: null
     },
   ];
 
@@ -880,8 +906,11 @@
 
   function renderProjects(filter) {
     const filtered = filter === 'all' ? PROJECTS : PROJECTS.filter(p => p.tags.includes(filter));
-    grid.innerHTML = filtered.map((p, i) => `
-      <a class="project-card${p.featured && i === 0 ? ' featured' : ''}" href="${p.url}" target="_blank">
+    grid.innerHTML = filtered.map((p, i) => {
+      const href = p.page || p.live || p.github || '#';
+      const external = p.page ? false : true;
+      return `
+      <a class="project-card${p.featured && i === 0 ? ' featured' : ''}" href="${href}"${external ? ' target="_blank"' : ''}>
         <div class="project-arrow">
           <svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
         </div>
@@ -895,8 +924,8 @@
           <div class="project-stack">${p.stack.map(s => `<span class="stack-chip">${s}</span>`).join('')}</div>
           <div class="project-score">${p.score}</div>
         </div>
-      </a>
-    `).join('');
+      </a>`;
+    }).join('');
   }
   renderProjects('all');
 
