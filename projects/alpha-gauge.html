@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha-Gauge — Polymarket Trading OS | Jesse Harrick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/design-system.css">
+<link rel="stylesheet" href="../shared/nav.css">
+<link rel="stylesheet" href="../shared/components.css">
+<link rel="stylesheet" href="../shared/project-page.css">
+<style>
+  .project-badge { color: #0ea5e9; border: 1px solid rgba(14,165,233,0.2); background: rgba(14,165,233,0.08); }
+  .project-hero-visual { background: linear-gradient(135deg, #080808 0%, #0a0f14 100%); }
+  .price-grid {
+    width: 80%;
+    display: grid;
+    gap: 4px;
+  }
+  .price-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .price-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    overflow: hidden;
+    position: relative;
+  }
+  .price-bar .fill {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    border-radius: 2px;
+  }
+  .price-bar .up { background: #10b981; }
+  .price-bar .down { background: #f43f5e; }
+  .price-label { width: 32px; text-align: right; }
+  .price-val { width: 40px; }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="../index.html" class="nav-brand"><span class="status-dot"></span>JH</a>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="../roadmap.html">Roadmap</a>
+    <a href="../portal.html">Portal</a>
+  </div>
+  <a href="../index.html" class="nav-back">← Back</a>
+</nav>
+
+<section class="project-hero">
+  <div class="project-hero-grid">
+    <div class="project-hero-left">
+      <div class="project-badge">📊 Fintech · Trading</div>
+      <h1 class="project-title">Alpha-Gauge</h1>
+      <p class="project-tagline">Real-time trading intelligence dashboard for Polymarket crypto Up/Down contracts. Streaming live prices, particle filter probability models, and a governance-tracked decision engine.</p>
+      <div class="project-links">
+        <a href="https://github.com/agenticjess-star/alpha-gauge" target="_blank" class="project-link primary">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+    <div class="project-hero-visual">
+      <div class="price-grid">
+        <div class="price-row">
+          <span class="price-label">BTC</span>
+          <div class="price-bar"><div class="fill up" style="width:68%;"></div></div>
+          <span class="price-val" style="color:#34d399;">UP</span>
+          <span style="color:var(--text-muted);">$62.4k</span>
+        </div>
+        <div class="price-row">
+          <span class="price-label">ETH</span>
+          <div class="price-bar"><div class="fill down" style="width:54%;"></div></div>
+          <span class="price-val" style="color:#f43f5e;">DN</span>
+          <span style="color:var(--text-muted);">$3.1k</span>
+        </div>
+        <div class="price-row">
+          <span class="price-label">SOL</span>
+          <div class="price-bar"><div class="fill up" style="width:71%;"></div></div>
+          <span class="price-val" style="color:#34d399;">UP</span>
+          <span style="color:var(--text-muted);">$142</span>
+        </div>
+        <div class="price-row">
+          <span class="price-label">5m</span>
+          <div class="price-bar"><div class="fill up" style="width:58%;"></div></div>
+          <span class="price-val" style="color:#34d399;">UP</span>
+        </div>
+        <div class="price-row">
+          <span class="price-label">15m</span>
+          <div class="price-bar"><div class="fill down" style="width:47%;"></div></div>
+          <span class="price-val" style="color:#f43f5e;">DN</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="project-stats" style="margin-top: 40px;">
+  <div class="stat-cell">
+    <div class="num"><span class="accent">117</span></div>
+    <div class="label">Source Files</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">12.8KB</div>
+    <div class="label">README (API Doc)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">4.2<span style="color:var(--text-muted);font-size:14px;">/5</span></div>
+    <div class="label">Maturity Score</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num" style="color:#f59e0b;">MVP</div>
+    <div class="label">Status</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num" style="color:#f43f5e;">99d</div>
+    <div class="label">Since Last Commit</div>
+  </div>
+</div>
+
+<div class="project-content">
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">01</span>
+      <h2>Architecture</h2>
+    </div>
+    <div class="arch-grid">
+      <div class="arch-card">
+        <div class="layer">Frontend</div>
+        <div class="tech">React 18 · Vite · TypeScript</div>
+        <div class="desc">shadcn/ui + Tailwind CSS. Operator-focused dashboard optimized for time-pressure decision-making.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Data Sources</div>
+        <div class="tech">Polymarket Gamma API · CLOB WS · RTDS WS</div>
+        <div class="desc">Two slug conventions for market discovery. Deterministic epoch-based slugs for 5m/15m/4h. Sub-second WebSocket price feeds.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Analysis Engine</div>
+        <div class="tech">Particle Filter · Monte Carlo</div>
+        <div class="desc">Probabilistic models estimate true probability vs market-implied. Brier scoring for accuracy tracking.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Decision Engine</div>
+        <div class="tech">Spot → Probability → Edge → Action</div>
+        <div class="desc">Four-step operator flow. Each step has explainable conditions. Governance log tracks every decision.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Backend</div>
+        <div class="tech">Lovable Cloud · Supabase Edge</div>
+        <div class="desc">Edge functions handle WebSocket aggregation and market discovery. No standalone server.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Governance</div>
+        <div class="tech">Audit Trail Panel</div>
+        <div class="desc">Every BUY/HOLD/EXIT decision logged with timestamp, conditions, and model edge. Full accountability.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">02</span>
+      <h2>Key Components</h2>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>File</th>
+          <th>Function</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Probability Engine</td>
+          <td class="mono">ProbabilityEngine.tsx</td>
+          <td>9KB — Core model comparison: filtered vs market-implied</td>
+        </tr>
+        <tr>
+          <td>Spot Price Chart</td>
+          <td class="mono">SpotPriceChart.tsx</td>
+          <td>Real-time underlying price with strike overlay</td>
+        </tr>
+        <tr>
+          <td>Up/Down Display</td>
+          <td class="mono">UpDownDisplay.tsx</td>
+          <td>Binary contract visualization — the "is it above/below?" answer</td>
+        </tr>
+        <tr>
+          <td>Brier Score Display</td>
+          <td class="mono">BrierScoreDisplay.tsx</td>
+          <td>Model accuracy metric — how well does the particle filter predict?</td>
+        </tr>
+        <tr>
+          <td>Monte Carlo Grid</td>
+          <td class="mono">MonteCarloGrid.tsx</td>
+          <td>Simulation visualization for price path scenarios</td>
+        </tr>
+        <tr>
+          <td>Governance Panel</td>
+          <td class="mono">GovernancePanel.tsx</td>
+          <td>Decision audit trail with full condition logging</td>
+        </tr>
+        <tr>
+          <td>Decision Engine Display</td>
+          <td class="mono">DecisionEngineDisplay.tsx</td>
+          <td>Final BUY/HOLD/EXIT recommendation with explainable conditions</td>
+        </tr>
+        <tr>
+          <td>Markets Panel</td>
+          <td class="mono">MarketsPanel.tsx</td>
+          <td>6.5KB — Market discovery and selection across timeframes</td>
+        </tr>
+        <tr>
+          <td>Particle Canvas</td>
+          <td class="mono">ParticleCanvas.tsx</td>
+          <td>Visual representation of the particle filter distribution</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">03</span>
+      <h2>The Decision Flow</h2>
+    </div>
+    <div class="feature-list">
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <div class="feature-text">
+          <div class="name">1. Spot vs Strike</div>
+          <div class="detail">"Is the underlying currently above/below the market threshold?" — The foundational question. Real-time spot price from WebSocket feeds overlaid with the contract strike.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 5-5"/></svg></div>
+        <div class="feature-text">
+          <div class="name">2. Implied Probability</div>
+          <div class="detail">"What is Polymarket pricing for UP vs DOWN right now?" — Market-implied probabilities extracted from order book data across multiple timeframes.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg></div>
+        <div class="feature-text">
+          <div class="name">3. Model Edge</div>
+          <div class="detail">"Does filtered probability disagree with market enough to matter?" — Particle filter + Monte Carlo produce a model probability. The gap between model and market = edge.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+        <div class="feature-text">
+          <div class="name">4. Action</div>
+          <div class="detail">"BUY / HOLD / EXIT with explainable conditions + governance log." — Every action is logged with the full decision chain, timestamp, and conditions for post-hoc analysis.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">04</span>
+      <h2>Project Status</h2>
+    </div>
+    <div class="status-panel">
+      <div class="status-cell">
+        <div class="key">Phase</div>
+        <div class="val"><span class="amber">● MVP Complete</span> — All components built, real Polymarket data wired. Last commit April 2026.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Blocker</div>
+        <div class="val"><span class="red">● Stalled 99 days</span> — Likely abandoned. Needs GTM decision: internal tool or SaaS product?</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">TAM</div>
+        <div class="val">$50–150M — Polymarket prediction market traders seeking an edge on binary crypto contracts.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Differentiator</div>
+        <div class="val">Not just a chart — a full decision engine with governance audit trail and explainable model edge.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">05</span>
+      <h2>Tech Stack</h2>
+    </div>
+    <div class="tech-bar">
+      <span class="tech-pill">React 18</span>
+      <span class="tech-pill">Vite</span>
+      <span class="tech-pill">TypeScript</span>
+      <span class="tech-pill">shadcn/ui</span>
+      <span class="tech-pill">Tailwind CSS</span>
+      <span class="tech-pill">Supabase Edge</span>
+      <span class="tech-pill">Polymarket API</span>
+      <span class="tech-pill">WebSocket</span>
+      <span class="tech-pill">Bun</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="left">Alpha-Gauge · Trading OS</div>
+  <div class="right">Jesse Harrick · 2026</div>
+</footer>
+
+<script src="../shared/utils.js"></script>
+<script>
+  initNavScroll({ navId: 'navbar' });
+  initScrollReveal();
+</script>
+</body>
+</html>
