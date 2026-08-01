@@ -4,329 +4,98 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Jesse — Builder</title>
-<meta name="description" content="Scroll to explore.">
+<meta name="description" content="Scroll to explore. Or talk to the orb.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-:root {
-  --bg: #0a0a0a;
-  --text: #ededed;
-  --text-muted: #525252;
-  --text-dim: #2a2a2a;
-  --accent: #10b981;
-  --font-sans: 'Geist', system-ui, sans-serif;
-  --font-mono: 'Geist Mono', monospace;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0a;--text:#ededed;--text-muted:#525252;--text-dim:#2a2a2a;
+  --accent:#10b981;--font-sans:'Geist',system-ui,sans-serif;--font-mono:'Geist Mono',monospace;
 }
-html, body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-sans);
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* WebGL canvas — fixed, full screen */
-#gl-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* 2D overlay canvas for project visuals */
-#overlay-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1;
-  pointer-events: none;
-}
-
-/* Text layer */
-#text-layer {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.scene-text {
-  position: absolute;
-  opacity: 0;
-  transition: opacity 0.6s ease, transform 0.6s ease;
-  transform: translateY(20px);
-  pointer-events: auto;
-}
-.scene-text.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Hero text — centered, minimal */
-.scene-hero {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) translateY(20px);
-  text-align: center;
-}
-.scene-hero.visible {
-  transform: translate(-50%, -50%) translateY(0);
-}
-.scene-hero h1 {
-  font-size: clamp(28px, 4vw, 48px);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  line-height: 1.1;
-  margin-bottom: 12px;
-}
-.scene-hero h1 .dim { color: var(--text-muted); }
-.scene-hero p {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-muted);
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-/* Project text — bottom left, minimal */
-.scene-project {
-  bottom: 15vh;
-  left: 6vw;
-  max-width: 420px;
-}
-.scene-project .label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.scene-project .label::before {
-  content: '';
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-}
-.scene-project h2 {
-  font-size: clamp(24px, 3vw, 36px);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  margin-bottom: 8px;
-}
-.scene-project .desc {
-  font-size: 14px;
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin-bottom: 16px;
-}
-.scene-project .links {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.scene-project .links a {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-decoration: none;
-  padding: 6px 14px;
-  border: 1px solid #1f1f1f;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-.scene-project .links a:hover {
-  color: var(--text);
-  border-color: #333;
-}
-
-/* Finale text — centered */
-.scene-finale {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) translateY(20px);
-  text-align: center;
-}
-.scene-finale.visible {
-  transform: translate(-50%, -50%) translateY(0);
-}
-.scene-finale h2 {
-  font-size: clamp(24px, 3.5vw, 40px);
-  font-weight: 500;
-  letter-spacing: -0.04em;
-  margin-bottom: 12px;
-}
-.scene-finale p {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-bottom: 24px;
-}
-.scene-finale .links {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.scene-finale .links a {
-  font-size: 13px;
-  color: var(--text);
-  text-decoration: none;
-  padding: 10px 20px;
-  border: 1px solid #1f1f1f;
-  border-radius: 6px;
-  transition: all 0.2s;
-}
-.scene-finale .links a:hover {
-  border-color: #333;
-  background: #111;
-}
-.scene-finale .links a.primary {
-  background: var(--text);
-  color: var(--bg);
-  border-color: var(--text);
-}
-
-/* Top bar */
-#topbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 32px;
-  pointer-events: auto;
-}
-#topbar .brand {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-#topbar .brand .dot {
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
-}
-#topbar .nav-links {
-  display: flex;
-  gap: 20px;
-}
-#topbar .nav-links a {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: color 0.15s;
-}
-#topbar .nav-links a:hover { color: var(--text); }
-
-/* Scroll hint */
-#scroll-hint {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 5;
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--text-dim);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  opacity: 1;
-  transition: opacity 0.5s;
-  pointer-events: none;
-}
-#scroll-hint.hidden { opacity: 0; }
-#scroll-hint .line {
-  width: 1px;
-  height: 20px;
-  background: linear-gradient(to bottom, var(--text-dim), transparent);
-  animation: line-pulse 2s ease-in-out infinite;
-}
-@keyframes line-pulse {
-  0%, 100% { opacity: 0.3; transform: scaleY(1); }
-  50% { opacity: 1; transform: scaleY(1.3); }
-}
-
-/* Route dots */
-#route-dots {
-  position: fixed;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 5;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  pointer-events: auto;
-}
-.route-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  border: 1px solid #1f1f1f;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.3s;
-  position: relative;
-  padding: 0;
-}
-.route-dot.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 0 6px rgba(16,185,129,0.5);
-}
-.route-dot .label {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: var(--font-mono);
-  font-size: 8px;
-  color: var(--text-dim);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.2s;
-  pointer-events: none;
-}
-.route-dot:hover { border-color: var(--text-muted); }
-.route-dot:hover .label { opacity: 1; }
+html,body{background:var(--bg);color:var(--text);font-family:var(--font-sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
 /* Scroll spacer */
-#spacer {
-  width: 1px;
-  position: relative;
-  z-index: -1;
-}
+#spacer{width:1px;position:relative;z-index:-1}
 
-@media (max-width: 768px) {
-  #topbar { padding: 14px 20px; }
-  #topbar .nav-links { display: none; }
-  .scene-project { left: 6vw; bottom: 12vh; max-width: 300px; }
-  .route-dot .label { display: none; }
-  #route-dots { right: 12px; }
+/* Fixed canvas for project visuals */
+#bg-canvas{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none}
+
+/* Text layer */
+#text-layer{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2;pointer-events:none}
+.scene-text{position:absolute;opacity:0;transition:opacity .5s ease,transform .5s ease;transform:translateY(20px);pointer-events:auto}
+.scene-text.visible{opacity:1;transform:translateY(0)}
+
+/* Hero — centered */
+.scene-hero{top:50%;left:50%;transform:translate(-50%,-50%) translateY(20px);text-align:center}
+.scene-hero.visible{transform:translate(-50%,-50%) translateY(0)}
+.scene-hero h1{font-size:clamp(28px,4vw,48px);font-weight:500;letter-spacing:-.04em;line-height:1.1;margin-bottom:10px}
+.scene-hero h1 .dim{color:var(--text-muted)}
+.scene-hero p{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.18em;text-transform:uppercase}
+
+/* Project — bottom left */
+.scene-project{bottom:14vh;left:6vw;max-width:400px}
+.scene-project .label{font-family:var(--font-mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px;display:inline-flex;align-items:center;gap:8px}
+.scene-project .label::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.scene-project h2{font-size:clamp(24px,3vw,36px);font-weight:500;letter-spacing:-.03em;line-height:1.1;margin-bottom:6px}
+.scene-project .desc{font-size:14px;color:var(--text-muted);line-height:1.5;margin-bottom:14px}
+.scene-project .links{display:flex;gap:8px;flex-wrap:wrap}
+.scene-project .links a{font-size:12px;color:var(--text-muted);text-decoration:none;padding:6px 14px;border:1px solid #1f1f1f;border-radius:4px;transition:all .2s}
+.scene-project .links a:hover{color:var(--text);border-color:#333}
+
+/* Finale */
+.scene-finale{top:50%;left:50%;transform:translate(-50%,-50%) translateY(20px);text-align:center}
+.scene-finale.visible{transform:translate(-50%,-50%) translateY(0)}
+.scene-finale h2{font-size:clamp(24px,3.5vw,40px);font-weight:500;letter-spacing:-.04em;margin-bottom:10px}
+.scene-finale p{font-size:14px;color:var(--text-muted);margin-bottom:20px}
+.scene-finale .links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.scene-finale .links a{font-size:13px;color:var(--text);text-decoration:none;padding:10px 20px;border:1px solid #1f1f1f;border-radius:6px;transition:all .2s}
+.scene-finale .links a:hover{border-color:#333;background:#111}
+.scene-finale .links a.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+/* Topbar */
+#topbar{position:fixed;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;pointer-events:auto}
+#topbar .brand{font-size:13px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:8px}
+#topbar .brand .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+#topbar .nav-links{display:flex;gap:20px}
+#topbar .nav-links a{font-size:12px;color:var(--text-muted);text-decoration:none;transition:color .15s}
+#topbar .nav-links a:hover{color:var(--text)}
+
+/* Route dots */
+#route-dots{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:10px;pointer-events:auto}
+.route-dot{width:6px;height:6px;border-radius:50%;border:1px solid #1f1f1f;background:transparent;cursor:pointer;transition:all .3s;position:relative;padding:0}
+.route-dot.active{background:var(--accent);border-color:var(--accent);box-shadow:0 0 6px rgba(16,185,129,.5)}
+.route-dot .label{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+.route-dot:hover{border-color:var(--text-muted)}
+.route-dot:hover .label{opacity:1}
+
+/* Scroll hint */
+#scroll-hint{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:5;font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:.2em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:1;transition:opacity .5s;pointer-events:none}
+#scroll-hint.hidden{opacity:0}
+#scroll-hint .line{width:1px;height:20px;background:linear-gradient(to bottom,var(--text-dim),transparent);animation:line-pulse 2s ease-in-out infinite}
+@keyframes line-pulse{0%,100%{opacity:.3;transform:scaleY(1)}50%{opacity:1;transform:scaleY(1.3)}}
+
+/* THE ORB — bottom right corner, like a pet */
+#orb-container{position:fixed;bottom:20px;right:20px;z-index:8;pointer-events:auto;cursor:pointer;transition:transform .2s}
+#orb-container:hover{transform:scale(1.08)}
+#orb-canvas{display:block;width:64px;height:64px}
+#orb-label{position:absolute;bottom:-16px;right:0;font-family:var(--font-mono);font-size:8px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;opacity:0;transition:opacity .2s}
+#orb-container:hover #orb-label{opacity:1}
+
+/* Orb status toast — when agent navigates */
+#orb-toast{position:fixed;bottom:96px;right:20px;z-index:9;max-width:260px;padding:10px 14px;background:#111;border:1px solid #1f1f1f;border-radius:6px;font-size:12px;color:var(--text-muted);line-height:1.4;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+#orb-toast.visible{opacity:1;transform:translateY(0)}
+#orb-toast .toast-label{font-family:var(--font-mono);font-size:9px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+
+@media(max-width:768px){
+  #topbar{padding:14px 20px}
+  #topbar .nav-links{display:none}
+  .scene-project{left:6vw;bottom:12vh;max-width:300px}
+  .route-dot .label{display:none}
+  #route-dots{right:12px}
+  #orb-canvas{width:48px;height:48px}
 }
 </style>
 </head>
@@ -341,592 +110,396 @@ html, body {
   </div>
 </div>
 
-<canvas id="gl-canvas"></canvas>
-<canvas id="overlay-canvas"></canvas>
+<canvas id="bg-canvas"></canvas>
 <div id="text-layer"></div>
 <div id="route-dots"></div>
 <div id="scroll-hint"><span>scroll</span><div class="line"></div></div>
+
+<!-- THE ORB PET -->
+<div id="orb-container" title="Agent is here. Talk to me on Telegram.">
+  <canvas id="orb-canvas"></canvas>
+  <div id="orb-label">agent</div>
+</div>
+<div id="orb-toast">
+  <div class="toast-label">Agent</div>
+  <div id="orb-toast-text">Navigating...</div>
+</div>
+
 <div id="spacer"></div>
 
 <script>
 // ============================================
-// THINKING ORB — WebGL scroll-scrubbed experience
-// One orb that morphs through project states as you scroll
+// THINKING ORBS ENGINE — Ported from thinking-orbs (Jakub Antalik)
+// Canvas 2D, dot-based 3D rendering. 6 states.
+// Source: github.com/Jakubantalik/thinking-orbs
 // ============================================
 
-(function() {
-'use strict';
+// --- core.ts ---
+const hashD=(a,b)=>{const h=Math.sin(a*12.9898+b*78.233)*43758.5453;return h-Math.floor(h)};
+const fibDir=(i,n)=>{const g=Math.PI*(3-Math.sqrt(5));const y=1-(2*(i+.5))/n;const r=Math.sqrt(1-y*y);const a=i*g;return[r*Math.cos(a),y,r*Math.sin(a)]};
+const angleDelta=(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b));
+function makeProj(yaw,tilt,cx,cy,scale){const st=Math.sin(tilt),ct=Math.cos(tilt),sy=Math.sin(yaw),cyw=Math.cos(yaw);return(x,y,z)=>{const x1=x*cyw+z*sy;const z1=-x*sy+z*cyw;const y1=y*ct-z1*st;const z2=y*st+z1*ct;return[cx+x1*scale,cy-y1*scale,z2]}};
+function paint(ctx,dots,dark,rMin){dots.sort((a,b)=>a.z-b.z);for(const d of dots){const alpha=d.a??1;if(alpha<.02)continue;const w=Math.min(1,Math.max(0,d.white));const g=Math.round((dark?1-w:w)*255);ctx.fillStyle=`rgba(${g},${g},${g},${alpha})`;ctx.beginPath();ctx.arc(d.x,d.y,Math.max(rMin,d.r),0,Math.PI*2);ctx.fill()}}
+const radiusScale=(size,pow)=>Math.pow(size/300,pow);
 
-// --- SCENES ---
-// Each scene: orb color, orb behavior, project overlay visual, text
-const SCENES = [
-  {
-    label: 'Intro',
-    orbColor: [0.063, 0.725, 0.502],  // emerald
-    orbState: 'calm',
-    text: { type: 'hero', title: 'Jesse builds\nthings that ship.', subtitle: 'Scroll to explore' },
-  },
-  {
-    label: 'LocalCheck',
-    orbColor: [0.976, 0.451, 0.086],  // amber #f97316
-    orbState: 'active',
-    overlay: 'localcheck',
-    text: {
-      type: 'project',
-      label: 'Sports · Mobile',
-      title: 'LocalCheck',
-      desc: 'Find active courts. Check in. Play. Rank up. 5,700+ courts mapped. Shipping to App Store.',
-      links: [
-        { label: 'GitHub', href: 'https://github.com/agenticjess-star/LocalCheck_Expo' },
-        { label: 'Live', href: 'https://localcheck.lovable.app' },
-        { label: 'Details', href: 'projects/localcheck.html' },
-      ],
-    },
-  },
-  {
-    label: 'TEAIMS',
-    orbColor: [0.506, 0.549, 0.973],  // indigo #818cf8
-    orbState: 'thinking',
-    overlay: 'teaims',
-    text: {
-      type: 'project',
-      label: 'AI / Agents',
-      title: 'TEAIMS',
-      desc: '9 agents. Adversarial debates. Human-in-the-loop judgement. Persistent context across sessions.',
-      links: [
-        { label: 'GitHub', href: 'https://github.com/GenJess/TEAIMS' },
-        { label: 'Details', href: 'projects/teaims.html' },
-      ],
-    },
-  },
-  {
-    label: 'OmniVital',
-    orbColor: [0.063, 0.725, 0.502],  // emerald
-    orbState: 'shaping',
-    overlay: 'omnivital',
-    text: {
-      type: 'project',
-      label: 'Health Tech',
-      title: 'OmniVital',
-      desc: 'Voice-first AI consultant. 6 precision formulas. Biometric tracking. Privacy-first community.',
-      links: [
-        { label: 'GitHub', href: 'https://github.com/GenJess/omnivital-v3' },
-        { label: 'Live', href: 'https://omnivital.lovable.app' },
-        { label: 'Details', href: 'projects/omnivital.html' },
-      ],
-    },
-  },
-  {
-    label: 'Alpha-Gauge',
-    orbColor: [0.055, 0.647, 0.914],  // sky #0ea5e9
-    orbState: 'solving',
-    overlay: 'alphagauge',
-    text: {
-      type: 'project',
-      label: 'Fintech',
-      title: 'Alpha-Gauge',
-      desc: 'Real-time Polymarket dashboard. Particle filter probability models. Monte Carlo analysis.',
-      links: [
-        { label: 'GitHub', href: 'https://github.com/agenticjess-star/alpha-gauge' },
-        { label: 'Details', href: 'projects/alpha-gauge.html' },
-      ],
-    },
-  },
-  {
-    label: 'Contact',
-    orbColor: [0.063, 0.725, 0.502],
-    orbState: 'converge',
-    text: {
-      type: 'finale',
-      title: 'Let\'s build\nsomething real.',
-      desc: 'Open to roles, contract work, founding engineer positions.',
-      links: [
-        { label: 'Email', href: 'mailto:Generative.jesse@gmail.com', primary: true },
-        { label: 'GitHub', href: 'https://github.com/GenJess' },
-        { label: 'Portfolio', href: 'https://generativejesse.com' },
-      ],
-    },
-  },
+// --- profiles.ts ---
+const BASE_PROFILES={
+  globe:{latRings:17,lonDensity:44,rBase:.6,rDepth:1.7,rBoost:1,inkFar:.62,inkSpan:.54,rsPow:.6,rMin:.3},
+  orbits:{orbitN:12,ghostN:40,ghostR:.9,ghostA:.5,particles:3,partR:1.2,partRDepth:1.6,rsPow:.6,rMin:.3},
+  rubik:{latRings:15,lonDensity:40,moveCount:14,rBase:.6,rDepth:1.7,rActive:.3,inkFar:.62,inkSpan:.54,rsPow:.6,rMin:.3},
+  wave:{rings:15,lonDensity:40,rBase:.6,rDepth:1.7,rsPow:.6,rMin:.3},
+  ribbon:{lanes:5,segs:88,ghostN:150,rBase:1.1,rDepth:1.7,rsPow:.6,rMin:.3},
+  morph:{rDot:.021,iconD:1,rMin:.25}
+};
+function scaleCounts(o,s){const out={...o};const rt=Math.sqrt(s);const pairs=[['latRings','lonDensity'],['rings','lonDensity'],['lanes','segs']];const done=new Set();for(const[a,b]of pairs){if(out[a]!=null&&out[b]!=null&&!done.has(a)){out[a]=Math.max(2,Math.round(out[a]*rt));out[b]=Math.max(2,Math.round(out[b]*rt));done.add(a);done.add(b)}}for(const k of['orbitN','ghostN']){if(out[k]!=null&&!done.has(k))out[k]=Math.max(1,Math.round(out[k]*s))}for(const k of['iconD']){if(out[k]!=null)out[k]=Math.max(.02,out[k]*s)}return out}
+function scaleRadii(o,s){const out={...o};for(const k of['rBase','rDepth','rActive','rDot','ghostR','partR','partRDepth']){if(out[k]!=null)out[k]*=s}out.rSizeMul=(out.rSizeMul??1)*s;return out}
+
+// --- presets.ts ---
+const STATE_TO_MODE={working:'orbits',searching:'globe',solving:'rubik',listening:'wave',composing:'ribbon',shaping:'morph'};
+const PRESETS={
+  orbits:{64:{speed:1.885,count:1,size:1},20:{speed:3.9,count:.238,size:2.4}},
+  globe:{64:{speed:2.015,count:.42,size:1.15,extra:{scanMul:4.08,dimBase:.45}},20:{speed:2.665,count:.105,size:1.75,extra:{scanMul:4.335,dimBase:.45}}},
+  rubik:{64:{speed:1.82,count:.35,size:1.05},20:{speed:1.95,count:.088,size:1.9}},
+  wave:{64:{speed:4.388,count:.341,size:1},20:{speed:3.998,count:.105,size:1.6}},
+  ribbon:{64:{speed:2.34,count:.25,size:.85,extra:{spin:0,bandMul:3.9,wobMul:1}},20:{speed:3.12,count:.051,size:1.073,extra:{spin:0,bandMul:4.94,wobMul:1}}},
+  morph:{64:{speed:2.405,count:.54,size:.395,extra:{spread:1.45}},20:{speed:2.08,count:.53,size:1.011,extra:{spread:1.45}}}
+};
+function resolvePreset(state,size){const mode=STATE_TO_MODE[state];const preset=PRESETS[mode][size];let opts={...BASE_PROFILES[mode]};if(preset.count!==1)opts=scaleCounts(opts,preset.count);if(preset.size!==1)opts=scaleRadii(opts,preset.size);if(preset.extra)opts={...opts,...preset.extra};return{mode,speed:preset.speed,opts}}
+
+// --- lattice.ts: drawGlobe, drawRubik, drawWave ---
+function solveCycle(time,count,slotDur,rest){const cyc=2*count*slotDur+rest;const tc=time%cyc;const amount=new Array(count).fill(0);let active=-1;if(tc<2*count*slotDur){const slot=Math.floor(tc/slotDur);const p=(tc-slot*slotDur)/slotDur;const cl=Math.min(1,p/.7);const ep=1-Math.pow(1-cl,3);if(slot<count){for(let i=0;i<slot;i++)amount[i]=1;amount[slot]=ep;active=slot}else{const u=2*count-1-slot;for(let i=0;i<u;i++)amount[i]=1;amount[u]=1-ep;active=u}}return{amount,active}}
+function makeMoves(count){const moves=[];for(let i=0;i<count;i++){const axis=Math.min(2,Math.floor(hashD(i,2.3)*3));const lo=-1+.5*Math.min(3,Math.floor(hashD(i,5.9)*4));const dir=hashD(i,7.7)<.5?1:-1;moves.push({axis,lo,hi:lo+.5,ang:dir*Math.PI/2})}return moves}
+function applyMoves(pt3,moves,sc){let[x,y,z]=pt3;let inActive=false;for(let i=0;i<moves.length;i++){if(sc.amount[i]<=0)continue;const mv=moves[i];const coord=mv.axis===0?x:mv.axis===1?y:z;if(coord<mv.lo||coord>=mv.hi)continue;if(i===sc.active)inActive=true;const a=mv.ang*sc.amount[i];const ca=Math.cos(a),sa=Math.sin(a);if(mv.axis===0){const y2=y*ca-z*sa;z=y*sa+z*ca;y=y2}else if(mv.axis===1){const x2=x*ca+z*sa;z=-x*sa+z*ca;x=x2}else{const x2=x*ca-y*sa;y=x*sa+y*ca;x=x2}}return[x,y,z,inActive]}
+
+function drawGlobe(ctx,size,t,dark,o){
+  const spin=.5,cx=size/2,cy=size/2,radius=(size/2)*.82,tilt=.4+.06*Math.sin(t*.35);
+  const pt=makeProj(t*spin,tilt,cx,cy,radius);
+  const scan=t*(spin+(1.7-spin)*(o.scanMul??1));
+  const rs=radiusScale(size,o.rsPow??.6),dimBase=o.dimBase??1;
+  const dots=[];const latRings=o.latRings??17,lonDensity=o.lonDensity??44;
+  for(let li=0;li<=latRings;li++){const lat=-Math.PI/2+(li/latRings)*Math.PI;const cl=Math.cos(lat),sl=Math.sin(lat);const lc=Math.max(1,Math.round(Math.abs(cl)*lonDensity));
+    for(let lj=0;lj<lc;lj++){const lon=(lj/lc)*2*Math.PI;const[px,py,z]=pt(cl*Math.cos(lon),sl,cl*Math.sin(lon));const depth=(z+1)/2;
+      const d=angleDelta(lon+t*spin,scan);const boost=Math.exp(-(d*d)/.18)*Math.max(0,z);
+      dots.push({x:px,y:py,z,r:((o.rBase??.6)+(o.rDepth??1.7)*depth+(o.rBoost??1)*boost)*rs,white:(o.inkFar??.62)-(o.inkSpan??.54)*depth,a:dimBase+(1-dimBase)*Math.min(1,boost)})}}
+  paint(ctx,dots,dark,o.rMin)
+}
+
+function drawRubik(ctx,size,t,dark,o){
+  const cx=size/2,cy=size/2,R=(size/2)*.82;
+  const pt=makeProj(t*.55,.35+.1*Math.sin(t*.9),cx,cy,R);
+  const rs=radiusScale(size,o.rsPow??.6),moveCount=o.moveCount??14;
+  const moves=makeMoves(moveCount),sc=solveCycle(t,moveCount,.42,1.2);
+  const dots=[];const latRings=o.latRings??15,lonDensity=o.lonDensity??40;
+  for(let li=0;li<=latRings;li++){const lat=-Math.PI/2+(li/latRings)*Math.PI;const cl=Math.cos(lat),sl=Math.sin(lat);const lc=Math.max(1,Math.round(Math.abs(cl)*lonDensity));
+    for(let lj=0;lj<lc;lj++){const lon=(lj/lc)*2*Math.PI;const[x,y,z,inActive]=applyMoves([cl*Math.cos(lon),sl,cl*Math.sin(lon)],moves,sc);const[px,py,zr]=pt(x,y,z);const depth=(zr+1)/2;
+      dots.push({x:px,y:py,z:zr,r:((o.rBase??.6)+(o.rDepth??1.7)*depth+(inActive?(o.rActive??.3):0))*rs,white:(o.inkFar??.62)-(o.inkSpan??.54)*depth-(inActive?.14:0)})}}
+  paint(ctx,dots,dark,o.rMin)
+}
+
+function drawWave(ctx,size,t,dark,o){
+  const cx=size/2,cy=size/2,R=(size/2)*.874;
+  const pt=makeProj(t*.18,.38,cx,cy,1),rs=radiusScale(size,o.rsPow??.6);
+  const dots=[];const rings=o.rings??15,lonDensity=o.lonDensity??40;
+  for(let ri=0;ri<=rings;ri++){const lat=-Math.PI/2+(ri/rings)*Math.PI;const cl=Math.cos(lat),sl=Math.sin(lat);
+    const w=.62*Math.sin(t*2.1-ri*.52)+.38*Math.sin(t*1.27+ri*.83);const rr=R*(.88+.105*w);
+    const lc=Math.max(1,Math.round(Math.abs(cl)*lonDensity));
+    for(let lj=0;lj<lc;lj++){const lon=(lj/lc)*2*Math.PI;const[px,py,z]=pt(cl*Math.cos(lon)*rr,sl*rr,cl*Math.sin(lon)*rr);const depth=(z/R+1)/2;const crest=Math.max(0,w);
+      dots.push({x:px,y:py,z,r:((o.rBase??.6)+(o.rDepth??1.7)*depth)*(1+.4*crest)*rs,white:(o.inkFar??.62)-(o.inkSpan??.54)*depth+.1*crest})}}
+  paint(ctx,dots,dark,o.rMin)
+}
+
+// --- morph.ts: drawMorph ---
+function drawMorph(ctx,size,t,dark,o){
+  function smoothE(x){return x*x*(3-2*x)}
+  function polyPath(verts){const V=verts.length,L=[],total=0;for(let i=0;i<V;i++){const a=verts[i],b=verts[(i+1)%V];const l=Math.hypot(b[0]-a[0],b[1]-a[1]);L.push(l);total+=l}return f=>{let target=f*total;let i=0;while(target>L[i]&&i<V-1){target-=L[i];i++}const a=verts[i],b=verts[(i+1)%V];const ff=L[i]?Math.min(1,target/L[i]):0;return[a[0]+(b[0]-a[0])*ff,a[1]+(b[1]-a[1])*ff]}}
+  const CIRCLE=f=>{const a=-Math.PI/2+f*2*Math.PI;return[Math.cos(a)*.24,Math.sin(a)*.24]};
+  const TRIANGLE=polyPath([[0,-.26],[.24,.16],[-.24,.16]]);
+  const SQUARE=polyPath([[0,-.2],[.2,-.2],[.2,.2],[-.2,.2],[-.2,-.2]]);
+  const CYCLE=[CIRCLE,TRIANGLE,SQUARE];
+  function morphN(d){return Math.max(6,Math.round(34*d))}
+  const HOLD=1.4,MORPH=.9,SEG=HOLD+MORPH;
+  const K=CYCLE.length,tc=t%(SEG*K),k=Math.floor(tc/SEG),local=tc-k*SEG;
+  const m=local>HOLD?smoothE((local-HOLD)/MORPH):0,sprd=o.spread??1;
+  const pA=CYCLE[k],pB=CYCLE[(k+1)%K],M=160;const pts=[];
+  for(let i=0;i<M;i++){const f=i/M,a=pA(f),b=pB(f);pts.push([(a[0]+(b[0]-a[0])*m)*sprd,(a[1]+(b[1]-a[1])*m)*sprd])}
+  const L=[],total=0;let tot=0;for(let i=0;i<M;i++){const a=pts[i],b=pts[(i+1)%M];const l=Math.hypot(b[0]-a[0],b[1]-a[1]);L.push(l);tot+=l}
+  const n=morphN(o.iconD??1),re=(o.rDot??.021)*1.35*sprd,pulse=1+.02*Math.sin(local*3.1);
+  const dots=[],c2=size/2;let seg=0,acc=0;
+  for(let k2=0;k2<n;k2++){const target=(k2/n)*tot;while(acc+L[seg]<target&&seg<M-1){acc+=L[seg];seg++}const a=pts[seg],b=pts[(seg+1)%M];const f=L[seg]?Math.min(1,(target-acc)/L[seg]):0;const x=(a[0]+(b[0]-a[0])*f)*pulse,y=(a[1]+(b[1]-a[1])*f)*pulse;
+    dots.push({x:c2+x*size,y:c2+y*size,z:0,r:Math.max(.35,re*size),white:.1})}
+  paint(ctx,dots,dark,o.rMin)
+}
+
+// --- orbits.ts: drawOrbits ---
+function drawOrbits(ctx,size,t,dark,o){
+  const cx=size/2,cy=size/2,R=(size/2)*.82;
+  const pt=makeProj(t*.12,.3,cx,cy,1),rs=radiusScale(size,o.rsPow??.6);
+  const dots=[];const orbitN=o.orbitN??12,ghostN=o.ghostN??40,particles=o.particles??3;
+  for(let orb=0;orb<orbitN;orb++){const h1=hashD(orb,1.7),h2=hashD(orb,5.2),h3=hashD(orb,8.9);
+    const ro=R*(.45+.52*h1),th=h1*2*Math.PI,phi=Math.acos(2*h2-1);
+    const nx=Math.sin(phi)*Math.cos(th),ny=Math.cos(phi),nz=Math.sin(phi)*Math.sin(th);
+    let ux=-ny,uy=nx,uz=0;const ul=Math.max(1e-6,Math.sqrt(ux*ux+uy*uy));ux/=ul;uy/=ul;
+    const vx=ny*uz-nz*uy,vy=nz*ux-nx*uz,vz=nx*uy-ny*ux;
+    const speed=(.25+.55*h3)*(h3>.5?1:-1);
+    for(let k=0;k<ghostN;k++){const a=(k/ghostN)*2*Math.PI;const[px,py,z]=pt((ux*Math.cos(a)+vx*Math.sin(a))*ro,(uy*Math.cos(a)+vy*Math.sin(a))*ro,(uz*Math.cos(a)+vz*Math.sin(a))*ro);const depth=(z/ro+1)/2;
+      dots.push({x:px,y:py,z,r:(o.ghostR??.9)*rs,white:.72,a:(o.ghostA??.5)*(.4+.6*depth)})}
+    for(let m2=0;m2<particles;m2++){const a=t*speed+(m2/particles)*2*Math.PI+h2*6;const[px,py,z]=pt((ux*Math.cos(a)+vx*Math.sin(a))*ro,(uy*Math.cos(a)+vy*Math.sin(a))*ro,(uz*Math.cos(a)+vz*Math.sin(a))*ro);const depth=(z/ro+1)/2;
+      dots.push({x:px,y:py,z,r:((o.partR??1.2)+(o.partRDepth??1.6)*depth)*rs,white:.3-.22*depth})}}
+  paint(ctx,dots,dark,o.rMin)
+}
+
+// --- ribbon.ts: drawRibbon ---
+function drawRibbon(ctx,size,t,dark,o){
+  const cx=size/2,cy=size/2,R=(size/2)*.78,spin=o.spin??1;
+  const pt=makeProj(t*.1*spin,.3,cx,cy,1),rs=radiusScale(size,o.rsPow??.6);
+  const dots=[];const ghostN=o.ghostN??150;
+  for(let i=0;i<ghostN;i++){const d=fibDir(i,ghostN);const[px,py,z]=pt(d[0]*R,d[1]*R,d[2]*R);const depth=(z/R+1)/2;dots.push({x:px,y:py,z,r:.8*rs,white:.78,a:.1+.22*depth})}
+  const ya=t*.24*spin,ta=.55+.3*Math.sin(t*.18)*spin;
+  const ux=Math.cos(ya),uy=0,uz=Math.sin(ya);
+  const vx=-uz*Math.sin(ta),vy=Math.cos(ta),vz=ux*Math.sin(ta);
+  const nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;
+  const baseLanes=o.lanes??5,segs=o.segs??88,lanes=Math.max(1,Math.round(baseLanes*(o.bandMul??1)));
+  for(let w=0;w<lanes;w++){const laneOff=(w-(lanes-1)/2)*.075;const edge=Math.abs(w-(lanes-1)/2)/Math.max(1,(lanes-1)/2);
+    for(let k=0;k<segs;k++){const a=(k/segs)*2*Math.PI;
+      const wob=(.16*Math.sin(a*3-t*1.7+w*.22)+.07*Math.sin(a*5+t*1.1))*(o.wobMul??1);
+      const off=laneOff+wob;let x=ux*Math.cos(a)+vx*Math.sin(a)+nx*off,y=uy*Math.cos(a)+vy*Math.sin(a)+ny*off,z=uz*Math.cos(a)+vz*Math.sin(a)+nz*off;
+      const l=Math.sqrt(x*x+y*y+z*z);const[px,py,zr]=pt((x/l)*R,(y/l)*R,(z/l)*R);const depth=(zr/R+1)/2;
+      dots.push({x:px,y:py,z:zr,r:((o.rBase??1.1)+(o.rDepth??1.7)*depth)*(1-.25*edge)*rs,white:.52-.44*depth+.18*edge,a:.4+.6*depth})}}
+  paint(ctx,dots,dark,o.rMin)
+}
+
+const MODE_DRAW={globe:drawGlobe,rubik:drawRubik,wave:drawWave,morph:drawMorph,orbits:drawOrbits,ribbon:drawRibbon};
+
+// ============================================
+// SCENES
+// ============================================
+const SCENES=[
+  {id:'intro',label:'Intro',orbState:'listening',
+    text:{type:'hero',title:'Jesse builds\nthings that ship.',subtitle:'Scroll or talk to the orb'}},
+  {id:'localcheck',label:'LocalCheck',orbState:'working',accent:'#f97316',
+    text:{type:'project',label:'Sports · Mobile',title:'LocalCheck',
+      desc:'Find active courts. Check in. Play. Rank up. 5,700+ courts mapped. Shipping to App Store.',
+      links:[{label:'GitHub',href:'https://github.com/agenticjess-star/LocalCheck_Expo'},{label:'Live',href:'https://localcheck.lovable.app'},{label:'Details',href:'projects/localcheck.html'}]}},
+  {id:'teaims',label:'TEAIMS',orbState:'solving',accent:'#818cf8',
+    text:{type:'project',label:'AI / Agents',title:'TEAIMS',
+      desc:'9 agents. Adversarial debates. Human-in-the-loop judgement. Persistent context across sessions.',
+      links:[{label:'GitHub',href:'https://github.com/GenJess/TEAIMS'},{label:'Details',href:'projects/teaims.html'}]}},
+  {id:'omnivital',label:'OmniVital',orbState:'shaping',accent:'#10b981',
+    text:{type:'project',label:'Health Tech',title:'OmniVital',
+      desc:'Voice-first AI consultant. 6 precision formulas. Biometric tracking. Privacy-first community.',
+      links:[{label:'GitHub',href:'https://github.com/GenJess/omnivital-v3'},{label:'Live',href:'https://omnivital.lovable.app'},{label:'Details',href:'projects/omnivital.html'}]}},
+  {id:'alpha-gauge',label:'Alpha-Gauge',orbState:'searching',accent:'#0ea5e9',
+    text:{type:'project',label:'Fintech',title:'Alpha-Gauge',
+      desc:'Real-time Polymarket dashboard. Particle filter probability models. Monte Carlo analysis.',
+      links:[{label:'GitHub',href:'https://github.com/agenticjess-star/alpha-gauge'},{label:'Details',href:'projects/alpha-gauge.html'}]}},
+  {id:'contact',label:'Contact',orbState:'composing',
+    text:{type:'finale',title:"Let's build\nsomething real.",
+      desc:'Open to roles, contract work, founding engineer positions.',
+      links:[{label:'Email',href:'mailto:Generative.jesse@gmail.com',primary:true},{label:'GitHub',href:'https://github.com/GenJess'},{label:'Portfolio',href:'https://generativejesse.com'}]}},
 ];
 
-const SCENE_SCROLL = 1.5;  // viewport heights per scene
+const SCENE_SCROLL=1.5;
 
-// --- WEBGL ORB SHADER ---
-const vertSrc = `
-attribute vec2 a_pos;
-void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
-`;
-
-const fragSrc = `
-precision highp float;
-uniform vec2 u_res;
-uniform float u_time;
-uniform vec3 u_color;
-uniform float u_progress;     // 0-1 scroll progress within scene
-uniform float u_globalProgress; // 0-1 total scroll progress
-uniform int u_state;            // 0=calm, 1=active, 2=thinking, 3=shaping, 4=solving, 5=converge
-uniform float u_orbSize;
-
-// Simple noise
-float hash(vec2 p) {
-  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-}
-
-float noise(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  f = f * f * (3.0 - 2.0 * f);
-  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
-}
-
-float fbm(vec2 p) {
-  float v = 0.0;
-  float a = 0.5;
-  for (int i = 0; i < 5; i++) {
-    v += a * noise(p);
-    p *= 2.0;
-    a *= 0.5;
-  }
-  return v;
-}
-
-void main() {
-  vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / min(u_res.x, u_res.y);
-  float t = u_time;
-  
-  // Orb center
-  float r = length(uv);
-  float orbR = u_orbSize;
-  
-  // State-specific distortion
-  float distortion = 0.0;
-  if (u_state == 0) {
-    // Calm — slow breathing
-    distortion = sin(r * 8.0 - t * 0.5) * 0.015;
-  } else if (u_state == 1) {
-    // Active — pulsing energy
-    distortion = sin(r * 12.0 - t * 2.0) * 0.025 + sin(uv.x * 3.0 + t) * 0.01;
-  } else if (u_state == 2) {
-    // Thinking — ripples
-    distortion = sin(r * 6.0 - t * 1.5) * 0.02 + fbm(uv * 3.0 + t * 0.1) * 0.015;
-  } else if (u_state == 3) {
-    // Shaping — flowing
-    distortion = fbm(uv * 4.0 + vec2(t * 0.2, 0.0)) * 0.03;
-  } else if (u_state == 4) {
-    // Solving — sharp pulses
-    distortion = sin(atan(uv.y, uv.x) * 5.0 + t * 3.0) * 0.02 + sin(r * 10.0 - t * 2.5) * 0.015;
-  } else {
-    // Converge — pulling inward
-    distortion = sin(r * 5.0 + t) * 0.01 * (1.0 - u_progress);
-  }
-  
-  orbR += distortion;
-  
-  // Orb body
-  float orb = smoothstep(orbR + 0.005, orbR - 0.005, r);
-  
-  // Glow
-  float glow = smoothstep(orbR + 0.3, orbR, r) * 0.4;
-  glow *= glow;
-  
-  // Internal texture
-  float n = fbm(uv * 4.0 + vec2(t * 0.15, t * 0.1));
-  float n2 = fbm(uv * 8.0 - vec2(t * 0.2, 0.0));
-  float internal = n * 0.5 + n2 * 0.3;
-  
-  // Color mixing
-  vec3 col = u_color;
-  vec3 hotSpot = u_color + vec3(0.3);
-  vec3 darkSpot = u_color * 0.3;
-  
-  vec3 orbCol = mix(darkSpot, hotSpot, internal);
-  orbCol += u_color * glow * 1.5;
-  
-  // Rim light
-  float rim = smoothstep(orbR - 0.02, orbR, r) * smoothstep(orbR + 0.04, orbR, r);
-  orbCol += vec3(1.0) * rim * 0.3;
-  
-  // Outer glow
-  vec3 outerGlow = u_color * glow * 0.15;
-  
-  // Background — subtle gradient
-  float bgGrad = 1.0 - length(uv) * 0.5;
-  vec3 bg = vec3(0.039, 0.039, 0.039) * bgGrad;
-  
-  // Combine
-  vec3 final = mix(bg, orbCol, orb);
-  final += outerGlow;
-  
-  // State rings (thinking/shaping states)
-  if (u_state == 2 || u_state == 3) {
-    for (int i = 1; i <= 3; i++) {
-      float ringR = orbR + 0.06 * float(i) + sin(t * float(i) * 0.5) * 0.01;
-      float ring = smoothstep(ringR + 0.003, ringR - 0.003, r) * smoothstep(ringR - 0.003, ringR + 0.003, r);
-      final += u_color * ring * 0.08;
-    }
-  }
-  
-  // Active state — energy particles
-  if (u_state == 1) {
-    for (int i = 0; i < 8; i++) {
-      float fi = float(i);
-      float angle = fi * 0.785 + t * 0.3;
-      float pr = orbR + 0.04 + sin(t * 2.0 + fi) * 0.02;
-      vec2 ppos = vec2(cos(angle), sin(angle)) * pr;
-      float pd = length(uv - ppos);
-      final += u_color * smoothstep(0.008, 0.0, pd) * 0.5;
-    }
-  }
-  
-  // Solving state — data lines
-  if (u_state == 4) {
-    float lines = step(0.98, sin(uv.y * 30.0 + t * 5.0));
-    float mask = smoothstep(orbR + 0.1, orbR - 0.1, r);
-    final += u_color * lines * mask * 0.06;
-  }
-  
-  gl_FragColor = vec4(final, 1.0);
-}
-`;
-
-// --- INIT WEBGL ---
-const glCanvas = document.getElementById('gl-canvas');
-const gl = glCanvas.getContext('webgl') || glCanvas.getContext('experimental-webgl');
-const overlayCanvas = document.getElementById('overlay-canvas');
-const octx = overlayCanvas.getContext('2d');
-
-let W, H, dpr;
-let scrollY = 0, maxScroll = 0;
-let time = 0;
-
-// Compile shader
-function compileShader(src, type) {
-  const s = gl.createShader(type);
-  gl.shaderSource(s, src);
-  gl.compileShader(s);
-  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-    console.error('Shader error:', gl.getShaderInfoLog(s));
-  }
-  return s;
-}
-
-const vs = compileShader(vertSrc, gl.VERTEX_SHADER);
-const fs = compileShader(fragSrc, gl.FRAGMENT_SHADER);
-const prog = gl.createProgram();
-gl.attachShader(prog, vs);
-gl.attachShader(prog, fs);
-gl.linkProgram(prog);
-gl.useProgram(prog);
-
-// Fullscreen quad
-const buf = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-const posLoc = gl.getAttribLocation(prog, 'a_pos');
-gl.enableVertexAttribArray(posLoc);
-gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-const uRes = gl.getUniformLocation(prog, 'u_res');
-const uTime = gl.getUniformLocation(prog, 'u_time');
-const uColor = gl.getUniformLocation(prog, 'u_color');
-const uProgress = gl.getUniformLocation(prog, 'u_progress');
-const uGlobalProgress = gl.getUniformLocation(prog, 'u_globalProgress');
-const uState = gl.getUniformLocation(prog, 'u_state');
-const uOrbSize = gl.getUniformLocation(prog, 'u_orbSize');
-
-// --- BUILD TEXT ---
-const textLayer = document.getElementById('text-layer');
-const textEls = [];
-
-SCENES.forEach((scene, i) => {
-  const el = document.createElement('div');
-  el.className = 'scene-text ' + (scene.text.type === 'hero' ? 'scene-hero' : scene.text.type === 'finale' ? 'scene-finale' : 'scene-project');
-  
-  if (scene.text.type === 'hero') {
-    el.innerHTML = `
-      <h1>${scene.text.title.replace(/\n/g, '<br>')}</h1>
-      <p>${scene.text.subtitle}</p>
-    `;
-  } else if (scene.text.type === 'project') {
-    const c = `rgb(${Math.round(scene.orbColor[0]*255)},${Math.round(scene.orbColor[1]*255)},${Math.round(scene.orbColor[2]*255)})`;
-    el.innerHTML = `
-      <div class="label" style="color:${c}">${scene.text.label}</div>
-      <h2>${scene.text.title}</h2>
-      <div class="desc">${scene.text.desc}</div>
-      <div class="links">${scene.text.links.map(l => `<a href="${l.href}" target="_blank">${l.label}</a>`).join('')}</div>
-    `;
-  } else if (scene.text.type === 'finale') {
-    el.innerHTML = `
-      <h2>${scene.text.title.replace(/\n/g, '<br>')}</h2>
-      <p>${scene.text.desc}</p>
-      <div class="links">${scene.text.links.map(l => `<a href="${l.href}" ${l.primary ? 'class="primary"' : ''}>${l.label}</a>`).join('')}</div>
-    `;
-  }
-  textLayer.appendChild(el);
-  textEls.push(el);
+// ============================================
+// BUILD DOM
+// ============================================
+const textLayer=document.getElementById('text-layer');
+const textEls=[];
+SCENES.forEach((scene,i)=>{
+  const el=document.createElement('div');
+  el.className='scene-text '+(scene.text.type==='hero'?'scene-hero':scene.text.type==='finale'?'scene-finale':'scene-project');
+  if(scene.text.type==='hero'){el.innerHTML=`<h1>${scene.text.title.replace(/\n/g,'<br>')}</h1><p>${scene.text.subtitle}</p>`}
+  else if(scene.text.type==='project'){const c=scene.accent||'#10b981';el.innerHTML=`<div class="label" style="color:${c}">${scene.text.label}</div><h2>${scene.text.title}</h2><div class="desc">${scene.text.desc}</div><div class="links">${scene.text.links.map(l=>`<a href="${l.href}" target="_blank">${l.label}</a>`).join('')}</div>`}
+  else if(scene.text.type==='finale'){el.innerHTML=`<h2>${scene.text.title.replace(/\n/g,'<br>')}</h2><p>${scene.text.desc}</p><div class="links">${scene.text.links.map(l=>`<a href="${l.href}" ${l.primary?'class="primary"':''}>${l.label}</a>`).join('')}</div>`}
+  textLayer.appendChild(el);textEls.push(el)
 });
 
-// --- BUILD ROUTE DOTS ---
-const routeDots = document.getElementById('route-dots');
-SCENES.forEach((scene, i) => {
-  const dot = document.createElement('button');
-  dot.className = 'route-dot';
-  dot.innerHTML = `<span class="label">${scene.label}</span>`;
-  dot.addEventListener('click', () => {
-    window.scrollTo({ top: i * SCENE_SCROLL * H, behavior: 'smooth' });
-  });
-  routeDots.appendChild(dot);
-});
-const dotEls = routeDots.querySelectorAll('.route-dot');
+const routeDots=document.getElementById('route-dots');
+SCENES.forEach((scene,i)=>{const dot=document.createElement('button');dot.className='route-dot';dot.innerHTML=`<span class="label">${scene.label}</span>`;dot.addEventListener('click',()=>window.scrollTo({top:i*SCENE_SCROLL*H,behavior:'smooth'}));routeDots.appendChild(dot)});
+const dotEls=routeDots.querySelectorAll('.route-dot');
 
-// --- RESIZE ---
-function resize() {
-  dpr = Math.min(window.devicePixelRatio || 1, 2);
-  W = window.innerWidth;
-  H = window.innerHeight;
-  
-  [glCanvas, overlayCanvas].forEach(c => {
-    c.width = W * dpr;
-    c.height = H * dpr;
-    c.style.width = W + 'px';
-    c.style.height = H + 'px';
-  });
-  
-  gl.viewport(0, 0, glCanvas.width, glCanvas.height);
-  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  
-  const totalH = SCENES.length * SCENE_SCROLL * H;
-  document.getElementById('spacer').style.height = totalH + 'px';
-  maxScroll = totalH - H;
+// ============================================
+// ORB — The pet
+// ============================================
+const orbCanvas=document.getElementById('orb-canvas');
+const orbCtx=orbCanvas.getContext('2d');
+const ORB_SIZE=64;
+const orbDpr=Math.min(window.devicePixelRatio||1,2);
+orbCanvas.width=ORB_SIZE*orbDpr;orbCanvas.height=ORB_SIZE*orbDpr;
+orbCtx.scale(orbDpr,orbDpr);
+let orbTime=0;let currentOrbState='listening';let resolvedPreset=null;
+
+function setOrbState(state){
+  if(state===currentOrbState)return;
+  currentOrbState=state;
+  resolvedPreset=resolvePreset(state,64);
+}
+setOrbState('listening');
+
+function renderOrb(){
+  orbCtx.clearRect(0,0,ORB_SIZE,ORB_SIZE);
+  const r=resolvedPreset;
+  if(r){const t=orbTime*r.speed;MODE_DRAW[r.mode](orbCtx,ORB_SIZE,t,true,r.opts)}
+  orbTime+=0.016;
+  requestAnimationFrame(renderOrb);
+}
+renderOrb();
+
+// ============================================
+// BACKGROUND CANVAS — Project visuals
+// ============================================
+const bgCanvas=document.getElementById('bg-canvas');
+const bgCtx=bgCanvas.getContext('2d');
+let W=0,H=0,dpr=1,scrollY=0,maxScroll=0,bgTime=0;
+
+function resize(){
+  dpr=Math.min(window.devicePixelRatio||1,2);W=window.innerWidth;H=window.innerHeight;
+  bgCanvas.width=W*dpr;bgCanvas.height=H*dpr;bgCanvas.style.width=W+'px';bgCanvas.style.height=H+'px';
+  bgCtx.setTransform(dpr,0,0,dpr,0,0);
+  const totalH=SCENES.length*SCENE_SCROLL*H;
+  document.getElementById('spacer').style.height=totalH+'px';
+  maxScroll=totalH-H
 }
 
-// --- SCROLL MATH ---
-function getScrollState() {
-  const sceneH = SCENE_SCROLL * H;
-  const scene = Math.min(Math.floor(scrollY / sceneH), SCENES.length - 1);
-  const start = scene * sceneH;
-  const progress = Math.max(0, Math.min(1, (scrollY - start) / sceneH));
-  const global = maxScroll > 0 ? scrollY / maxScroll : 0;
-  return { scene, progress, global };
+function getScrollState(){
+  const sH=SCENE_SCROLL*H;
+  const scene=Math.min(Math.floor(scrollY/sH),SCENES.length-1);
+  const start=scene*sH;
+  const progress=Math.max(0,Math.min(1,(scrollY-start)/sH));
+  return{scene,progress}
 }
 
-// Smooth interpolation
-function lerp(a, b, t) { return a + (b - a) * t; }
-function lerpColor(c1, c2, t) {
-  return [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)];
-}
-function smoothstep(t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }
+function smoothstep(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)}
 
-// --- RENDER ---
-function render() {
-  time += 0.016;
-  const { scene, progress, global } = getScrollState();
-  
-  // --- WebGL orb ---
-  // Interpolate color between current and next scene during transition
-  let orbColor = SCENES[scene].orbColor;
-  let orbSize = 0.22;
-  let orbState = SCENES[scene].orbState;
-  let stateNum = 0;
-  
-  const stateMap = { calm: 0, active: 1, thinking: 2, shaping: 3, solving: 4, converge: 5 };
-  stateNum = stateMap[orbState] || 0;
-  
-  // Size animation per scene
-  if (orbState === 'calm') orbSize = 0.20 + Math.sin(time * 0.3) * 0.005;
-  else if (orbState === 'active') orbSize = 0.24 + Math.sin(time * 1.0) * 0.01;
-  else if (orbState === 'thinking') orbSize = 0.22 + Math.sin(time * 0.5) * 0.008;
-  else if (orbState === 'shaping') orbSize = 0.23;
-  else if (orbState === 'solving') orbSize = 0.22 + Math.sin(time * 2.0) * 0.012;
-  else if (orbState === 'converge') orbSize = 0.15 + progress * 0.05;
-  
-  // Crossfade color at scene transitions
-  const transitionStart = 0.85;
-  if (progress > transitionStart && scene < SCENES.length - 1) {
-    const t = smoothstep((progress - transitionStart) / (1 - transitionStart));
-    orbColor = lerpColor(SCENES[scene].orbColor, SCENES[scene + 1].orbColor, t);
+function renderBg(){
+  bgTime+=0.016;bgCtx.clearRect(0,0,W,H);
+  const{scene,progress}=getScrollState();
+
+  // Background visual per scene
+  const opacity=smoothstep(progress*1.5)*smoothstep((1-progress)*2);
+  if(opacity>0.01&&SCENES[scene].accent){
+    bgCtx.globalAlpha=opacity*0.35;
+    renderProjectVisual(SCENES[scene].id,bgTime,SCENES[scene].accent||'#10b981');
+    bgCtx.globalAlpha=1
   }
-  
-  // Render orb
-  gl.uniform2f(uRes, glCanvas.width, glCanvas.height);
-  gl.uniform1f(uTime, time);
-  gl.uniform3f(uColor, orbColor[0], orbColor[1], orbColor[2]);
-  gl.uniform1f(uProgress, progress);
-  gl.uniform1f(uGlobalProgress, global);
-  gl.uniform1i(uState, stateNum);
-  gl.uniform1f(uOrbSize, orbSize);
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  
-  // --- 2D overlay ---
-  octx.clearRect(0, 0, W, H);
-  const overlayOpacity = smoothstep(progress * 1.5) * smoothstep((1 - progress) * 2);
-  
-  if (SCENES[scene].overlay && overlayOpacity > 0.01) {
-    octx.globalAlpha = overlayOpacity * 0.5;
-    renderOverlay(SCENES[scene].overlay, progress, orbColor);
-    octx.globalAlpha = 1;
-  }
-  
-  // --- Text visibility ---
-  textEls.forEach((el, i) => {
-    const sceneStart = i * SCENE_SCROLL * H;
-    const sceneMid = sceneStart + SCENE_SCROLL * H * 0.4;
-    const dist = Math.abs(scrollY - sceneMid);
-    const range = SCENE_SCROLL * H * 0.35;
-    el.classList.toggle('visible', dist < range);
+
+  // Update orb state based on scene
+  const orbState=SCENES[scene].orbState;
+  setOrbState(orbState);
+
+  // Text visibility
+  textEls.forEach((el,i)=>{
+    const start=i*SCENE_SCROLL*H;const mid=start+SCENE_SCROLL*H*.4;
+    const dist=Math.abs(scrollY-mid);const range=SCENE_SCROLL*H*.35;
+    el.classList.toggle('visible',dist<range)
   });
-  
-  // --- Route dots ---
-  dotEls.forEach((d, i) => d.classList.toggle('active', i === scene));
-  
-  // --- Scroll hint ---
-  document.getElementById('scroll-hint').classList.toggle('hidden', scrollY > 50);
-  
-  requestAnimationFrame(render);
+
+  // Route dots
+  dotEls.forEach((d,i)=>d.classList.toggle('active',i===scene));
+
+  // Scroll hint
+  document.getElementById('scroll-hint').classList.toggle('hidden',scrollY>50);
+
+  requestAnimationFrame(renderBg)
 }
 
-// --- OVERLAY RENDERERS (project-specific visuals around the orb) ---
-function renderOverlay(type, progress, color) {
-  const cx = W / 2, cy = H / 2;
-  const orbR = Math.min(W, H) * 0.22;
-  const c = `rgba(${Math.round(color[0]*255)},${Math.round(color[1]*255)},${Math.round(color[2]*255)},`;
-  
-  if (type === 'localcheck') {
-    // Court grid around orb
-    const cellSize = 36;
-    const gridR = orbR + 60;
-    for (let i = -4; i <= 4; i++) {
-      for (let j = -4; j <= 4; j++) {
-        const x = cx + i * cellSize;
-        const y = cy + j * cellSize;
-        const dist = Math.sqrt(i*i + j*j) * cellSize;
-        if (dist > gridR || dist < orbR - 10) continue;
-        const fade = 1 - Math.max(0, (dist - orbR) / (gridR - orbR));
-        const active = (i + j + Math.floor(time * 0.8)) % 3 === 0;
-        if (active) {
-          octx.strokeStyle = c + (0.12 * fade) + ')';
-          octx.lineWidth = 1;
-          octx.strokeRect(x - cellSize/2, y - cellSize/2, cellSize - 2, cellSize - 2);
-          const pulse = 0.5 + Math.sin(time * 2 + i + j) * 0.5;
-          octx.fillStyle = c + (0.15 * fade * pulse) + ')';
-          octx.beginPath();
-          octx.arc(x, y, 2.5 * pulse, 0, Math.PI * 2);
-          octx.fill();
-        }
+function renderProjectVisual(id,t,color){
+  const cx=W/2,cy=H/2;
+  const c=hexToRgb(color);
+
+  if(id==='localcheck'){
+    // Court grid
+    const cs=36,gr=Math.min(W,H)*0.25;
+    for(let i=-4;i<=4;i++)for(let j=-4;j<=4;j++){
+      const x=cx+i*cs,y=cy+j*cs,d=Math.sqrt(i*i+j*j)*cs;
+      if(d>gr+40)continue;
+      const fade=1-Math.max(0,(d-gr*.5)/(gr));
+      if(fade<=0)continue;
+      const active=(i+j+Math.floor(t*0.8))%3===0;
+      if(active){
+        bgCtx.strokeStyle=`rgba(${c},${.1*fade})`;bgCtx.lineWidth=1;
+        bgCtx.strokeRect(x-cs/2,y-cs/2,cs-2,cs-2);
+        const p=.5+Math.sin(t*2+i+j)*.5;
+        bgCtx.fillStyle=`rgba(${c},${.12*fade*p})`;
+        bgCtx.beginPath();bgCtx.arc(x,y,2.5*p,0,Math.PI*2);bgCtx.fill()
       }
     }
-    // ELO number
-    octx.fillStyle = c + '0.15)';
-    octx.font = '700 14px Geist Mono, monospace';
-    octx.textAlign = 'center';
-    octx.fillText('1247', cx, cy - orbR - 24);
-    octx.font = '500 8px Geist Mono, monospace';
-    octx.fillStyle = c + '0.08)';
-    octx.fillText('ELO', cx, cy - orbR - 10);
-    
-  } else if (type === 'teaims') {
-    // Agent nodes orbiting
-    const agents = ['IDEA', 'ARCH', 'DESIGN', 'SEC', 'GROW', 'LEGAL', 'DATA', 'OPS', 'QA'];
-    const orbitR = orbR + 50;
-    agents.forEach((label, i) => {
-      const a = (i / agents.length) * Math.PI * 2 + time * 0.08;
-      const x = cx + Math.cos(a) * orbitR;
-      const y = cy + Math.sin(a) * orbitR;
-      // Connection line
-      octx.strokeStyle = c + '0.04)';
-      octx.lineWidth = 0.5;
-      octx.beginPath();
-      octx.moveTo(cx, cy);
-      octx.lineTo(x, y);
-      octx.stroke();
-      // Node
-      octx.fillStyle = '#111';
-      octx.strokeStyle = c + '0.1)';
-      octx.lineWidth = 1;
-      octx.beginPath();
-      octx.arc(x, y, 14, 0, Math.PI * 2);
-      octx.fill();
-      octx.stroke();
-      // Label
-      octx.fillStyle = c + '0.2)';
-      octx.font = '500 6px Geist Mono, monospace';
-      octx.textAlign = 'center';
-      octx.fillText(label, x, y + 2);
-    });
-    
-  } else if (type === 'omnivital') {
-    // Vitality rings expanding from orb
-    for (let i = 0; i < 4; i++) {
-      const phase = (time * 0.3 + i / 4) % 1;
-      const r = orbR + phase * 100;
-      const a = (1 - phase) * 0.06;
-      octx.strokeStyle = c + a + ')';
-      octx.lineWidth = 1.5;
-      octx.beginPath();
-      octx.arc(cx, cy, r, 0, Math.PI * 2);
-      octx.stroke();
+  }else if(id==='teaims'){
+    // Agent nodes
+    const agents=['IDEA','ARCH','DESIGN','SEC','GROW','LEGAL','DATA','OPS','QA'];
+    const oR=Math.min(W,H)*0.18;
+    agents.forEach((label,i)=>{
+      const a=(i/agents.length)*Math.PI*2+t*0.08;
+      const x=cx+Math.cos(a)*oR,y=cy+Math.sin(a)*oR;
+      bgCtx.strokeStyle=`rgba(${c},.03)`;bgCtx.lineWidth=.5;
+      bgCtx.beginPath();bgCtx.moveTo(cx,cy);bgCtx.lineTo(x,y);bgCtx.stroke();
+      bgCtx.fillStyle='#111';bgCtx.strokeStyle=`rgba(${c},.08)`;bgCtx.lineWidth=1;
+      bgCtx.beginPath();bgCtx.arc(x,y,14,0,Math.PI*2);bgCtx.fill();bgCtx.stroke()
+    })
+  }else if(id==='omnivital'){
+    // Vitality rings
+    for(let i=0;i<4;i++){
+      const phase=(t*0.3+i/4)%1;const r=Math.min(W,H)*0.12+phase*100;
+      bgCtx.strokeStyle=`rgba(${c},${(1-phase)*.05})`;bgCtx.lineWidth=1.5;
+      bgCtx.beginPath();bgCtx.arc(cx,cy,r,0,Math.PI*2);bgCtx.stroke()
     }
-    // Pulsing inner ring
-    const pulseR = orbR + 8 + Math.sin(time * 1.5) * 3;
-    octx.strokeStyle = c + '0.1)';
-    octx.lineWidth = 2;
-    octx.beginPath();
-    octx.arc(cx, cy, pulseR, 0, Math.PI * 2);
-    octx.stroke();
-    // Vitality score
-    octx.fillStyle = c + '0.12)';
-    octx.font = '500 10px Geist Mono, monospace';
-    octx.textAlign = 'center';
-    octx.fillText('92', cx, cy + orbR + 28);
-    octx.font = '400 7px Geist Mono, monospace';
-    octx.fillStyle = c + '0.06)';
-    octx.fillText('VITALITY', cx, cy + orbR + 42);
-    
-  } else if (type === 'alphagauge') {
-    // Price bars below orb
-    const bars = [
-      { label: 'BTC', up: true, val: '62.4k' },
-      { label: 'ETH', up: false, val: '3.1k' },
-      { label: 'SOL', up: true, val: '142' },
-      { label: '5m',  up: true, val: 'UP' },
-    ];
-    const barW = 80;
-    const spacing = 18;
-    const startY = cy + orbR + 30;
-    const totalW = bars.length * barW;
-    const startX = cx - totalW / 2;
-    
-    bars.forEach((bar, i) => {
-      const x = startX + i * barW;
-      const y = startY;
-      const fill = 0.4 + Math.sin(time * 0.5 + i * 1.2) * 0.2 + 0.2;
-      // Bar track
-      octx.fillStyle = 'rgba(30,30,30,0.5)';
-      octx.fillRect(x, y, barW - 8, 3);
-      // Bar fill
-      octx.fillStyle = bar.up ? 'rgba(16,185,129,0.15)' : 'rgba(244,63,94,0.15)';
-      octx.fillRect(x, y, (barW - 8) * fill, 3);
-      // Label
-      octx.fillStyle = 'rgba(80,80,80,0.4)';
-      octx.font = '500 8px Geist Mono, monospace';
-      octx.textAlign = 'left';
-      octx.fillText(bar.label, x, y - 4);
-      // Value
-      octx.fillStyle = bar.up ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)';
-      octx.font = '500 7px Geist Mono, monospace';
-      octx.fillText(bar.val, x + barW - 24, y - 4);
-    });
+  }else if(id==='alpha-gauge'){
+    // Price bars
+    const bars=[{l:'BTC',up:true,v:'62.4k'},{l:'ETH',up:false,v:'3.1k'},{l:'SOL',up:true,v:'142'},{l:'5m',up:true,v:'UP'}];
+    const bw=80,sp=18,sy=cy+Math.min(W,H)*0.12+30;
+    const tw=bars.length*bw,sx=cx-tw/2;
+    bars.forEach((bar,i)=>{
+      const x=sx+i*bw,y=sy;const fill=.4+Math.sin(t*.5+i*1.2)*.2+.2;
+      bgCtx.fillStyle='rgba(30,30,30,.4)';bgCtx.fillRect(x,y,bw-8,3);
+      bgCtx.fillStyle=bar.up?'rgba(16,185,129,.12)':'rgba(244,63,94,.12)';bgCtx.fillRect(x,y,(bw-8)*fill,3)
+    })
   }
 }
 
-// --- SCROLL ---
-window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
-window.addEventListener('resize', resize);
+function hexToRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return`${r},${g},${b}`}
 
-// --- INIT ---
-resize();
-render();
+// ============================================
+// SCROLL + URL HASH NAVIGATION
+// ============================================
+window.addEventListener('scroll',()=>{scrollY=window.scrollY},{passive:true});
+window.addEventListener('resize',resize);
+
+// Hash navigation — agent can send URL with #localcheck to auto-scroll
+function handleHash(){
+  const hash=window.location.hash.slice(1);
+  if(!hash)return;
+  const idx=SCENES.findIndex(s=>s.id===hash);
+  if(idx>=0){
+    // Show toast
+    const toast=document.getElementById('orb-toast');
+    const toastText=document.getElementById('orb-toast-text');
+    toastText.textContent=`Taking you to ${SCENES[idx].label}...`;
+    toast.classList.add('visible');
+    setTimeout(()=>toast.classList.remove('visible'),2500);
+    // Scroll there
+    setTimeout(()=>window.scrollTo({top:idx*SCENE_SCROLL*H,behavior:'smooth'}),300)
+  }
+}
+window.addEventListener('hashchange',handleHash);
+handleHash(); // Check on load
+
+// Poll for agent commands (lightweight — checks URL hash changes)
+// This lets the agent navigate the user by sending a link
+setInterval(()=>{
+  if(window.location.hash){
+    // Already handled by hashchange
+  }
+},1000);
+
+resize();renderBg();
+
+// Orb click — cycles through states as a demo
+let stateIdx=0;
+const states=['listening','working','solving','searching','shaping','composing'];
+document.getElementById('orb-container').addEventListener('click',()=>{
+  stateIdx=(stateIdx+1)%states.length;
+  setOrbState(states[stateIdx]);
+});
 
 })();
 </script>
