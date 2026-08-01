@@ -3,36 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Jesse — Full-Stack AI Builder</title>
-<meta name="description" content="Scroll to fly through the world of Jesse's builds.">
+<title>Jesse — Builder</title>
+<meta name="description" content="Scroll to explore.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="shared/design-system.css">
-<link rel="stylesheet" href="shared/nav.css">
 <style>
-/* ============================================
-   SCROLL-WORLD — Scroll-scrubbed fly-through
-   Canvas scenes driven by scroll position
-   ============================================ */
-
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0a0a0a;
+  --text: #ededed;
+  --text-muted: #525252;
+  --text-dim: #2a2a2a;
+  --accent: #10b981;
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+}
 html, body {
-  margin: 0; padding: 0;
   background: var(--bg);
-  color: var(--text-primary);
+  color: var(--text);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* The scroll spacer — sets total scrollable height */
-#scroll-track {
-  width: 1px;
-  position: relative;
-  z-index: -1;
-}
-
-/* Fixed canvas stage */
-#stage {
+/* WebGL canvas — fixed, full screen */
+#gl-canvas {
   position: fixed;
   top: 0; left: 0;
   width: 100vw;
@@ -41,116 +37,162 @@ html, body {
   pointer-events: none;
 }
 
-#stage canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
+/* 2D overlay canvas for project visuals */
+#overlay-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
 }
 
-/* Copy layer — text overlays */
-#copy-layer {
+/* Text layer */
+#text-layer {
   position: fixed;
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
   z-index: 2;
   pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.copy-card {
+.scene-text {
   position: absolute;
-  max-width: 560px;
-  padding: 0 32px;
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateY(20px);
   pointer-events: auto;
 }
-.copy-card.visible {
+.scene-text.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-.copy-card .eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+/* Hero text — centered, minimal */
+.scene-hero {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(20px);
+  text-align: center;
+}
+.scene-hero.visible {
+  transform: translate(-50%, -50%) translateY(0);
+}
+.scene-hero h1 {
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+.scene-hero h1 .dim { color: var(--text-muted); }
+.scene-hero p {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Project text — bottom left, minimal */
+.scene-project {
+  bottom: 15vh;
+  left: 6vw;
+  max-width: 420px;
+}
+.scene-project .label {
   font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin-bottom: 16px;
-  padding: 5px 12px;
-  border-radius: 4px;
-  border: 1px solid;
+  margin-bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
-.copy-card .num {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--text-muted);
-  letter-spacing: 0.1em;
+.scene-project .label::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.scene-project h2 {
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
   margin-bottom: 8px;
 }
-.copy-card h2 {
-  font-size: clamp(32px, 4vw, 52px);
-  font-weight: 600;
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+.scene-project .desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
   margin-bottom: 16px;
 }
-.copy-card p {
-  font-size: 15px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: 24px;
-  max-width: 440px;
-}
-.copy-card .stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 24px;
-}
-.copy-card .stack span {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  padding: 4px 10px;
-  border-radius: 3px;
-}
-.copy-card .links {
+.scene-project .links {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
-.copy-card .links a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+.scene-project .links a {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   text-decoration: none;
-  padding: 8px 16px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  transition: all 0.15s;
+  padding: 6px 14px;
+  border: 1px solid #1f1f1f;
+  border-radius: 4px;
+  transition: all 0.2s;
 }
-.copy-card .links a:hover {
-  color: var(--text-primary);
+.scene-project .links a:hover {
+  color: var(--text);
   border-color: #333;
-  transform: translateY(-1px);
 }
-.copy-card .links a.primary {
+
+/* Finale text — centered */
+.scene-finale {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(20px);
+  text-align: center;
+}
+.scene-finale.visible {
+  transform: translate(-50%, -50%) translateY(0);
+}
+.scene-finale h2 {
+  font-size: clamp(24px, 3.5vw, 40px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  margin-bottom: 12px;
+}
+.scene-finale p {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+.scene-finale .links {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.scene-finale .links a {
+  font-size: 13px;
+  color: var(--text);
+  text-decoration: none;
+  padding: 10px 20px;
+  border: 1px solid #1f1f1f;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+.scene-finale .links a:hover {
+  border-color: #333;
+  background: #111;
+}
+.scene-finale .links a.primary {
+  background: var(--text);
   color: var(--bg);
-  background: var(--text-primary);
-  border-color: var(--text-primary);
+  border-color: var(--text);
 }
 
 /* Top bar */
@@ -165,948 +207,726 @@ html, body {
   pointer-events: auto;
 }
 #topbar .brand {
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: -0.02em;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
   text-decoration: none;
-  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 #topbar .brand .dot {
-  width: 6px; height: 6px;
+  width: 5px; height: 5px;
   border-radius: 50%;
   background: var(--accent);
-  animation: pulse-dot 2s ease-in-out infinite;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
 }
 #topbar .nav-links {
   display: flex;
-  gap: 24px;
+  gap: 20px;
 }
 #topbar .nav-links a {
-  font-size: 13px;
-  color: var(--text-secondary);
+  font-size: 12px;
+  color: var(--text-muted);
   text-decoration: none;
   transition: color 0.15s;
 }
-#topbar .nav-links a:hover { color: var(--text-primary); }
+#topbar .nav-links a:hover { color: var(--text); }
 
 /* Scroll hint */
 #scroll-hint {
   position: fixed;
-  bottom: 32px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 5;
   font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 0.15em;
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   opacity: 1;
-  transition: opacity 0.4s;
+  transition: opacity 0.5s;
   pointer-events: none;
 }
 #scroll-hint.hidden { opacity: 0; }
-#scroll-hint .arrow {
+#scroll-hint .line {
   width: 1px;
-  height: 24px;
-  background: linear-gradient(to bottom, var(--text-muted), transparent);
-  animation: hint-pulse 1.8s ease-in-out infinite;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--text-dim), transparent);
+  animation: line-pulse 2s ease-in-out infinite;
 }
-@keyframes hint-pulse {
+@keyframes line-pulse {
   0%, 100% { opacity: 0.3; transform: scaleY(1); }
   50% { opacity: 1; transform: scaleY(1.3); }
 }
 
-/* Route dots — right side navigation */
+/* Route dots */
 #route-dots {
   position: fixed;
-  right: 24px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 5;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   pointer-events: auto;
 }
 .route-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px; height: 6px;
   border-radius: 50%;
-  border: 1px solid var(--border);
+  border: 1px solid #1f1f1f;
   background: transparent;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s;
   position: relative;
+  padding: 0;
 }
 .route-dot.active {
   background: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 0 8px rgba(16,185,129,0.4);
-}
-.route-dot:hover {
-  border-color: var(--text-secondary);
+  box-shadow: 0 0 6px rgba(16,185,129,0.5);
 }
 .route-dot .label {
   position: absolute;
-  right: 16px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--text-muted);
-  letter-spacing: 0.08em;
+  font-size: 8px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
   opacity: 0;
   transition: opacity 0.2s;
   pointer-events: none;
 }
+.route-dot:hover { border-color: var(--text-muted); }
 .route-dot:hover .label { opacity: 1; }
 
-/* Scrollbar progress */
-#scroll-progress {
-  position: fixed;
-  top: 0; left: 0;
-  height: 2px;
-  width: 0%;
-  background: var(--accent);
-  z-index: 20;
-  transition: width 0.1s linear;
+/* Scroll spacer */
+#spacer {
+  width: 1px;
+  position: relative;
+  z-index: -1;
 }
 
-/* Mobile */
 @media (max-width: 768px) {
-  #topbar { padding: 16px 20px; }
+  #topbar { padding: 14px 20px; }
   #topbar .nav-links { display: none; }
-  .copy-card { padding: 0 24px; }
-  .copy-card h2 { font-size: 28px; }
-  .copy-card p { font-size: 14px; }
-  #route-dots { right: 12px; gap: 8px; }
+  .scene-project { left: 6vw; bottom: 12vh; max-width: 300px; }
   .route-dot .label { display: none; }
+  #route-dots { right: 12px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Scroll progress bar -->
-<div id="scroll-progress"></div>
-
-<!-- Top bar -->
 <div id="topbar">
   <a href="#" class="brand"><span class="dot"></span>Jesse Harrick</a>
   <div class="nav-links">
-    <a href="roadmap.html">Roadmap</a>
-    <a href="portal.html">Portal</a>
+    <a href="https://github.com/GenJess">GitHub</a>
+    <a href="https://generativejesse.com">Portfolio</a>
     <a href="https://github.com/jGPT-Automated/repo-atlas">Atlas</a>
   </div>
 </div>
 
-<!-- Fixed canvas stage -->
-<div id="stage">
-  <canvas id="canvas"></canvas>
-</div>
-
-<!-- Copy layer with project overlays -->
-<div id="copy-layer"></div>
-
-<!-- Route dots -->
+<canvas id="gl-canvas"></canvas>
+<canvas id="overlay-canvas"></canvas>
+<div id="text-layer"></div>
 <div id="route-dots"></div>
-
-<!-- Scroll hint -->
-<div id="scroll-hint">
-  <span>scroll to fly through</span>
-  <div class="arrow"></div>
-</div>
-
-<!-- Scroll spacer — sets the scrollable height -->
-<div id="scroll-track"></div>
+<div id="scroll-hint"><span>scroll</span><div class="line"></div></div>
+<div id="spacer"></div>
 
 <script>
 // ============================================
-// SCROLL-WORLD ENGINE — Canvas scroll-scrubbed fly-through
-// Adapted from scroll-world scrub concept, using canvas
-// instead of video clips. Each scene = 2x viewport scroll.
+// THINKING ORB — WebGL scroll-scrubbed experience
+// One orb that morphs through project states as you scroll
 // ============================================
 
 (function() {
-  'use strict';
+'use strict';
 
-  // --- CONFIG ---
-  const SCENE_SCROLL = 2.0;  // viewport heights per scene
-  const TRANSITION = 0.15;    // fraction of scene for crossfade
+// --- SCENES ---
+// Each scene: orb color, orb behavior, project overlay visual, text
+const SCENES = [
+  {
+    label: 'Intro',
+    orbColor: [0.063, 0.725, 0.502],  // emerald
+    orbState: 'calm',
+    text: { type: 'hero', title: 'Jesse builds\nthings that ship.', subtitle: 'Scroll to explore' },
+  },
+  {
+    label: 'LocalCheck',
+    orbColor: [0.976, 0.451, 0.086],  // amber #f97316
+    orbState: 'active',
+    overlay: 'localcheck',
+    text: {
+      type: 'project',
+      label: 'Sports · Mobile',
+      title: 'LocalCheck',
+      desc: 'Find active courts. Check in. Play. Rank up. 5,700+ courts mapped. Shipping to App Store.',
+      links: [
+        { label: 'GitHub', href: 'https://github.com/agenticjess-star/LocalCheck_Expo' },
+        { label: 'Live', href: 'https://localcheck.lovable.app' },
+        { label: 'Details', href: 'projects/localcheck.html' },
+      ],
+    },
+  },
+  {
+    label: 'TEAIMS',
+    orbColor: [0.506, 0.549, 0.973],  // indigo #818cf8
+    orbState: 'thinking',
+    overlay: 'teaims',
+    text: {
+      type: 'project',
+      label: 'AI / Agents',
+      title: 'TEAIMS',
+      desc: '9 agents. Adversarial debates. Human-in-the-loop judgement. Persistent context across sessions.',
+      links: [
+        { label: 'GitHub', href: 'https://github.com/GenJess/TEAIMS' },
+        { label: 'Details', href: 'projects/teaims.html' },
+      ],
+    },
+  },
+  {
+    label: 'OmniVital',
+    orbColor: [0.063, 0.725, 0.502],  // emerald
+    orbState: 'shaping',
+    overlay: 'omnivital',
+    text: {
+      type: 'project',
+      label: 'Health Tech',
+      title: 'OmniVital',
+      desc: 'Voice-first AI consultant. 6 precision formulas. Biometric tracking. Privacy-first community.',
+      links: [
+        { label: 'GitHub', href: 'https://github.com/GenJess/omnivital-v3' },
+        { label: 'Live', href: 'https://omnivital.lovable.app' },
+        { label: 'Details', href: 'projects/omnivital.html' },
+      ],
+    },
+  },
+  {
+    label: 'Alpha-Gauge',
+    orbColor: [0.055, 0.647, 0.914],  // sky #0ea5e9
+    orbState: 'solving',
+    overlay: 'alphagauge',
+    text: {
+      type: 'project',
+      label: 'Fintech',
+      title: 'Alpha-Gauge',
+      desc: 'Real-time Polymarket dashboard. Particle filter probability models. Monte Carlo analysis.',
+      links: [
+        { label: 'GitHub', href: 'https://github.com/agenticjess-star/alpha-gauge' },
+        { label: 'Details', href: 'projects/alpha-gauge.html' },
+      ],
+    },
+  },
+  {
+    label: 'Contact',
+    orbColor: [0.063, 0.725, 0.502],
+    orbState: 'converge',
+    text: {
+      type: 'finale',
+      title: 'Let\'s build\nsomething real.',
+      desc: 'Open to roles, contract work, founding engineer positions.',
+      links: [
+        { label: 'Email', href: 'mailto:Generative.jesse@gmail.com', primary: true },
+        { label: 'GitHub', href: 'https://github.com/GenJess' },
+        { label: 'Portfolio', href: 'https://generativejesse.com' },
+      ],
+    },
+  },
+];
 
-  // --- SCENES ---
-  // Each scene has: id, label, accent color, and a render function(ctx, progress, w, h)
-  // Progress goes 0→1 within the scene's scroll range.
-  // The render function draws the scene-specific visual.
+const SCENE_SCROLL = 1.5;  // viewport heights per scene
 
-  const ACCENTS = {
-    localcheck: '#f97316',
-    teaims: '#818cf8',
-    omnivital: '#10b981',
-    alphaGauge: '#0ea5e9',
-    generativejesse: '#10b981',
-    propersona: '#10b981',
-    careerops: '#f59e0b',
-    agentjess: '#a78bfa',
-    purpdex: '#0ea5e9',
-    axonai: '#f59e0b',
-    stocktok: '#0ea5e9',
-    danielscuts: '#a78bfa',
-  };
+// --- WEBGL ORB SHADER ---
+const vertSrc = `
+attribute vec2 a_pos;
+void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+`;
 
-  const SCENES = [
-    {
-      id: 'hero',
-      label: 'Intro',
-      accent: '#10b981',
-      copy: {
-        eyebrow: 'Full-Stack AI Builder',
-        title: 'Jesse builds\nthings that ship.',
-        body: '70+ repos across AI, fintech, health tech, and sports. Scroll to fly through the portfolio.',
-      },
-      render: renderHero,
-    },
-    {
-      id: 'localcheck',
-      label: 'LocalCheck',
-      accent: ACCENTS.localcheck,
-      copy: {
-        eyebrow: 'Sports · Mobile',
-        title: 'LocalCheck',
-        body: 'Street sports app — find active courts, check in, play, rank up. 5,734 courts mapped, 25+ TestFlight users, shipping.',
-        stack: ['Expo SDK 54', 'React Native', 'Supabase', 'Mapbox', 'ELO'],
-        links: [
-          { label: 'GitHub', href: 'https://github.com/agenticjess-star/LocalCheck_Expo', primary: true },
-          { label: 'Live', href: 'https://localcheck.lovable.app' },
-          { label: 'Details', href: 'projects/localcheck.html' },
-        ],
-      },
-      render: renderLocalCheck,
-    },
-    {
-      id: 'teaims',
-      label: 'TEAIMS',
-      accent: ACCENTS.teaims,
-      copy: {
-        eyebrow: 'AI / Agents',
-        title: 'TEAIMS',
-        body: 'Multi-agent AI operating system — 9 specialized agents with adversarial debates, HITL judgement, and persistent context.',
-        stack: ['React 18', 'Vite', 'shadcn/ui', 'Framer Motion', 'LangGraph'],
-        links: [
-          { label: 'GitHub', href: 'https://github.com/GenJess/TEAIMS', primary: true },
-          { label: 'Details', href: 'projects/teaims.html' },
-        ],
-      },
-      render: renderTEAIMS,
-    },
-    {
-      id: 'omnivital',
-      label: 'OmniVital',
-      accent: ACCENTS.omnivital,
-      copy: {
-        eyebrow: 'Health Tech',
-        title: 'OmniVital',
-        body: 'AI wellness platform — voice-first consultant, 6 precision formulas, biometric tracking, privacy-first community. 11K+ lines, live.',
-        stack: ['React 18', 'FastAPI', 'Supabase', 'GPT-4.1', 'ElevenLabs'],
-        links: [
-          { label: 'GitHub', href: 'https://github.com/GenJess/omnivital-v3', primary: true },
-          { label: 'Live', href: 'https://omnivital.lovable.app' },
-          { label: 'Details', href: 'projects/omnivital.html' },
-        ],
-      },
-      render: renderOmniVital,
-    },
-    {
-      id: 'alpha-gauge',
-      label: 'Alpha-Gauge',
-      accent: ACCENTS.alphaGauge,
-      copy: {
-        eyebrow: 'Fintech',
-        title: 'Alpha-Gauge',
-        body: 'Real-time Polymarket trading dashboard — particle filter probability models, Monte Carlo analysis, governance audit trail.',
-        stack: ['React 18', 'Vite', 'TypeScript', 'Polymarket API', 'WebSocket'],
-        links: [
-          { label: 'GitHub', href: 'https://github.com/agenticjess-star/alpha-gauge', primary: true },
-          { label: 'Details', href: 'projects/alpha-gauge.html' },
-        ],
-      },
-      render: renderAlphaGauge,
-    },
-    {
-      id: 'generativejesse',
-      label: 'GenerativeJesse',
-      accent: ACCENTS.generativejesse,
-      copy: {
-        eyebrow: 'Portfolio',
-        title: 'GenerativeJesse',
-        body: 'Live portfolio — Spline 3D ocean landing, interactive navigation, crypto dashboard. Production at generativejesse.com.',
-        stack: ['Vite', 'React', 'Spline 3D', 'shadcn/ui', 'Vercel'],
-        links: [
-          { label: 'GitHub', href: 'https://github.com/GenJess/GenerativeJesse-LIVE', primary: true },
-          { label: 'Live', href: 'https://generativejesse.com' },
-          { label: 'Details', href: 'projects/generativejesse.html' },
-        ],
-      },
-      render: renderGenerativeJesse,
-    },
-    {
-      id: 'propersona',
-      label: 'ProPersona',
-      accent: ACCENTS.propersona,
-      copy: {
-        eyebrow: 'AI / Agents',
-        title: 'ProPersona',
-        body: 'Live at pro-persona.lovable.app — AI-generated personas for branding, UX research, and go-to-market.',
-        stack: ['React', 'OpenAI', 'Lovable'],
-        links: [
-          { label: 'Live', href: 'https://pro-persona.lovable.app', primary: true },
-        ],
-      },
-      render: renderGeneric,
-    },
-    {
-      id: 'careerops',
-      label: 'CareerOps',
-      accent: ACCENTS.careerops,
-      copy: {
-        eyebrow: 'AI / Agents',
-        title: 'CareerOps',
-        body: 'DevOps principles applied to job hunting — automated pipeline for applications, follow-ups, and tracking.',
-        stack: ['Python', 'CLI', 'Automation', 'LLM'],
-        links: [
-          { label: 'GitHub', href: 'https://github.com/GenJess/career-ops', primary: true },
-        ],
-      },
-      render: renderGeneric,
-    },
-    {
-      id: 'agentjess',
-      label: 'AgentJess',
-      accent: ACCENTS.agentjess,
-      copy: {
-        eyebrow: 'Portfolio',
-        title: 'AgentJess',
-        body: 'Voice-navigated portfolio with Three.js particle orb, ElevenLabs orb, and client-side navigation tools.',
-        stack: ['React', 'Three.js', 'ElevenLabs', 'Gemini'],
-        links: [
-          { label: 'GitHub', href: 'https://github.com/GenJess/agentjess-portfolio', primary: true },
-        ],
-      },
-      render: renderGeneric,
-    },
-    {
-      id: 'finale',
-      label: 'Contact',
-      accent: '#10b981',
-      copy: {
-        eyebrow: 'Let\'s build',
-        title: 'Something real.',
-        body: 'Open to full-time roles, contract work, and founding engineer opportunities. AI, health tech, or fintech — let\'s talk.',
-        links: [
-          { label: 'Email', href: 'mailto:Generative.jesse@gmail.com', primary: true },
-          { label: 'GitHub', href: 'https://github.com/GenJess' },
-          { label: 'Portfolio', href: 'https://generativejesse.com' },
-        ],
-      },
-      render: renderFinale,
-    },
-  ];
+const fragSrc = `
+precision highp float;
+uniform vec2 u_res;
+uniform float u_time;
+uniform vec3 u_color;
+uniform float u_progress;     // 0-1 scroll progress within scene
+uniform float u_globalProgress; // 0-1 total scroll progress
+uniform int u_state;            // 0=calm, 1=active, 2=thinking, 3=shaping, 4=solving, 5=converge
+uniform float u_orbSize;
 
-  // --- SETUP ---
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
-  const copyLayer = document.getElementById('copy-layer');
-  const routeDots = document.getElementById('route-dots');
-  const scrollTrack = document.getElementById('scroll-track');
-  const scrollHint = document.getElementById('scroll-hint');
-  const scrollProgress = document.getElementById('scroll-progress');
+// Simple noise
+float hash(vec2 p) {
+  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
 
-  let W = 0, H = 0, dpr = 1;
-  let scrollY = 0;
-  let maxScroll = 0;
-  let activeScene = 0;
-  let time = 0;
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
+             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
 
-  // Particles for hero/transition
-  const particles = [];
-  const PARTICLE_COUNT = 120;
+float fbm(vec2 p) {
+  float v = 0.0;
+  float a = 0.5;
+  for (int i = 0; i < 5; i++) {
+    v += a * noise(p);
+    p *= 2.0;
+    a *= 0.5;
+  }
+  return v;
+}
 
-  function initParticles() {
-    particles.length = 0;
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(Math.random() * 2 - 1);
-      const r = 0.35 + Math.random() * 0.15;
-      particles.push({
-        x: r * Math.sin(phi) * Math.cos(theta),
-        y: r * Math.sin(phi) * Math.sin(theta),
-        z: r * Math.cos(phi),
-        size: Math.random() * 1.5 + 0.3,
-      });
+void main() {
+  vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / min(u_res.x, u_res.y);
+  float t = u_time;
+  
+  // Orb center
+  float r = length(uv);
+  float orbR = u_orbSize;
+  
+  // State-specific distortion
+  float distortion = 0.0;
+  if (u_state == 0) {
+    // Calm — slow breathing
+    distortion = sin(r * 8.0 - t * 0.5) * 0.015;
+  } else if (u_state == 1) {
+    // Active — pulsing energy
+    distortion = sin(r * 12.0 - t * 2.0) * 0.025 + sin(uv.x * 3.0 + t) * 0.01;
+  } else if (u_state == 2) {
+    // Thinking — ripples
+    distortion = sin(r * 6.0 - t * 1.5) * 0.02 + fbm(uv * 3.0 + t * 0.1) * 0.015;
+  } else if (u_state == 3) {
+    // Shaping — flowing
+    distortion = fbm(uv * 4.0 + vec2(t * 0.2, 0.0)) * 0.03;
+  } else if (u_state == 4) {
+    // Solving — sharp pulses
+    distortion = sin(atan(uv.y, uv.x) * 5.0 + t * 3.0) * 0.02 + sin(r * 10.0 - t * 2.5) * 0.015;
+  } else {
+    // Converge — pulling inward
+    distortion = sin(r * 5.0 + t) * 0.01 * (1.0 - u_progress);
+  }
+  
+  orbR += distortion;
+  
+  // Orb body
+  float orb = smoothstep(orbR + 0.005, orbR - 0.005, r);
+  
+  // Glow
+  float glow = smoothstep(orbR + 0.3, orbR, r) * 0.4;
+  glow *= glow;
+  
+  // Internal texture
+  float n = fbm(uv * 4.0 + vec2(t * 0.15, t * 0.1));
+  float n2 = fbm(uv * 8.0 - vec2(t * 0.2, 0.0));
+  float internal = n * 0.5 + n2 * 0.3;
+  
+  // Color mixing
+  vec3 col = u_color;
+  vec3 hotSpot = u_color + vec3(0.3);
+  vec3 darkSpot = u_color * 0.3;
+  
+  vec3 orbCol = mix(darkSpot, hotSpot, internal);
+  orbCol += u_color * glow * 1.5;
+  
+  // Rim light
+  float rim = smoothstep(orbR - 0.02, orbR, r) * smoothstep(orbR + 0.04, orbR, r);
+  orbCol += vec3(1.0) * rim * 0.3;
+  
+  // Outer glow
+  vec3 outerGlow = u_color * glow * 0.15;
+  
+  // Background — subtle gradient
+  float bgGrad = 1.0 - length(uv) * 0.5;
+  vec3 bg = vec3(0.039, 0.039, 0.039) * bgGrad;
+  
+  // Combine
+  vec3 final = mix(bg, orbCol, orb);
+  final += outerGlow;
+  
+  // State rings (thinking/shaping states)
+  if (u_state == 2 || u_state == 3) {
+    for (int i = 1; i <= 3; i++) {
+      float ringR = orbR + 0.06 * float(i) + sin(t * float(i) * 0.5) * 0.01;
+      float ring = smoothstep(ringR + 0.003, ringR - 0.003, r) * smoothstep(ringR - 0.003, ringR + 0.003, r);
+      final += u_color * ring * 0.08;
     }
   }
-
-  // --- RESIZE ---
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth;
-    H = window.innerHeight;
-    canvas.width = W * dpr;
-    canvas.height = H * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-    // Set scroll track height
-    const totalScenes = SCENES.length;
-    const totalScrollH = totalScenes * SCENE_SCROLL * H;
-    scrollTrack.style.height = totalScrollH + 'px';
-    maxScroll = totalScrollH - H;
+  
+  // Active state — energy particles
+  if (u_state == 1) {
+    for (int i = 0; i < 8; i++) {
+      float fi = float(i);
+      float angle = fi * 0.785 + t * 0.3;
+      float pr = orbR + 0.04 + sin(t * 2.0 + fi) * 0.02;
+      vec2 ppos = vec2(cos(angle), sin(angle)) * pr;
+      float pd = length(uv - ppos);
+      final += u_color * smoothstep(0.008, 0.0, pd) * 0.5;
+    }
   }
+  
+  // Solving state — data lines
+  if (u_state == 4) {
+    float lines = step(0.98, sin(uv.y * 30.0 + t * 5.0));
+    float mask = smoothstep(orbR + 0.1, orbR - 0.1, r);
+    final += u_color * lines * mask * 0.06;
+  }
+  
+  gl_FragColor = vec4(final, 1.0);
+}
+`;
 
-  // --- BUILD COPY CARDS ---
-  const copyCards = [];
-  SCENES.forEach((scene, i) => {
-    const card = document.createElement('div');
-    card.className = 'copy-card';
-    card.style.setProperty('--accent', scene.accent);
+// --- INIT WEBGL ---
+const glCanvas = document.getElementById('gl-canvas');
+const gl = glCanvas.getContext('webgl') || glCanvas.getContext('experimental-webgl');
+const overlayCanvas = document.getElementById('overlay-canvas');
+const octx = overlayCanvas.getContext('2d');
 
-    const eyebrowColor = scene.accent;
-    const num = String(i).padStart(2, '0');
-    const totalNum = String(SCENES.length - 1).padStart(2, '0');
+let W, H, dpr;
+let scrollY = 0, maxScroll = 0;
+let time = 0;
 
-    let html = `<div class="num">${num} / ${totalNum}</div>`;
-    html += `<span class="eyebrow" style="color:${eyebrowColor};border-color:${eyebrowColor}33;background:${eyebrowColor}11;">${scene.copy.eyebrow}</span>`;
-    html += `<h2>${scene.copy.title.replace(/\n/g, '<br>')}</h2>`;
-    if (scene.copy.body) html += `<p>${scene.copy.body}</p>`;
-    if (scene.copy.stack) {
-      html += `<div class="stack">${scene.copy.stack.map(s => `<span>${s}</span>`).join('')}</div>`;
-    }
-    if (scene.copy.links) {
-      html += `<div class="links">${scene.copy.links.map(l =>
-        `<a href="${l.href}" target="_blank" class="${l.primary ? 'primary' : ''}">${l.label}</a>`
-      ).join('')}</div>`;
-    }
-    card.innerHTML = html;
-    copyLayer.appendChild(card);
-    copyCards.push(card);
+// Compile shader
+function compileShader(src, type) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+    console.error('Shader error:', gl.getShaderInfoLog(s));
+  }
+  return s;
+}
+
+const vs = compileShader(vertSrc, gl.VERTEX_SHADER);
+const fs = compileShader(fragSrc, gl.FRAGMENT_SHADER);
+const prog = gl.createProgram();
+gl.attachShader(prog, vs);
+gl.attachShader(prog, fs);
+gl.linkProgram(prog);
+gl.useProgram(prog);
+
+// Fullscreen quad
+const buf = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+const posLoc = gl.getAttribLocation(prog, 'a_pos');
+gl.enableVertexAttribArray(posLoc);
+gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+const uRes = gl.getUniformLocation(prog, 'u_res');
+const uTime = gl.getUniformLocation(prog, 'u_time');
+const uColor = gl.getUniformLocation(prog, 'u_color');
+const uProgress = gl.getUniformLocation(prog, 'u_progress');
+const uGlobalProgress = gl.getUniformLocation(prog, 'u_globalProgress');
+const uState = gl.getUniformLocation(prog, 'u_state');
+const uOrbSize = gl.getUniformLocation(prog, 'u_orbSize');
+
+// --- BUILD TEXT ---
+const textLayer = document.getElementById('text-layer');
+const textEls = [];
+
+SCENES.forEach((scene, i) => {
+  const el = document.createElement('div');
+  el.className = 'scene-text ' + (scene.text.type === 'hero' ? 'scene-hero' : scene.text.type === 'finale' ? 'scene-finale' : 'scene-project');
+  
+  if (scene.text.type === 'hero') {
+    el.innerHTML = `
+      <h1>${scene.text.title.replace(/\n/g, '<br>')}</h1>
+      <p>${scene.text.subtitle}</p>
+    `;
+  } else if (scene.text.type === 'project') {
+    const c = `rgb(${Math.round(scene.orbColor[0]*255)},${Math.round(scene.orbColor[1]*255)},${Math.round(scene.orbColor[2]*255)})`;
+    el.innerHTML = `
+      <div class="label" style="color:${c}">${scene.text.label}</div>
+      <h2>${scene.text.title}</h2>
+      <div class="desc">${scene.text.desc}</div>
+      <div class="links">${scene.text.links.map(l => `<a href="${l.href}" target="_blank">${l.label}</a>`).join('')}</div>
+    `;
+  } else if (scene.text.type === 'finale') {
+    el.innerHTML = `
+      <h2>${scene.text.title.replace(/\n/g, '<br>')}</h2>
+      <p>${scene.text.desc}</p>
+      <div class="links">${scene.text.links.map(l => `<a href="${l.href}" ${l.primary ? 'class="primary"' : ''}>${l.label}</a>`).join('')}</div>
+    `;
+  }
+  textLayer.appendChild(el);
+  textEls.push(el);
+});
+
+// --- BUILD ROUTE DOTS ---
+const routeDots = document.getElementById('route-dots');
+SCENES.forEach((scene, i) => {
+  const dot = document.createElement('button');
+  dot.className = 'route-dot';
+  dot.innerHTML = `<span class="label">${scene.label}</span>`;
+  dot.addEventListener('click', () => {
+    window.scrollTo({ top: i * SCENE_SCROLL * H, behavior: 'smooth' });
   });
+  routeDots.appendChild(dot);
+});
+const dotEls = routeDots.querySelectorAll('.route-dot');
 
-  // --- BUILD ROUTE DOTS ---
-  SCENES.forEach((scene, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'route-dot';
-    dot.innerHTML = `<span class="label">${scene.label}</span>`;
-    dot.addEventListener('click', () => {
-      const targetY = i * SCENE_SCROLL * H;
-      window.scrollTo({ top: targetY, behavior: 'smooth' });
-    });
-    routeDots.appendChild(dot);
+// --- RESIZE ---
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  
+  [glCanvas, overlayCanvas].forEach(c => {
+    c.width = W * dpr;
+    c.height = H * dpr;
+    c.style.width = W + 'px';
+    c.style.height = H + 'px';
   });
-  const dotElements = routeDots.querySelectorAll('.route-dot');
+  
+  gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+  octx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  
+  const totalH = SCENES.length * SCENE_SCROLL * H;
+  document.getElementById('spacer').style.height = totalH + 'px';
+  maxScroll = totalH - H;
+}
 
-  // --- SCROLL MATH ---
-  function getSceneProgress() {
-    const sceneHeight = SCENE_SCROLL * H;
-    const currentScene = Math.min(Math.floor(scrollY / sceneHeight), SCENES.length - 1);
-    const sceneStart = currentScene * sceneHeight;
-    const progress = (scrollY - sceneStart) / sceneHeight;
-    return { scene: currentScene, progress: Math.max(0, Math.min(1, progress)) };
+// --- SCROLL MATH ---
+function getScrollState() {
+  const sceneH = SCENE_SCROLL * H;
+  const scene = Math.min(Math.floor(scrollY / sceneH), SCENES.length - 1);
+  const start = scene * sceneH;
+  const progress = Math.max(0, Math.min(1, (scrollY - start) / sceneH));
+  const global = maxScroll > 0 ? scrollY / maxScroll : 0;
+  return { scene, progress, global };
+}
+
+// Smooth interpolation
+function lerp(a, b, t) { return a + (b - a) * t; }
+function lerpColor(c1, c2, t) {
+  return [lerp(c1[0], c2[0], t), lerp(c1[1], c2[1], t), lerp(c1[2], c2[2], t)];
+}
+function smoothstep(t) { t = Math.max(0, Math.min(1, t)); return t * t * (3 - 2 * t); }
+
+// --- RENDER ---
+function render() {
+  time += 0.016;
+  const { scene, progress, global } = getScrollState();
+  
+  // --- WebGL orb ---
+  // Interpolate color between current and next scene during transition
+  let orbColor = SCENES[scene].orbColor;
+  let orbSize = 0.22;
+  let orbState = SCENES[scene].orbState;
+  let stateNum = 0;
+  
+  const stateMap = { calm: 0, active: 1, thinking: 2, shaping: 3, solving: 4, converge: 5 };
+  stateNum = stateMap[orbState] || 0;
+  
+  // Size animation per scene
+  if (orbState === 'calm') orbSize = 0.20 + Math.sin(time * 0.3) * 0.005;
+  else if (orbState === 'active') orbSize = 0.24 + Math.sin(time * 1.0) * 0.01;
+  else if (orbState === 'thinking') orbSize = 0.22 + Math.sin(time * 0.5) * 0.008;
+  else if (orbState === 'shaping') orbSize = 0.23;
+  else if (orbState === 'solving') orbSize = 0.22 + Math.sin(time * 2.0) * 0.012;
+  else if (orbState === 'converge') orbSize = 0.15 + progress * 0.05;
+  
+  // Crossfade color at scene transitions
+  const transitionStart = 0.85;
+  if (progress > transitionStart && scene < SCENES.length - 1) {
+    const t = smoothstep((progress - transitionStart) / (1 - transitionStart));
+    orbColor = lerpColor(SCENES[scene].orbColor, SCENES[scene + 1].orbColor, t);
   }
-
-  // --- RENDER LOOP ---
-  function render() {
-    time += 0.016;
-    ctx.clearRect(0, 0, W, H);
-
-    // Background
-    ctx.fillStyle = '#080808';
-    ctx.fillRect(0, 0, W, H);
-
-    const { scene, progress } = getSceneProgress();
-    activeScene = scene;
-
-    // Draw current scene
-    const currentAccent = SCENES[scene].accent;
-    SCENES[scene].render(ctx, progress, W, H, time, currentAccent);
-
-    // Crossfade with next scene near the end
-    if (progress > 1 - TRANSITION && scene < SCENES.length - 1) {
-      const fadeProgress = (progress - (1 - TRANSITION)) / TRANSITION;
-      ctx.globalAlpha = fadeProgress;
-      const nextAccent = SCENES[scene + 1].accent;
-      SCENES[scene + 1].render(ctx, 0, W, H, time, nextAccent);
-      ctx.globalAlpha = 1;
-    }
-
-    // Update copy cards
-    copyCards.forEach((card, i) => {
-      const sceneStart = i * SCENE_SCROLL * H;
-      const sceneMid = sceneStart + SCENE_SCROLL * H * 0.4;
-      const sceneEnd = sceneStart + SCENE_SCROLL * H;
-      const dist = Math.abs(scrollY - sceneMid);
-      const visibleRange = SCENE_SCROLL * H * 0.35;
-      if (dist < visibleRange) {
-        card.classList.add('visible');
-      } else {
-        card.classList.remove('visible');
-      }
-    });
-
-    // Update route dots
-    dotElements.forEach((dot, i) => {
-      dot.classList.toggle('active', i === scene);
-    });
-
-    // Scroll progress bar
-    const totalProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
-    scrollProgress.style.width = (totalProgress * 100) + '%';
-
-    // Hide scroll hint after first scroll
-    if (scrollY > 50) scrollHint.classList.add('hidden');
-    else scrollHint.classList.remove('hidden');
-
-    requestAnimationFrame(render);
+  
+  // Render orb
+  gl.uniform2f(uRes, glCanvas.width, glCanvas.height);
+  gl.uniform1f(uTime, time);
+  gl.uniform3f(uColor, orbColor[0], orbColor[1], orbColor[2]);
+  gl.uniform1f(uProgress, progress);
+  gl.uniform1f(uGlobalProgress, global);
+  gl.uniform1i(uState, stateNum);
+  gl.uniform1f(uOrbSize, orbSize);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  
+  // --- 2D overlay ---
+  octx.clearRect(0, 0, W, H);
+  const overlayOpacity = smoothstep(progress * 1.5) * smoothstep((1 - progress) * 2);
+  
+  if (SCENES[scene].overlay && overlayOpacity > 0.01) {
+    octx.globalAlpha = overlayOpacity * 0.5;
+    renderOverlay(SCENES[scene].overlay, progress, orbColor);
+    octx.globalAlpha = 1;
   }
+  
+  // --- Text visibility ---
+  textEls.forEach((el, i) => {
+    const sceneStart = i * SCENE_SCROLL * H;
+    const sceneMid = sceneStart + SCENE_SCROLL * H * 0.4;
+    const dist = Math.abs(scrollY - sceneMid);
+    const range = SCENE_SCROLL * H * 0.35;
+    el.classList.toggle('visible', dist < range);
+  });
+  
+  // --- Route dots ---
+  dotEls.forEach((d, i) => d.classList.toggle('active', i === scene));
+  
+  // --- Scroll hint ---
+  document.getElementById('scroll-hint').classList.toggle('hidden', scrollY > 50);
+  
+  requestAnimationFrame(render);
+}
 
-  // --- SCENE RENDERERS ---
-
-  function renderHero(ctx, p, w, h, t, accent) {
-    // Particle sphere — "fly through" intro
-    const cx = w / 2, cy = h / 2;
-    const baseR = Math.min(w, h) * 0.28;
-    const scale = 1 + p * 1.5;  // sphere grows as you scroll
-    const opacity = Math.max(0, 1 - p * 1.2);
-
-    // Background gradient
-    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.6);
-    grad.addColorStop(0, 'rgba(16,185,129,0.04)');
-    grad.addColorStop(1, 'rgba(8,8,8,0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.globalAlpha = opacity;
-
-    const angle = t * 0.15;
-    const proj = particles.map(pt => {
-      let x = pt.x * Math.cos(angle) - pt.z * Math.sin(angle);
-      let z = pt.x * Math.sin(angle) + pt.z * Math.cos(angle);
-      let y = pt.y;
-      const fov = 3;
-      const s = fov / (fov + z);
-      return {
-        sx: x * baseR * scale * s,
-        sy: y * baseR * scale * s,
-        s, z: z * scale,
-      };
-    }).sort((a, b) => a.z - b.z);
-
-    // Connections
-    ctx.lineWidth = 0.5;
-    for (let i = 0; i < proj.length; i++) {
-      for (let j = i + 1; j < proj.length; j++) {
-        const dx = proj[i].sx - proj[j].sx;
-        const dy = proj[i].sy - proj[j].sy;
-        const d = Math.sqrt(dx * dx + dy * dy);
-        if (d < 60) {
-          ctx.strokeStyle = `rgba(16,185,129,${(1 - d / 60) * 0.12 * opacity})`;
-          ctx.beginPath();
-          ctx.moveTo(proj[i].sx, proj[i].sy);
-          ctx.lineTo(proj[j].sx, proj[j].sy);
-          ctx.stroke();
+// --- OVERLAY RENDERERS (project-specific visuals around the orb) ---
+function renderOverlay(type, progress, color) {
+  const cx = W / 2, cy = H / 2;
+  const orbR = Math.min(W, H) * 0.22;
+  const c = `rgba(${Math.round(color[0]*255)},${Math.round(color[1]*255)},${Math.round(color[2]*255)},`;
+  
+  if (type === 'localcheck') {
+    // Court grid around orb
+    const cellSize = 36;
+    const gridR = orbR + 60;
+    for (let i = -4; i <= 4; i++) {
+      for (let j = -4; j <= 4; j++) {
+        const x = cx + i * cellSize;
+        const y = cy + j * cellSize;
+        const dist = Math.sqrt(i*i + j*j) * cellSize;
+        if (dist > gridR || dist < orbR - 10) continue;
+        const fade = 1 - Math.max(0, (dist - orbR) / (gridR - orbR));
+        const active = (i + j + Math.floor(time * 0.8)) % 3 === 0;
+        if (active) {
+          octx.strokeStyle = c + (0.12 * fade) + ')';
+          octx.lineWidth = 1;
+          octx.strokeRect(x - cellSize/2, y - cellSize/2, cellSize - 2, cellSize - 2);
+          const pulse = 0.5 + Math.sin(time * 2 + i + j) * 0.5;
+          octx.fillStyle = c + (0.15 * fade * pulse) + ')';
+          octx.beginPath();
+          octx.arc(x, y, 2.5 * pulse, 0, Math.PI * 2);
+          octx.fill();
         }
       }
     }
-
-    // Particles
-    proj.forEach(pt => {
-      const a = Math.max(0.08, Math.min(0.7, (pt.z + 1) / 2 * opacity));
-      ctx.fillStyle = `rgba(16,185,129,${a})`;
-      ctx.beginPath();
-      ctx.arc(pt.sx, pt.sy, pt.s * 1.5, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    ctx.restore();
-  }
-
-  function renderLocalCheck(ctx, p, w, h, t, accent) {
-    const cx = w / 2, cy = h / 2;
-    const scale = 0.5 + p * 0.8;
-
-    // Court grid
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(scale, scale);
-    ctx.globalAlpha = Math.min(1, p * 2);
-
-    const gridSize = 4;
-    const cellSize = 40;
-    const totalSize = gridSize * cellSize;
-    const offset = -totalSize / 2;
-
-    for (let i = 0; i < gridSize; i++) {
-      for (let j = 0; j < gridSize; j++) {
-        const x = offset + i * cellSize;
-        const y = offset + j * cellSize;
-        const isActive = (i + j + Math.floor(t * 0.5)) % 3 === 0;
-
-        ctx.strokeStyle = isActive ? accent : '#28282f';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(x, y, cellSize - 2, cellSize - 2);
-
-        if (isActive) {
-          ctx.fillStyle = accent + '15';
-          ctx.fillRect(x, y, cellSize - 2, cellSize - 2);
-          // Pulse dot
-          const pulse = 0.5 + Math.sin(t * 2 + i + j) * 0.5;
-          ctx.fillStyle = accent;
-          ctx.beginPath();
-          ctx.arc(x + cellSize/2, y + cellSize/2, 3 * pulse, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-    }
-
-    // ELO display
-    ctx.globalAlpha = Math.min(1, p * 1.5);
-    ctx.fillStyle = '#f2f2f6';
-    ctx.font = '700 48px Geist Mono, monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('1247', 0, -totalSize/2 - 30);
-    ctx.fillStyle = '#72728a';
-    ctx.font = '500 10px Geist Mono, monospace';
-    ctx.fillText('ELO RATING', 0, -totalSize/2 - 12);
-
-    ctx.restore();
-  }
-
-  function renderTEAIMS(ctx, p, w, h, t, accent) {
-    const cx = w / 2, cy = h / 2;
-    const scale = 0.6 + p * 0.5;
-    const opacity = Math.min(1, p * 2);
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.globalAlpha = opacity;
-
-    // Orbit rings
-    const rings = [140, 100, 60];
-    rings.forEach((r, i) => {
-      ctx.strokeStyle = `rgba(99,102,241,${0.06 + i * 0.02})`;
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.arc(0, 0, r * scale, 0, Math.PI * 2);
-      ctx.stroke();
-    });
-    ctx.setLineDash([]);
-
-    // Core
-    ctx.fillStyle = 'rgba(99,102,241,0.08)';
-    ctx.beginPath();
-    ctx.arc(0, 0, 30 * scale, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(99,102,241,0.3)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-    ctx.fillStyle = '#818cf8';
-    ctx.font = '500 10px Geist Mono, monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('HITL', 0, 4);
-
-    // Agent nodes
-    const agents = ['IDEA', 'ARCH', 'DESIGN', 'SEC', 'GROW', 'LEGAL'];
-    const angle = t * 0.1;
+    // ELO number
+    octx.fillStyle = c + '0.15)';
+    octx.font = '700 14px Geist Mono, monospace';
+    octx.textAlign = 'center';
+    octx.fillText('1247', cx, cy - orbR - 24);
+    octx.font = '500 8px Geist Mono, monospace';
+    octx.fillStyle = c + '0.08)';
+    octx.fillText('ELO', cx, cy - orbR - 10);
+    
+  } else if (type === 'teaims') {
+    // Agent nodes orbiting
+    const agents = ['IDEA', 'ARCH', 'DESIGN', 'SEC', 'GROW', 'LEGAL', 'DATA', 'OPS', 'QA'];
+    const orbitR = orbR + 50;
     agents.forEach((label, i) => {
-      const a = (i / agents.length) * Math.PI * 2 + angle;
-      const r = 140 * scale;
-      const x = Math.cos(a) * r;
-      const y = Math.sin(a) * r;
-
-      ctx.fillStyle = '#111';
-      ctx.strokeStyle = '#1f1f1f';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(x, y, 18, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      // Connection to core
-      ctx.strokeStyle = `rgba(99,102,241,${0.08})`;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-
-      ctx.fillStyle = '#444';
-      ctx.font = '500 7px Geist Mono, monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(label, x, y + 2);
-    });
-
-    ctx.restore();
-  }
-
-  function renderOmniVital(ctx, p, w, h, t, accent) {
-    const cx = w / 2, cy = h / 2;
-    const scale = 0.6 + p * 0.5;
-    const opacity = Math.min(1, p * 2);
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.globalAlpha = opacity;
-
-    // Vitality rings
-    const rings = [
-      { r: 100, color: '#10b981', progress: 0.75 + Math.sin(t * 0.3) * 0.05 },
-      { r: 75, color: '#34d399', progress: 0.60 + Math.sin(t * 0.4) * 0.05 },
-      { r: 50, color: '#6ee7b7', progress: 0.45 + Math.sin(t * 0.5) * 0.05 },
-    ];
-
-    rings.forEach(ring => {
-      const r = ring.r * scale;
-      // Background ring
-      ctx.strokeStyle = 'rgba(16,185,129,0.06)';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Progress arc
-      ctx.strokeStyle = ring.color;
-      ctx.lineWidth = 3;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.arc(0, 0, r, -Math.PI/2, -Math.PI/2 + ring.progress * Math.PI * 2);
-      ctx.stroke();
-    });
-
-    // Center value
-    ctx.fillStyle = '#34d399';
-    ctx.font = '700 28px Geist Mono, monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText('92', 0, 8);
-    ctx.fillStyle = '#444';
-    ctx.font = '500 9px Geist Mono, monospace';
-    ctx.fillText('VITALITY', 0, 24);
-
-    ctx.restore();
-  }
-
-  function renderAlphaGauge(ctx, p, w, h, t, accent) {
-    const cx = w / 2, cy = h / 2;
-    const opacity = Math.min(1, p * 2);
-    const scale = 0.7 + p * 0.4;
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.globalAlpha = opacity;
-
-    // Price bars
-    const bars = [
-      { label: 'BTC', up: true, fill: 0.68, val: '$62.4k' },
-      { label: 'ETH', up: false, fill: 0.54, val: '$3.1k' },
-      { label: 'SOL', up: true, fill: 0.71, val: '$142' },
-      { label: '5m',  up: true, fill: 0.58, val: 'UP' },
-      { label: '15m', up: false, fill: 0.47, val: 'DN' },
-    ];
-
-    const barW = 120 * scale;
-    const barH = 6;
-    const spacing = 20;
-    const totalH = bars.length * spacing;
-    const startY = -totalH / 2;
-
-    bars.forEach((bar, i) => {
-      const y = startY + i * spacing;
-      const animFill = bar.fill + Math.sin(t * 0.5 + i) * 0.03;
-
+      const a = (i / agents.length) * Math.PI * 2 + time * 0.08;
+      const x = cx + Math.cos(a) * orbitR;
+      const y = cy + Math.sin(a) * orbitR;
+      // Connection line
+      octx.strokeStyle = c + '0.04)';
+      octx.lineWidth = 0.5;
+      octx.beginPath();
+      octx.moveTo(cx, cy);
+      octx.lineTo(x, y);
+      octx.stroke();
+      // Node
+      octx.fillStyle = '#111';
+      octx.strokeStyle = c + '0.1)';
+      octx.lineWidth = 1;
+      octx.beginPath();
+      octx.arc(x, y, 14, 0, Math.PI * 2);
+      octx.fill();
+      octx.stroke();
       // Label
-      ctx.fillStyle = '#444';
-      ctx.font = '500 10px Geist Mono, monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(bar.label, -barW/2 - 36, y + 4);
-
-      // Track
-      ctx.fillStyle = '#1f1f1f';
-      ctx.fillRect(-barW/2, y - barH/2, barW, barH);
-
-      // Fill
-      const fillW = barW * animFill;
-      ctx.fillStyle = bar.up ? '#10b981' : '#f43f5e';
-      ctx.fillRect(-barW/2, y - barH/2, fillW, barH);
-
+      octx.fillStyle = c + '0.2)';
+      octx.font = '500 6px Geist Mono, monospace';
+      octx.textAlign = 'center';
+      octx.fillText(label, x, y + 2);
+    });
+    
+  } else if (type === 'omnivital') {
+    // Vitality rings expanding from orb
+    for (let i = 0; i < 4; i++) {
+      const phase = (time * 0.3 + i / 4) % 1;
+      const r = orbR + phase * 100;
+      const a = (1 - phase) * 0.06;
+      octx.strokeStyle = c + a + ')';
+      octx.lineWidth = 1.5;
+      octx.beginPath();
+      octx.arc(cx, cy, r, 0, Math.PI * 2);
+      octx.stroke();
+    }
+    // Pulsing inner ring
+    const pulseR = orbR + 8 + Math.sin(time * 1.5) * 3;
+    octx.strokeStyle = c + '0.1)';
+    octx.lineWidth = 2;
+    octx.beginPath();
+    octx.arc(cx, cy, pulseR, 0, Math.PI * 2);
+    octx.stroke();
+    // Vitality score
+    octx.fillStyle = c + '0.12)';
+    octx.font = '500 10px Geist Mono, monospace';
+    octx.textAlign = 'center';
+    octx.fillText('92', cx, cy + orbR + 28);
+    octx.font = '400 7px Geist Mono, monospace';
+    octx.fillStyle = c + '0.06)';
+    octx.fillText('VITALITY', cx, cy + orbR + 42);
+    
+  } else if (type === 'alphagauge') {
+    // Price bars below orb
+    const bars = [
+      { label: 'BTC', up: true, val: '62.4k' },
+      { label: 'ETH', up: false, val: '3.1k' },
+      { label: 'SOL', up: true, val: '142' },
+      { label: '5m',  up: true, val: 'UP' },
+    ];
+    const barW = 80;
+    const spacing = 18;
+    const startY = cy + orbR + 30;
+    const totalW = bars.length * barW;
+    const startX = cx - totalW / 2;
+    
+    bars.forEach((bar, i) => {
+      const x = startX + i * barW;
+      const y = startY;
+      const fill = 0.4 + Math.sin(time * 0.5 + i * 1.2) * 0.2 + 0.2;
+      // Bar track
+      octx.fillStyle = 'rgba(30,30,30,0.5)';
+      octx.fillRect(x, y, barW - 8, 3);
+      // Bar fill
+      octx.fillStyle = bar.up ? 'rgba(16,185,129,0.15)' : 'rgba(244,63,94,0.15)';
+      octx.fillRect(x, y, (barW - 8) * fill, 3);
+      // Label
+      octx.fillStyle = 'rgba(80,80,80,0.4)';
+      octx.font = '500 8px Geist Mono, monospace';
+      octx.textAlign = 'left';
+      octx.fillText(bar.label, x, y - 4);
       // Value
-      ctx.fillStyle = bar.up ? '#34d399' : '#f43f5e';
-      ctx.font = '500 9px Geist Mono, monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(bar.val, barW/2 + 8, y + 4);
-    });
-
-    ctx.restore();
-  }
-
-  function renderGenerativeJesse(ctx, p, w, h, t, accent) {
-    const cx = w / 2, cy = h / 2;
-    const opacity = Math.min(1, p * 2);
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.globalAlpha = opacity;
-
-    // Expanding wave rings
-    const rings = 5;
-    for (let i = 0; i < rings; i++) {
-      const phase = (t * 0.4 + i / rings) % 1;
-      const r = phase * 200;
-      const a = (1 - phase) * 0.15;
-      ctx.strokeStyle = `rgba(16,185,129,${a})`;
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    // Core glow
-    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 40);
-    glowGrad.addColorStop(0, 'rgba(16,185,129,0.15)');
-    glowGrad.addColorStop(1, 'rgba(16,185,129,0)');
-    ctx.fillStyle = glowGrad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 40, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  function renderGeneric(ctx, p, w, h, t, accent) {
-    // Simple geometric pattern for remaining projects
-    const cx = w / 2, cy = h / 2;
-    const opacity = Math.min(1, p * 2);
-    const scale = 0.5 + p * 0.5;
-
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.globalAlpha = opacity * 0.4;
-
-    // Hexagonal grid
-    const hexSize = 24 * scale;
-    const hexW = hexSize * Math.sqrt(3);
-    const hexH = hexSize * 1.5;
-
-    for (let row = -3; row <= 3; row++) {
-      for (let col = -3; col <= 3; col++) {
-        const x = col * hexW + (row % 2) * hexW / 2;
-        const y = row * hexH;
-        const dist = Math.sqrt(x * x + y * y);
-        const fade = Math.max(0, 1 - dist / (hexSize * 5));
-        if (fade > 0) {
-          ctx.strokeStyle = `rgba(${hexToRgb(accent)},${fade * 0.1})`;
-          ctx.lineWidth = 1;
-          drawHex(ctx, x, y, hexSize);
-        }
-      }
-    }
-
-    ctx.restore();
-  }
-
-  function renderFinale(ctx, p, w, h, t, accent) {
-    // Particle convergence — particles fly toward center
-    const cx = w / 2, cy = h / 2;
-    const opacity = Math.min(1, p * 1.5);
-
-    // Background gradient
-    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.5);
-    grad.addColorStop(0, 'rgba(16,185,129,0.06)');
-    grad.addColorStop(1, 'rgba(8,8,8,0)');
-    ctx.fillStyle = grad;
-    ctx.globalAlpha = opacity;
-    ctx.fillRect(0, 0, w, h);
-
-    // Converging particles
-    ctx.save();
-    ctx.translate(cx, cy);
-    for (let i = 0; i < 40; i++) {
-      const angle = (i / 40) * Math.PI * 2 + t * 0.2;
-      const dist = 200 * (1 - p) + Math.sin(t + i) * 20;
-      const x = Math.cos(angle) * dist;
-      const y = Math.sin(angle) * dist;
-      const size = 1 + (1 - p) * 2;
-      const a = 0.3 + (1 - p) * 0.4;
-      ctx.fillStyle = `rgba(16,185,129,${a * opacity})`;
-      ctx.beginPath();
-      ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Trail
-      ctx.strokeStyle = `rgba(16,185,129,${a * 0.1 * opacity})`;
-      ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(x * 0.3, y * 0.3);
-      ctx.stroke();
-    }
-
-    // Central glow
-    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 60 + p * 40);
-    glowGrad.addColorStop(0, `rgba(16,185,129,${0.2 * opacity})`);
-    glowGrad.addColorStop(1, 'rgba(16,185,129,0)');
-    ctx.fillStyle = glowGrad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 60 + p * 40, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  // --- HELPERS ---
-  function drawHex(ctx, x, y, size) {
-    ctx.beginPath();
-    for (let i = 0; i < 6; i++) {
-      const a = (i / 6) * Math.PI * 2;
-      const px = x + Math.cos(a) * size;
-      const py = y + Math.sin(a) * size;
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
-    }
-    ctx.closePath();
-    ctx.stroke();
-  }
-
-  function hexToRgb(hex) {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `${r},${g},${b}`;
-  }
-
-  // --- SCROLL HANDLER ---
-  let scrollRAF = null;
-  function onScroll() {
-    scrollY = window.scrollY || window.pageYOffset;
-    if (scrollRAF) return;
-    scrollRAF = requestAnimationFrame(() => {
-      scrollRAF = null;
+      octx.fillStyle = bar.up ? 'rgba(16,185,129,0.2)' : 'rgba(244,63,94,0.2)';
+      octx.font = '500 7px Geist Mono, monospace';
+      octx.fillText(bar.val, x + barW - 24, y - 4);
     });
   }
+}
 
-  // --- INIT ---
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', resize);
-  resize();
-  initParticles();
-  render();
+// --- SCROLL ---
+window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+window.addEventListener('resize', resize);
+
+// --- INIT ---
+resize();
+render();
 
 })();
 </script>
