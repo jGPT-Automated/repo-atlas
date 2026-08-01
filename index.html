@@ -2,1031 +2,1113 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Jesse — Full-Stack AI Builder</title>
+<meta name="description" content="Scroll to fly through the world of Jesse's builds.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared/design-system.css">
 <link rel="stylesheet" href="shared/nav.css">
-<link rel="stylesheet" href="shared/components.css">
 <style>
-  /* ============================================
-     INDEX.HTML — Page-specific styles
-     Uses shared design system, nav, and components
-  ============================================ */
+/* ============================================
+   SCROLL-WORLD — Scroll-scrubbed fly-through
+   Canvas scenes driven by scroll position
+   ============================================ */
 
-  html { scroll-behavior: smooth; }
-  body { line-height: 1.6; }
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
 
-  /* ===== CANVAS HERO ===== */
-  #hero-canvas {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
+/* The scroll spacer — sets total scrollable height */
+#scroll-track {
+  width: 1px;
+  position: relative;
+  z-index: -1;
+}
 
-  /* ===== SECTIONS ===== */
-  section { position: relative; z-index: 1; }
+/* Fixed canvas stage */
+#stage {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
 
-  /* Nav override: transparent on index until scrolled */
-  nav { padding: 0 32px; }
+#stage canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 
-  /* ===== HERO ===== */
-  #hero {
-    min-height: 100dvh;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 100px 48px 80px;
-    gap: 80px;
-  }
-  .hero-left { max-width: 580px; }
-  .hero-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--accent);
-    border: 1px solid var(--accent-border);
-    background: var(--accent-dim);
-    padding: 5px 12px;
-    border-radius: 4px;
-    margin-bottom: 28px;
-    opacity: 0;
-    animation: fade-up 0.6s ease forwards 0.1s;
-  }
-  h1.hero-title {
-    font-size: clamp(44px, 5vw, 72px);
-    font-weight: 600;
-    line-height: 1.02;
-    letter-spacing: -0.04em;
-    color: var(--text-primary);
-    margin-bottom: 24px;
-    opacity: 0;
-    animation: fade-up 0.6s ease forwards 0.2s;
-  }
-  h1.hero-title .dim { color: var(--text-muted); }
-  .hero-sub {
-    font-size: 16px;
-    color: var(--text-secondary);
-    line-height: 1.7;
-    max-width: 500px;
-    margin-bottom: 40px;
-    border-left: 2px solid var(--border);
-    padding-left: 20px;
-    opacity: 0;
-    animation: fade-up 0.6s ease forwards 0.35s;
-  }
-  .hero-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    opacity: 0;
-    animation: fade-up 0.6s ease forwards 0.5s;
-  }
+/* Copy layer — text overlays */
+#copy-layer {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.copy-card {
+  position: absolute;
+  max-width: 560px;
+  padding: 0 32px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  pointer-events: auto;
+}
+.copy-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-  /* Hero stats */
-  .hero-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    opacity: 0;
-    animation: fade-up 0.6s ease forwards 0.65s;
-    margin-top: 48px;
-  }
-  .stat {
-    background: var(--bg);
-    padding: 18px 20px;
-    transition: background 0.15s;
-  }
-  .stat:hover { background: var(--bg-elevated); }
-  .stat-num {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-  .stat-num .accent { color: var(--accent); }
-  .stat-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
+.copy-card .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid;
+}
+.copy-card .num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+.copy-card h2 {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  margin-bottom: 16px;
+}
+.copy-card p {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  max-width: 440px;
+}
+.copy-card .stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 24px;
+}
+.copy-card .stack span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 3px;
+}
+.copy-card .links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.copy-card .links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  transition: all 0.15s;
+}
+.copy-card .links a:hover {
+  color: var(--text-primary);
+  border-color: #333;
+  transform: translateY(-1px);
+}
+.copy-card .links a.primary {
+  color: var(--bg);
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+}
 
-  /* Hero right — particle canvas placeholder */
-  .hero-right {
-    position: relative;
-    height: 500px;
-    opacity: 0;
-    animation: fade-in 1s ease forwards 0.4s;
-    min-width: 0;
-  }
-  #particle-canvas {
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-  }
-  .hero-right-label {
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    font-family: var(--font-mono);
-    font-size: 9px;
-    color: var(--text-muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
+/* Top bar */
+#topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  pointer-events: auto;
+}
+#topbar .brand {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#topbar .brand .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+#topbar .nav-links {
+  display: flex;
+  gap: 24px;
+}
+#topbar .nav-links a {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+#topbar .nav-links a:hover { color: var(--text-primary); }
 
-  /* ===== SECTION HEADERS ===== */
-  .section-wrap { max-width: 1400px; margin: 0 auto; padding: 0 48px; }
-  .section-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 40px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  h2.section-title {
-    font-size: 28px;
-    font-weight: 600;
-    letter-spacing: -0.03em;
-    color: var(--text-primary);
-    line-height: 1.1;
-  }
-  .section-count {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-    letter-spacing: 0.08em;
-  }
+/* Scroll hint */
+#scroll-hint {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 1;
+  transition: opacity 0.4s;
+  pointer-events: none;
+}
+#scroll-hint.hidden { opacity: 0; }
+#scroll-hint .arrow {
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(to bottom, var(--text-muted), transparent);
+  animation: hint-pulse 1.8s ease-in-out infinite;
+}
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.3); }
+}
 
-  /* ===== SKILLS MARQUEE ===== */
-  #skills {
-    padding: 64px 0;
-    border-top: 1px solid var(--border-subtle);
-    border-bottom: 1px solid var(--border-subtle);
-    overflow: hidden;
-  }
-  .marquee-track {
-    display: flex;
-    gap: 0;
-    width: max-content;
-    animation: marquee 28s linear infinite;
-  }
-  .marquee-track:hover { animation-play-state: paused; }
-  .skill-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-secondary);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    padding: 0 32px;
-    border-right: 1px solid var(--border-subtle);
-    transition: color 0.15s;
-  }
-  .skill-chip:hover { color: var(--text-primary); }
-  .skill-chip .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.5; }
+/* Route dots — right side navigation */
+#route-dots {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: auto;
+}
+.route-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+.route-dot.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 8px rgba(16,185,129,0.4);
+}
+.route-dot:hover {
+  border-color: var(--text-secondary);
+}
+.route-dot .label {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+.route-dot:hover .label { opacity: 1; }
 
-  /* ===== PROJECTS ===== */
-  #projects { padding: 100px 0; }
+/* Scrollbar progress */
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: var(--accent);
+  z-index: 20;
+  transition: width 0.1s linear;
+}
 
-  .project-filters {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 32px;
-  }
-  .filter-btn {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    background: transparent;
-    border: 1px solid var(--border);
-    padding: 6px 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .filter-btn:hover, .filter-btn.active {
-    color: var(--text-primary);
-    border-color: var(--accent-border);
-    background: var(--accent-dim);
-    color: var(--accent);
-  }
-
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .project-card {
-    background: var(--bg);
-    padding: 28px;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.15s;
-    text-decoration: none;
-    display: block;
-  }
-  .project-card:hover { background: var(--bg-hover); }
-  .project-card.featured {
-    grid-column: span 2;
-  }
-  .project-tag {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .project-tag .tag-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-  }
-  .tag-dot-teal { background: var(--accent); }
-  .tag-dot-amber { background: #f59e0b; }
-  .tag-dot-rose { background: #f43f5e; }
-  .tag-dot-violet { background: #8b5cf6; }
-  .tag-dot-sky { background: #0ea5e9; }
-
-  .project-name {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: -0.02em;
-    margin-bottom: 8px;
-    line-height: 1.3;
-  }
-  .project-desc {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-  .project-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .project-stack {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-  .stack-chip {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    background: var(--bg-elevated);
-    border: 1px solid var(--border);
-    padding: 2px 7px;
-    border-radius: 3px;
-  }
-  .project-score {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--accent);
-    opacity: 0.6;
-  }
-  .project-arrow {
-    position: absolute;
-    top: 24px;
-    right: 24px;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.15s, transform 0.15s;
-  }
-  .project-card:hover .project-arrow { opacity: 1; transform: translate(2px, -2px); }
-  .project-arrow svg { width: 12px; height: 12px; stroke: var(--text-secondary); fill: none; stroke-width: 2; }
-
-  /* ===== ABOUT ===== */
-  #about { padding: 100px 0; border-top: 1px solid var(--border-subtle); }
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: start;
-  }
-  .about-left h2 {
-    font-size: 36px;
-    font-weight: 600;
-    letter-spacing: -0.04em;
-    line-height: 1.15;
-    margin-bottom: 24px;
-    color: var(--text-primary);
-  }
-  .about-left h2 .dim { color: var(--text-muted); }
-  .about-left p {
-    font-size: 14px;
-    color: var(--text-secondary);
-    line-height: 1.75;
-    margin-bottom: 16px;
-  }
-  .about-right { padding-top: 4px; }
-  .about-items { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .about-item {
-    background: var(--bg);
-    padding: 18px 20px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: background 0.15s;
-  }
-  .about-item:hover { background: var(--bg-elevated); }
-  .about-item-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    background: var(--bg-elevated);
-  }
-  .about-item-icon svg { width: 16px; height: 16px; fill: none; stroke: var(--text-secondary); stroke-width: 1.5; }
-  .about-item-text .label {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 2px;
-  }
-  .about-item-text .sub {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    letter-spacing: 0.05em;
-  }
-  .about-item-val {
-    margin-left: auto;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-
-  /* ===== CONTACT ===== */
-  #contact { padding: 100px 0; border-top: 1px solid var(--border-subtle); }
-  .contact-inner {
-    max-width: 640px;
-  }
-  .contact-inner h2 {
-    font-size: 40px;
-    font-weight: 600;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-    margin-bottom: 16px;
-  }
-  .contact-inner h2 .dim { color: var(--text-muted); }
-  .contact-inner p {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-bottom: 36px;
-    line-height: 1.7;
-  }
-  .contact-links { display: flex; gap: 10px; flex-wrap: wrap; }
-  .contact-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-decoration: none;
-    padding: 10px 18px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    letter-spacing: 0.01em;
-    transition: all 0.15s;
-  }
-  .contact-link:hover {
-    color: var(--text-primary);
-    border-color: #333;
-    transform: translateY(-1px);
-  }
-  .contact-link svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.5; }
-
-
-
-
-
-  /* ===== RESPONSIVE ===== */
-  /* ── Tablet ── */
-  @media (max-width: 768px) {
-    #hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 40px; }
-    .hero-right { height: 300px; }
-    .projects-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-    .project-card.featured { grid-column: span 1; }
-    .about-grid { grid-template-columns: 1fr; gap: 40px; }
-    .section-wrap { padding: 0 24px; }
-    nav { padding: 0 24px; }
-    .nav-links { display: none; }
-      footer { padding: 24px; flex-direction: column; gap: 8px; text-align: center; }
-    #hero { max-width: 100%; }
-    .hero-stats { grid-template-columns: 1fr 1fr; }
-  }
-
-  /* ── Mobile ── */
-  @media (max-width: 640px) {
-    #hero { padding: 88px 16px 48px; gap: 32px; }
-    .hero-left { max-width: 100%; }
-    .hero-sub { max-width: 100%; font-size: 15px; }
-    h1.hero-title { font-size: clamp(36px, 10vw, 52px); }
-    .hero-actions { flex-wrap: wrap; gap: 10px; }
-    .btn-primary, .btn-secondary { width: 100%; text-align: center; padding: 12px 16px; }
-    .hero-stats { grid-template-columns: 1fr 1fr; }
-    .hero-right { display: none; }
-
-    .section-wrap { padding: 0 16px; }
-    #skills { padding: 48px 0; }
-
-    #projects { padding: 64px 0; }
-    .projects-grid { grid-template-columns: 1fr; border-radius: 6px; }
-    .project-card { padding: 20px; }
-    .project-filters { flex-wrap: wrap; }
-    .filter-btn { font-size: 10px; padding: 5px 10px; }
-
-    #about { padding: 64px 0; }
-    .about-left h2 { font-size: 28px; }
-    .about-left p { font-size: 13px; }
-    .about-items { border-radius: 6px; }
-
-    #contact { padding: 64px 0; }
-    .contact-inner h2 { font-size: 30px; }
-    .contact-links { flex-direction: column; }
-    .contact-link { justify-content: center; }
-
-    footer { padding: 20px 16px; flex-direction: column; gap: 6px; text-align: center; }
-    nav { padding: 0 16px; }
-    .hero-eyebrow { font-size: 9px; }
-    .section-header { flex-direction: column; gap: 4px; align-items: flex-start; }
-  }
-
-
+/* Mobile */
+@media (max-width: 768px) {
+  #topbar { padding: 16px 20px; }
+  #topbar .nav-links { display: none; }
+  .copy-card { padding: 0 24px; }
+  .copy-card h2 { font-size: 28px; }
+  .copy-card p { font-size: 14px; }
+  #route-dots { right: 12px; gap: 8px; }
+  .route-dot .label { display: none; }
+}
 </style>
 </head>
 <body>
 
-<!-- Background canvas -->
-<canvas id="hero-canvas"></canvas>
+<!-- Scroll progress bar -->
+<div id="scroll-progress"></div>
 
-<!-- NAV -->
-<nav id="navbar" class="transparent">
-  <a href="#" class="nav-brand">
-    <span class="status-dot"></span>
-    Jesse
-  </a>
+<!-- Top bar -->
+<div id="topbar">
+  <a href="#" class="brand"><span class="dot"></span>Jesse Harrick</a>
   <div class="nav-links">
-    <a href="#projects">Projects</a>
-    <a href="#about">About</a>
     <a href="roadmap.html">Roadmap</a>
-    <a href="#contact">Contact</a>
-    <a href="portal.html" class="nav-portal" id="portalBtn" title="Portal">
-      <span class="portal-icon">⬡</span>
-    </a>
+    <a href="portal.html">Portal</a>
+    <a href="https://github.com/jGPT-Automated/repo-atlas">Atlas</a>
   </div>
-  <a href="mailto:Generative.jesse@gmail.com" class="nav-cta">Hire Me</a>
-</nav>
+</div>
 
-<!-- HERO -->
-<section id="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow">
-      <span>Available for work</span>
-    </div>
-    <h1 class="hero-title">
-      Full-Stack<br>
-      <span class="dim">AI Builder.</span>
-    </h1>
-    <p class="hero-sub">
-      I build AI-native products — agents, trading systems, wellness platforms, voice interfaces. 
-      70+ shipped projects. From idea to deployed in days.
-    </p>
-    <div class="hero-actions">
-      <a href="#projects" class="btn-primary">View Projects</a>
-      <a href="https://github.com/GenJess" target="_blank" class="btn-secondary">GitHub</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-num">70<span class="accent">+</span></div>
-        <div class="stat-label">Repos shipped</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">3</div>
-        <div class="stat-label">Active products</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">11<span class="accent">K</span></div>
-        <div class="stat-label">Lines — OmniVital</div>
-      </div>
-      <div class="stat">
-        <div class="stat-num">4.4<span class="accent">/5</span></div>
-        <div class="stat-label">Top project score</div>
-      </div>
-    </div>
-  </div>
-  <div class="hero-right">
-    <canvas id="particle-canvas"></canvas>
-    <div class="hero-right-label">Neural graph // v2.5.0</div>
-  </div>
-</section>
+<!-- Fixed canvas stage -->
+<div id="stage">
+  <canvas id="canvas"></canvas>
+</div>
 
-<!-- SKILLS MARQUEE -->
-<section id="skills">
-  <div class="marquee-track" id="marquee">
-    <!-- JS fills this -->
-  </div>
-</section>
+<!-- Copy layer with project overlays -->
+<div id="copy-layer"></div>
 
-<!-- PROJECTS -->
-<section id="projects">
-  <div class="section-wrap">
-    <div class="section-header reveal">
-      <div>
-        <div class="section-label">Selected Work</div>
-        <h2 class="section-title">Projects</h2>
-      </div>
-      <div class="section-count">12 / 70+</div>
-    </div>
+<!-- Route dots -->
+<div id="route-dots"></div>
 
-    <div class="project-filters reveal">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="ai">AI / Agents</button>
-      <button class="filter-btn" data-filter="health">Health Tech</button>
-      <button class="filter-btn" data-filter="finance">Fintech</button>
-      <button class="filter-btn" data-filter="sports">Sports</button>
-      <button class="filter-btn" data-filter="portfolio">Portfolio</button>
-    </div>
+<!-- Scroll hint -->
+<div id="scroll-hint">
+  <span>scroll to fly through</span>
+  <div class="arrow"></div>
+</div>
 
-    <div class="projects-grid reveal" id="projects-grid">
-      <!-- JS rendered -->
-    </div>
-  </div>
-</section>
+<!-- Scroll spacer — sets the scrollable height -->
+<div id="scroll-track"></div>
 
-<!-- ABOUT -->
-<section id="about">
-  <div class="section-wrap">
-    <div class="about-grid">
-      <div class="about-left reveal">
-        <h2>Builder by default.<br><span class="dim">Architect by design.</span></h2>
-        <p>
-          I'm Jesse — a full-stack AI engineer based in Texas. I've spent the last few years building at the intersection of AI, finance, and health tech, across 70+ repositories and three GitHub accounts.
-        </p>
-        <p>
-          My work spans AI agents with real memory and autonomous workflows, voice interfaces built on ElevenLabs and AssemblyAI, trading systems across crypto and options markets, and full-stack SaaS products from schema to deploy.
-        </p>
-        <p>
-          I don't prototype — I ship. OmniVital is a 11,000-line production wellness platform deployed on Vercel with a live Supabase database, GPT-4.1 advisor, and ElevenLabs voice agent. That's the standard I hold everything to.
-        </p>
-        <div style="margin-top:32px;">
-          <a href="mailto:Generative.jesse@gmail.com" class="btn-primary">Get in touch</a>
-        </div>
-      </div>
-      <div class="about-right reveal">
-        <div class="about-items">
-          <div class="about-item">
-            <div class="about-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            </div>
-            <div class="about-item-text">
-              <div class="label">Stack</div>
-              <div class="sub">React · FastAPI · Supabase · Python</div>
-            </div>
-          </div>
-          <div class="about-item">
-            <div class="about-item-icon">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-            </div>
-            <div class="about-item-text">
-              <div class="label">Available</div>
-              <div class="sub">Full-time · Contract · Founding eng</div>
-            </div>
-            <div class="about-item-val">Now</div>
-          </div>
-          <div class="about-item">
-            <div class="about-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-            <div class="about-item-text">
-              <div class="label">Location</div>
-              <div class="sub">Texas, US · Remote-first</div>
-            </div>
-          </div>
-          <div class="about-item">
-            <div class="about-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
-            </div>
-            <div class="about-item-text">
-              <div class="label">GitHub</div>
-              <div class="sub">GenJess · iJessCloud · jesseutexas</div>
-            </div>
-            <div class="about-item-val">70+ repos</div>
-          </div>
-          <div class="about-item">
-            <div class="about-item-icon">
-              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-            </div>
-            <div class="about-item-text">
-              <div class="label">Domains</div>
-              <div class="sub">AI agents · Fintech · Health · Voice</div>
-            </div>
-          </div>
-          <div class="about-item">
-            <div class="about-item-icon">
-              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-            </div>
-            <div class="about-item-text">
-              <div class="label">Contact</div>
-              <div class="sub">Generative.jesse@gmail.com</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTACT -->
-<section id="contact">
-  <div class="section-wrap">
-    <div class="contact-inner reveal">
-      <h2>Let's build<br><span class="dim">something real.</span></h2>
-      <p>Open to full-time roles, contract work, and founding engineer opportunities. If you're building something in AI, health tech, or fintech — let's talk.</p>
-      <div class="contact-links">
-        <a href="mailto:Generative.jesse@gmail.com" class="contact-link">
-          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          Email
-        </a>
-        <a href="https://github.com/GenJess" target="_blank" class="contact-link">
-          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
-          GitHub
-        </a>
-        <a href="https://linkedin.com" target="_blank" class="contact-link">
-          <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-          LinkedIn
-        </a>
-        <a href="https://github.com/GenJess/agentjess-portfolio" target="_blank" class="contact-link">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          Voice Agent
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="left">Jesse · Full-Stack AI Builder · Texas</div>
-  <div class="right">Built with taste-skill · 2026</div>
-</footer>
-
-<script src="shared/utils.js"></script>
 <script>
-  // ============================================
-  // DATA
-  // ============================================
-  const PROJECTS = [
+// ============================================
+// SCROLL-WORLD ENGINE — Canvas scroll-scrubbed fly-through
+// Adapted from scroll-world scrub concept, using canvas
+// instead of video clips. Each scene = 2x viewport scroll.
+// ============================================
+
+(function() {
+  'use strict';
+
+  // --- CONFIG ---
+  const SCENE_SCROLL = 2.0;  // viewport heights per scene
+  const TRANSITION = 0.15;    // fraction of scene for crossfade
+
+  // --- SCENES ---
+  // Each scene has: id, label, accent color, and a render function(ctx, progress, w, h)
+  // Progress goes 0→1 within the scene's scroll range.
+  // The render function draws the scene-specific visual.
+
+  const ACCENTS = {
+    localcheck: '#f97316',
+    teaims: '#818cf8',
+    omnivital: '#10b981',
+    alphaGauge: '#0ea5e9',
+    generativejesse: '#10b981',
+    propersona: '#10b981',
+    careerops: '#f59e0b',
+    agentjess: '#a78bfa',
+    purpdex: '#0ea5e9',
+    axonai: '#f59e0b',
+    stocktok: '#0ea5e9',
+    danielscuts: '#a78bfa',
+  };
+
+  const SCENES = [
+    {
+      id: 'hero',
+      label: 'Intro',
+      accent: '#10b981',
+      copy: {
+        eyebrow: 'Full-Stack AI Builder',
+        title: 'Jesse builds\nthings that ship.',
+        body: '70+ repos across AI, fintech, health tech, and sports. Scroll to fly through the portfolio.',
+      },
+      render: renderHero,
+    },
     {
       id: 'localcheck',
-      name: 'LocalCheck',
-      desc: 'Street sports app — find active courts, check in, play, rank up. 5,734 courts mapped, 25+ TestFlight users, shipping.',
-      tags: ['sports'],
-      stack: ['Expo SDK 54', 'React Native', 'Supabase', 'Mapbox', 'ELO'],
-      score: '4.7',
-      dotClass: 'tag-dot-amber',
-      category: 'Sports · Mobile',
-      featured: true,
-      page: 'projects/localcheck.html',
-      github: 'https://github.com/agenticjess-star/LocalCheck_Expo',
-      live: 'https://localcheck.lovable.app'
+      label: 'LocalCheck',
+      accent: ACCENTS.localcheck,
+      copy: {
+        eyebrow: 'Sports · Mobile',
+        title: 'LocalCheck',
+        body: 'Street sports app — find active courts, check in, play, rank up. 5,734 courts mapped, 25+ TestFlight users, shipping.',
+        stack: ['Expo SDK 54', 'React Native', 'Supabase', 'Mapbox', 'ELO'],
+        links: [
+          { label: 'GitHub', href: 'https://github.com/agenticjess-star/LocalCheck_Expo', primary: true },
+          { label: 'Live', href: 'https://localcheck.lovable.app' },
+          { label: 'Details', href: 'projects/localcheck.html' },
+        ],
+      },
+      render: renderLocalCheck,
     },
     {
       id: 'teaims',
-      name: 'TEAIMS',
-      desc: 'Multi-agent AI operating system — 9 specialized agents with adversarial debates, HITL judgement, and persistent context.',
-      tags: ['ai'],
-      stack: ['React 18', 'Vite', 'shadcn/ui', 'Framer Motion', 'LangGraph'],
-      score: '4.1',
-      dotClass: 'tag-dot-amber',
-      category: 'AI / Agents',
-      featured: true,
-      page: 'projects/teaims.html',
-      github: 'https://github.com/GenJess/TEAIMS',
-      live: null
+      label: 'TEAIMS',
+      accent: ACCENTS.teaims,
+      copy: {
+        eyebrow: 'AI / Agents',
+        title: 'TEAIMS',
+        body: 'Multi-agent AI operating system — 9 specialized agents with adversarial debates, HITL judgement, and persistent context.',
+        stack: ['React 18', 'Vite', 'shadcn/ui', 'Framer Motion', 'LangGraph'],
+        links: [
+          { label: 'GitHub', href: 'https://github.com/GenJess/TEAIMS', primary: true },
+          { label: 'Details', href: 'projects/teaims.html' },
+        ],
+      },
+      render: renderTEAIMS,
     },
     {
       id: 'omnivital',
-      name: 'OmniVital',
-      desc: 'AI wellness platform — voice-first consultant, 6 precision formulas, biometric tracking, privacy-first community. 11K+ lines, live.',
-      tags: ['health'],
-      stack: ['React 18', 'FastAPI', 'Supabase', 'GPT-4.1', 'ElevenLabs'],
-      score: '4.2',
-      dotClass: 'tag-dot-teal',
-      category: 'Health Tech',
-      page: 'projects/omnivital.html',
-      github: 'https://github.com/GenJess/omnivital-v3',
-      live: 'https://omnivital.lovable.app'
+      label: 'OmniVital',
+      accent: ACCENTS.omnivital,
+      copy: {
+        eyebrow: 'Health Tech',
+        title: 'OmniVital',
+        body: 'AI wellness platform — voice-first consultant, 6 precision formulas, biometric tracking, privacy-first community. 11K+ lines, live.',
+        stack: ['React 18', 'FastAPI', 'Supabase', 'GPT-4.1', 'ElevenLabs'],
+        links: [
+          { label: 'GitHub', href: 'https://github.com/GenJess/omnivital-v3', primary: true },
+          { label: 'Live', href: 'https://omnivital.lovable.app' },
+          { label: 'Details', href: 'projects/omnivital.html' },
+        ],
+      },
+      render: renderOmniVital,
     },
     {
       id: 'alpha-gauge',
-      name: 'Alpha-Gauge',
-      desc: 'Real-time Polymarket trading dashboard — particle filter probability models, Monte Carlo analysis, governance audit trail.',
-      tags: ['finance'],
-      stack: ['React 18', 'Vite', 'TypeScript', 'Polymarket API', 'WebSocket'],
-      score: '4.2',
-      dotClass: 'tag-dot-sky',
-      category: 'Fintech',
-      page: 'projects/alpha-gauge.html',
-      github: 'https://github.com/agenticjess-star/alpha-gauge',
-      live: null
+      label: 'Alpha-Gauge',
+      accent: ACCENTS.alphaGauge,
+      copy: {
+        eyebrow: 'Fintech',
+        title: 'Alpha-Gauge',
+        body: 'Real-time Polymarket trading dashboard — particle filter probability models, Monte Carlo analysis, governance audit trail.',
+        stack: ['React 18', 'Vite', 'TypeScript', 'Polymarket API', 'WebSocket'],
+        links: [
+          { label: 'GitHub', href: 'https://github.com/agenticjess-star/alpha-gauge', primary: true },
+          { label: 'Details', href: 'projects/alpha-gauge.html' },
+        ],
+      },
+      render: renderAlphaGauge,
     },
     {
       id: 'generativejesse',
-      name: 'GenerativeJesse',
-      desc: 'Live portfolio — Spline 3D ocean landing, interactive navigation, crypto dashboard. Production at generativejesse.com.',
-      tags: ['portfolio'],
-      stack: ['Vite', 'React', 'Spline 3D', 'shadcn/ui', 'Vercel'],
-      score: '4.4',
-      dotClass: 'tag-dot-violet',
-      category: 'Portfolio',
-      page: 'projects/generativejesse.html',
-      github: 'https://github.com/GenJess/GenerativeJesse-LIVE',
-      live: 'https://generativejesse.com'
+      label: 'GenerativeJesse',
+      accent: ACCENTS.generativejesse,
+      copy: {
+        eyebrow: 'Portfolio',
+        title: 'GenerativeJesse',
+        body: 'Live portfolio — Spline 3D ocean landing, interactive navigation, crypto dashboard. Production at generativejesse.com.',
+        stack: ['Vite', 'React', 'Spline 3D', 'shadcn/ui', 'Vercel'],
+        links: [
+          { label: 'GitHub', href: 'https://github.com/GenJess/GenerativeJesse-LIVE', primary: true },
+          { label: 'Live', href: 'https://generativejesse.com' },
+          { label: 'Details', href: 'projects/generativejesse.html' },
+        ],
+      },
+      render: renderGenerativeJesse,
     },
     {
       id: 'propersona',
-      name: 'ProPersona',
-      desc: 'Live at pro-persona.lovable.app — AI-generated personas for branding, UX research, and go-to-market.',
-      tags: ['ai'],
-      stack: ['React', 'OpenAI', 'Lovable'],
-      score: '4.6',
-      dotClass: 'tag-dot-teal',
-      category: 'AI / Agents',
-      page: null,
-      github: null,
-      live: 'https://pro-persona.lovable.app'
+      label: 'ProPersona',
+      accent: ACCENTS.propersona,
+      copy: {
+        eyebrow: 'AI / Agents',
+        title: 'ProPersona',
+        body: 'Live at pro-persona.lovable.app — AI-generated personas for branding, UX research, and go-to-market.',
+        stack: ['React', 'OpenAI', 'Lovable'],
+        links: [
+          { label: 'Live', href: 'https://pro-persona.lovable.app', primary: true },
+        ],
+      },
+      render: renderGeneric,
     },
     {
       id: 'careerops',
-      name: 'CareerOps',
-      desc: 'DevOps principles applied to job hunting — automated pipeline for applications, follow-ups, and tracking.',
-      tags: ['ai'],
-      stack: ['Python', 'CLI', 'Automation', 'LLM'],
-      score: '4.4',
-      dotClass: 'tag-dot-amber',
-      category: 'AI / Agents',
-      page: null,
-      github: 'https://github.com/GenJess/career-ops',
-      live: null
+      label: 'CareerOps',
+      accent: ACCENTS.careerops,
+      copy: {
+        eyebrow: 'AI / Agents',
+        title: 'CareerOps',
+        body: 'DevOps principles applied to job hunting — automated pipeline for applications, follow-ups, and tracking.',
+        stack: ['Python', 'CLI', 'Automation', 'LLM'],
+        links: [
+          { label: 'GitHub', href: 'https://github.com/GenJess/career-ops', primary: true },
+        ],
+      },
+      render: renderGeneric,
     },
     {
       id: 'agentjess',
-      name: 'AgentJess Portfolio',
-      desc: 'Voice-navigated portfolio with Three.js particle orb, ElevenLabs orb, and client-side navigation tools.',
-      tags: ['portfolio'],
-      stack: ['React', 'Three.js', 'ElevenLabs', 'Gemini'],
-      score: '4.0',
-      dotClass: 'tag-dot-violet',
-      category: 'Portfolio',
-      page: null,
-      github: 'https://github.com/GenJess/agentjess-portfolio',
-      live: null
+      label: 'AgentJess',
+      accent: ACCENTS.agentjess,
+      copy: {
+        eyebrow: 'Portfolio',
+        title: 'AgentJess',
+        body: 'Voice-navigated portfolio with Three.js particle orb, ElevenLabs orb, and client-side navigation tools.',
+        stack: ['React', 'Three.js', 'ElevenLabs', 'Gemini'],
+        links: [
+          { label: 'GitHub', href: 'https://github.com/GenJess/agentjess-portfolio', primary: true },
+        ],
+      },
+      render: renderGeneric,
     },
     {
-      id: 'purpdex',
-      name: 'PurpDex Live',
-      desc: 'Live DEX analytics dashboard. Real-time crypto data, charting, and market intelligence for DeFi.',
-      tags: ['finance'],
-      stack: ['React', 'Web3', 'DeFi', 'APIs'],
-      score: '3.8',
-      dotClass: 'tag-dot-sky',
-      category: 'Fintech',
-      page: null,
-      github: 'https://github.com/GenJess/PurpDex-live',
-      live: null
-    },
-    {
-      id: 'axonai',
-      name: 'AxonAI',
-      desc: 'Neural-style AI agent framework. Context-aware multi-step task execution with memory.',
-      tags: ['ai'],
-      stack: ['Python', 'LangChain', 'Agents', 'Vector DB'],
-      score: '3.6',
-      dotClass: 'tag-dot-amber',
-      category: 'AI / Agents',
-      page: null,
-      github: 'https://github.com/GenJess/AxonAI',
-      live: null
-    },
-    {
-      id: 'stocktok',
-      name: 'StockTok',
-      desc: 'TikTok-style stock discovery feed. Short-form AI summaries of market movers served in a scroll interface.',
-      tags: ['finance'],
-      stack: ['React', 'Python', 'APIs', 'OpenAI'],
-      score: '3.6',
-      dotClass: 'tag-dot-sky',
-      category: 'Fintech',
-      page: null,
-      github: 'https://github.com/GenJess/stocktok',
-      live: null
-    },
-    {
-      id: 'danielscuts',
-      name: "Daniel's Cuts",
-      desc: 'Barber shop booking and client management platform. Deployed for a real client.',
-      tags: ['portfolio'],
-      stack: ['React', 'Node.js', 'Booking API'],
-      score: '3.4',
-      dotClass: 'tag-dot-violet',
-      category: 'Client Work',
-      page: null,
-      github: 'https://github.com/GenJess/DanielsBarberShop2.0',
-      live: null
+      id: 'finale',
+      label: 'Contact',
+      accent: '#10b981',
+      copy: {
+        eyebrow: 'Let\'s build',
+        title: 'Something real.',
+        body: 'Open to full-time roles, contract work, and founding engineer opportunities. AI, health tech, or fintech — let\'s talk.',
+        links: [
+          { label: 'Email', href: 'mailto:Generative.jesse@gmail.com', primary: true },
+          { label: 'GitHub', href: 'https://github.com/GenJess' },
+          { label: 'Portfolio', href: 'https://generativejesse.com' },
+        ],
+      },
+      render: renderFinale,
     },
   ];
 
-  const SKILLS = [
-    'React 18', 'TypeScript', 'Python', 'FastAPI', 'Supabase', 'PostgreSQL',
-    'MongoDB', 'GPT-4.1', 'ElevenLabs', 'LangChain', 'Three.js', 'Vercel',
-    'Node.js', 'TailwindCSS', 'Vite', 'OpenAI API', 'Web3', 'DeFi',
-    'Docker', 'GitHub Actions', 'RAG', 'Vector DBs', 'WebRTC', 'AssemblyAI',
-    'React Native', 'Redis', 'Stripe', 'n8n', 'Framer Motion', 'ML/CV',
-  ];
-
-  // ============================================
-  // MARQUEE (shared utility)
-  // ============================================
-  initMarquee({ elementId: 'marquee', skills: SKILLS });
-
-  // ============================================
-  // PROJECTS GRID
-  // ============================================
-  let activeFilter = 'all';
-  const grid = document.getElementById('projects-grid');
-
-  function renderProjects(filter) {
-    const filtered = filter === 'all' ? PROJECTS : PROJECTS.filter(p => p.tags.includes(filter));
-    grid.innerHTML = filtered.map((p, i) => {
-      const href = p.page || p.live || p.github || '#';
-      const external = p.page ? false : true;
-      return `
-      <a class="project-card${p.featured && i === 0 ? ' featured' : ''}" href="${href}"${external ? ' target="_blank"' : ''}>
-        <div class="project-arrow">
-          <svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-        </div>
-        <div class="project-tag">
-          <span class="tag-dot ${p.dotClass}"></span>
-          ${p.category}
-        </div>
-        <div class="project-name">${p.name}</div>
-        <div class="project-desc">${p.desc}</div>
-        <div class="project-footer">
-          <div class="project-stack">${p.stack.map(s => `<span class="stack-chip">${s}</span>`).join('')}</div>
-          <div class="project-score">${p.score}</div>
-        </div>
-      </a>`;
-    }).join('');
-  }
-  renderProjects('all');
-
-  initFilterButtons({
-    selector: '.filter-btn',
-    dataAttr: 'filter',
-    onFilter: (value) => { activeFilter = value; renderProjects(value); }
-  });
-
-  // ============================================
-  // PARTICLE CANVAS (Three.js-style 2D)
-  // ============================================
-  const canvas = document.getElementById('particle-canvas');
+  // --- SETUP ---
+  const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
-  let W, H, particles = [], angle = 0;
+  const copyLayer = document.getElementById('copy-layer');
+  const routeDots = document.getElementById('route-dots');
+  const scrollTrack = document.getElementById('scroll-track');
+  const scrollHint = document.getElementById('scroll-hint');
+  const scrollProgress = document.getElementById('scroll-progress');
 
-  function resizeCanvas() {
-    W = canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-    H = canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  }
+  let W = 0, H = 0, dpr = 1;
+  let scrollY = 0;
+  let maxScroll = 0;
+  let activeScene = 0;
+  let time = 0;
+
+  // Particles for hero/transition
+  const particles = [];
+  const PARTICLE_COUNT = 120;
 
   function initParticles() {
-    particles = [];
-    const count = 120;
-    const r = Math.min(canvas.offsetWidth, canvas.offsetHeight) * 0.38;
-    for (let i = 0; i < count; i++) {
+    particles.length = 0;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
-      const rad = r * (0.5 + Math.random() * 0.5);
+      const r = 0.35 + Math.random() * 0.15;
       particles.push({
-        x: rad * Math.sin(phi) * Math.cos(theta),
-        y: rad * Math.sin(phi) * Math.sin(theta),
-        z: rad * Math.cos(phi),
-        size: Math.random() * 1.5 + 0.3
+        x: r * Math.sin(phi) * Math.cos(theta),
+        y: r * Math.sin(phi) * Math.sin(theta),
+        z: r * Math.cos(phi),
+        size: Math.random() * 1.5 + 0.3,
       });
     }
   }
 
-  let mouseX = 0, mouseY = 0;
-  canvas.addEventListener('mousemove', e => {
-    const r = canvas.getBoundingClientRect();
-    mouseX = ((e.clientX - r.left) / r.width) * 2 - 1;
-    mouseY = ((e.clientY - r.top) / r.height) * 2 - 1;
+  // --- RESIZE ---
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Set scroll track height
+    const totalScenes = SCENES.length;
+    const totalScrollH = totalScenes * SCENE_SCROLL * H;
+    scrollTrack.style.height = totalScrollH + 'px';
+    maxScroll = totalScrollH - H;
+  }
+
+  // --- BUILD COPY CARDS ---
+  const copyCards = [];
+  SCENES.forEach((scene, i) => {
+    const card = document.createElement('div');
+    card.className = 'copy-card';
+    card.style.setProperty('--accent', scene.accent);
+
+    const eyebrowColor = scene.accent;
+    const num = String(i).padStart(2, '0');
+    const totalNum = String(SCENES.length - 1).padStart(2, '0');
+
+    let html = `<div class="num">${num} / ${totalNum}</div>`;
+    html += `<span class="eyebrow" style="color:${eyebrowColor};border-color:${eyebrowColor}33;background:${eyebrowColor}11;">${scene.copy.eyebrow}</span>`;
+    html += `<h2>${scene.copy.title.replace(/\n/g, '<br>')}</h2>`;
+    if (scene.copy.body) html += `<p>${scene.copy.body}</p>`;
+    if (scene.copy.stack) {
+      html += `<div class="stack">${scene.copy.stack.map(s => `<span>${s}</span>`).join('')}</div>`;
+    }
+    if (scene.copy.links) {
+      html += `<div class="links">${scene.copy.links.map(l =>
+        `<a href="${l.href}" target="_blank" class="${l.primary ? 'primary' : ''}">${l.label}</a>`
+      ).join('')}</div>`;
+    }
+    card.innerHTML = html;
+    copyLayer.appendChild(card);
+    copyCards.push(card);
   });
 
-  function drawParticles() {
-    const W2 = canvas.offsetWidth, H2 = canvas.offsetHeight;
-    ctx.clearRect(0, 0, W2, H2);
-    angle += 0.004 + mouseX * 0.002;
-    const angleX = mouseY * 0.3;
+  // --- BUILD ROUTE DOTS ---
+  SCENES.forEach((scene, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'route-dot';
+    dot.innerHTML = `<span class="label">${scene.label}</span>`;
+    dot.addEventListener('click', () => {
+      const targetY = i * SCENE_SCROLL * H;
+      window.scrollTo({ top: targetY, behavior: 'smooth' });
+    });
+    routeDots.appendChild(dot);
+  });
+  const dotElements = routeDots.querySelectorAll('.route-dot');
 
-    const proj = particles.map(p => {
-      let x = p.x * Math.cos(angle) - p.z * Math.sin(angle);
-      let z = p.x * Math.sin(angle) + p.z * Math.cos(angle);
-      let y = p.y * Math.cos(angleX) - z * Math.sin(angleX);
-      z = p.y * Math.sin(angleX) + z * Math.cos(angleX);
-      const fov = 400;
-      const scale = fov / (fov + z);
-      return { sx: x * scale + W2 / 2, sy: y * scale + H2 / 2, scale, z };
+  // --- SCROLL MATH ---
+  function getSceneProgress() {
+    const sceneHeight = SCENE_SCROLL * H;
+    const currentScene = Math.min(Math.floor(scrollY / sceneHeight), SCENES.length - 1);
+    const sceneStart = currentScene * sceneHeight;
+    const progress = (scrollY - sceneStart) / sceneHeight;
+    return { scene: currentScene, progress: Math.max(0, Math.min(1, progress)) };
+  }
+
+  // --- RENDER LOOP ---
+  function render() {
+    time += 0.016;
+    ctx.clearRect(0, 0, W, H);
+
+    // Background
+    ctx.fillStyle = '#080808';
+    ctx.fillRect(0, 0, W, H);
+
+    const { scene, progress } = getSceneProgress();
+    activeScene = scene;
+
+    // Draw current scene
+    const currentAccent = SCENES[scene].accent;
+    SCENES[scene].render(ctx, progress, W, H, time, currentAccent);
+
+    // Crossfade with next scene near the end
+    if (progress > 1 - TRANSITION && scene < SCENES.length - 1) {
+      const fadeProgress = (progress - (1 - TRANSITION)) / TRANSITION;
+      ctx.globalAlpha = fadeProgress;
+      const nextAccent = SCENES[scene + 1].accent;
+      SCENES[scene + 1].render(ctx, 0, W, H, time, nextAccent);
+      ctx.globalAlpha = 1;
+    }
+
+    // Update copy cards
+    copyCards.forEach((card, i) => {
+      const sceneStart = i * SCENE_SCROLL * H;
+      const sceneMid = sceneStart + SCENE_SCROLL * H * 0.4;
+      const sceneEnd = sceneStart + SCENE_SCROLL * H;
+      const dist = Math.abs(scrollY - sceneMid);
+      const visibleRange = SCENE_SCROLL * H * 0.35;
+      if (dist < visibleRange) {
+        card.classList.add('visible');
+      } else {
+        card.classList.remove('visible');
+      }
+    });
+
+    // Update route dots
+    dotElements.forEach((dot, i) => {
+      dot.classList.toggle('active', i === scene);
+    });
+
+    // Scroll progress bar
+    const totalProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
+    scrollProgress.style.width = (totalProgress * 100) + '%';
+
+    // Hide scroll hint after first scroll
+    if (scrollY > 50) scrollHint.classList.add('hidden');
+    else scrollHint.classList.remove('hidden');
+
+    requestAnimationFrame(render);
+  }
+
+  // --- SCENE RENDERERS ---
+
+  function renderHero(ctx, p, w, h, t, accent) {
+    // Particle sphere — "fly through" intro
+    const cx = w / 2, cy = h / 2;
+    const baseR = Math.min(w, h) * 0.28;
+    const scale = 1 + p * 1.5;  // sphere grows as you scroll
+    const opacity = Math.max(0, 1 - p * 1.2);
+
+    // Background gradient
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.6);
+    grad.addColorStop(0, 'rgba(16,185,129,0.04)');
+    grad.addColorStop(1, 'rgba(8,8,8,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.globalAlpha = opacity;
+
+    const angle = t * 0.15;
+    const proj = particles.map(pt => {
+      let x = pt.x * Math.cos(angle) - pt.z * Math.sin(angle);
+      let z = pt.x * Math.sin(angle) + pt.z * Math.cos(angle);
+      let y = pt.y;
+      const fov = 3;
+      const s = fov / (fov + z);
+      return {
+        sx: x * baseR * scale * s,
+        sy: y * baseR * scale * s,
+        s, z: z * scale,
+      };
     }).sort((a, b) => a.z - b.z);
 
-    // Draw connections
+    // Connections
+    ctx.lineWidth = 0.5;
     for (let i = 0; i < proj.length; i++) {
       for (let j = i + 1; j < proj.length; j++) {
         const dx = proj[i].sx - proj[j].sx;
         const dy = proj[i].sy - proj[j].sy;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 80) {
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 60) {
+          ctx.strokeStyle = `rgba(16,185,129,${(1 - d / 60) * 0.12 * opacity})`;
           ctx.beginPath();
           ctx.moveTo(proj[i].sx, proj[i].sy);
           ctx.lineTo(proj[j].sx, proj[j].sy);
-          ctx.strokeStyle = `rgba(16, 185, 129, ${(1 - dist / 80) * 0.15})`;
-          ctx.lineWidth = 0.5;
           ctx.stroke();
         }
       }
     }
 
-    // Draw particles
-    proj.forEach(p => {
+    // Particles
+    proj.forEach(pt => {
+      const a = Math.max(0.08, Math.min(0.7, (pt.z + 1) / 2 * opacity));
+      ctx.fillStyle = `rgba(16,185,129,${a})`;
       ctx.beginPath();
-      ctx.arc(p.sx, p.sy, p.scale * 1.2, 0, Math.PI * 2);
-      const alpha = (p.z + 300) / 600;
-      ctx.fillStyle = `rgba(16, 185, 129, ${Math.max(0.08, Math.min(0.7, alpha))})`;
+      ctx.arc(pt.sx, pt.sy, pt.s * 1.5, 0, Math.PI * 2);
       ctx.fill();
     });
 
-    requestAnimationFrame(drawParticles);
+    ctx.restore();
   }
 
-  resizeCanvas();
-  initParticles();
-  drawParticles();
-  window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+  function renderLocalCheck(ctx, p, w, h, t, accent) {
+    const cx = w / 2, cy = h / 2;
+    const scale = 0.5 + p * 0.8;
 
-  // ============================================
-  // NAV SCROLL + SCROLL REVEAL (shared utilities)
-  // ============================================
-  initNavScroll({ navId: 'navbar' });
-  initScrollReveal();
+    // Court grid
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = Math.min(1, p * 2);
+
+    const gridSize = 4;
+    const cellSize = 40;
+    const totalSize = gridSize * cellSize;
+    const offset = -totalSize / 2;
+
+    for (let i = 0; i < gridSize; i++) {
+      for (let j = 0; j < gridSize; j++) {
+        const x = offset + i * cellSize;
+        const y = offset + j * cellSize;
+        const isActive = (i + j + Math.floor(t * 0.5)) % 3 === 0;
+
+        ctx.strokeStyle = isActive ? accent : '#28282f';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, cellSize - 2, cellSize - 2);
+
+        if (isActive) {
+          ctx.fillStyle = accent + '15';
+          ctx.fillRect(x, y, cellSize - 2, cellSize - 2);
+          // Pulse dot
+          const pulse = 0.5 + Math.sin(t * 2 + i + j) * 0.5;
+          ctx.fillStyle = accent;
+          ctx.beginPath();
+          ctx.arc(x + cellSize/2, y + cellSize/2, 3 * pulse, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // ELO display
+    ctx.globalAlpha = Math.min(1, p * 1.5);
+    ctx.fillStyle = '#f2f2f6';
+    ctx.font = '700 48px Geist Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('1247', 0, -totalSize/2 - 30);
+    ctx.fillStyle = '#72728a';
+    ctx.font = '500 10px Geist Mono, monospace';
+    ctx.fillText('ELO RATING', 0, -totalSize/2 - 12);
+
+    ctx.restore();
+  }
+
+  function renderTEAIMS(ctx, p, w, h, t, accent) {
+    const cx = w / 2, cy = h / 2;
+    const scale = 0.6 + p * 0.5;
+    const opacity = Math.min(1, p * 2);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.globalAlpha = opacity;
+
+    // Orbit rings
+    const rings = [140, 100, 60];
+    rings.forEach((r, i) => {
+      ctx.strokeStyle = `rgba(99,102,241,${0.06 + i * 0.02})`;
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.arc(0, 0, r * scale, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    // Core
+    ctx.fillStyle = 'rgba(99,102,241,0.08)';
+    ctx.beginPath();
+    ctx.arc(0, 0, 30 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(99,102,241,0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#818cf8';
+    ctx.font = '500 10px Geist Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('HITL', 0, 4);
+
+    // Agent nodes
+    const agents = ['IDEA', 'ARCH', 'DESIGN', 'SEC', 'GROW', 'LEGAL'];
+    const angle = t * 0.1;
+    agents.forEach((label, i) => {
+      const a = (i / agents.length) * Math.PI * 2 + angle;
+      const r = 140 * scale;
+      const x = Math.cos(a) * r;
+      const y = Math.sin(a) * r;
+
+      ctx.fillStyle = '#111';
+      ctx.strokeStyle = '#1f1f1f';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(x, y, 18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Connection to core
+      ctx.strokeStyle = `rgba(99,102,241,${0.08})`;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+
+      ctx.fillStyle = '#444';
+      ctx.font = '500 7px Geist Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, x, y + 2);
+    });
+
+    ctx.restore();
+  }
+
+  function renderOmniVital(ctx, p, w, h, t, accent) {
+    const cx = w / 2, cy = h / 2;
+    const scale = 0.6 + p * 0.5;
+    const opacity = Math.min(1, p * 2);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.globalAlpha = opacity;
+
+    // Vitality rings
+    const rings = [
+      { r: 100, color: '#10b981', progress: 0.75 + Math.sin(t * 0.3) * 0.05 },
+      { r: 75, color: '#34d399', progress: 0.60 + Math.sin(t * 0.4) * 0.05 },
+      { r: 50, color: '#6ee7b7', progress: 0.45 + Math.sin(t * 0.5) * 0.05 },
+    ];
+
+    rings.forEach(ring => {
+      const r = ring.r * scale;
+      // Background ring
+      ctx.strokeStyle = 'rgba(16,185,129,0.06)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Progress arc
+      ctx.strokeStyle = ring.color;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(0, 0, r, -Math.PI/2, -Math.PI/2 + ring.progress * Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Center value
+    ctx.fillStyle = '#34d399';
+    ctx.font = '700 28px Geist Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('92', 0, 8);
+    ctx.fillStyle = '#444';
+    ctx.font = '500 9px Geist Mono, monospace';
+    ctx.fillText('VITALITY', 0, 24);
+
+    ctx.restore();
+  }
+
+  function renderAlphaGauge(ctx, p, w, h, t, accent) {
+    const cx = w / 2, cy = h / 2;
+    const opacity = Math.min(1, p * 2);
+    const scale = 0.7 + p * 0.4;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.globalAlpha = opacity;
+
+    // Price bars
+    const bars = [
+      { label: 'BTC', up: true, fill: 0.68, val: '$62.4k' },
+      { label: 'ETH', up: false, fill: 0.54, val: '$3.1k' },
+      { label: 'SOL', up: true, fill: 0.71, val: '$142' },
+      { label: '5m',  up: true, fill: 0.58, val: 'UP' },
+      { label: '15m', up: false, fill: 0.47, val: 'DN' },
+    ];
+
+    const barW = 120 * scale;
+    const barH = 6;
+    const spacing = 20;
+    const totalH = bars.length * spacing;
+    const startY = -totalH / 2;
+
+    bars.forEach((bar, i) => {
+      const y = startY + i * spacing;
+      const animFill = bar.fill + Math.sin(t * 0.5 + i) * 0.03;
+
+      // Label
+      ctx.fillStyle = '#444';
+      ctx.font = '500 10px Geist Mono, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(bar.label, -barW/2 - 36, y + 4);
+
+      // Track
+      ctx.fillStyle = '#1f1f1f';
+      ctx.fillRect(-barW/2, y - barH/2, barW, barH);
+
+      // Fill
+      const fillW = barW * animFill;
+      ctx.fillStyle = bar.up ? '#10b981' : '#f43f5e';
+      ctx.fillRect(-barW/2, y - barH/2, fillW, barH);
+
+      // Value
+      ctx.fillStyle = bar.up ? '#34d399' : '#f43f5e';
+      ctx.font = '500 9px Geist Mono, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText(bar.val, barW/2 + 8, y + 4);
+    });
+
+    ctx.restore();
+  }
+
+  function renderGenerativeJesse(ctx, p, w, h, t, accent) {
+    const cx = w / 2, cy = h / 2;
+    const opacity = Math.min(1, p * 2);
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.globalAlpha = opacity;
+
+    // Expanding wave rings
+    const rings = 5;
+    for (let i = 0; i < rings; i++) {
+      const phase = (t * 0.4 + i / rings) % 1;
+      const r = phase * 200;
+      const a = (1 - phase) * 0.15;
+      ctx.strokeStyle = `rgba(16,185,129,${a})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Core glow
+    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 40);
+    glowGrad.addColorStop(0, 'rgba(16,185,129,0.15)');
+    glowGrad.addColorStop(1, 'rgba(16,185,129,0)');
+    ctx.fillStyle = glowGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, 40, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function renderGeneric(ctx, p, w, h, t, accent) {
+    // Simple geometric pattern for remaining projects
+    const cx = w / 2, cy = h / 2;
+    const opacity = Math.min(1, p * 2);
+    const scale = 0.5 + p * 0.5;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.globalAlpha = opacity * 0.4;
+
+    // Hexagonal grid
+    const hexSize = 24 * scale;
+    const hexW = hexSize * Math.sqrt(3);
+    const hexH = hexSize * 1.5;
+
+    for (let row = -3; row <= 3; row++) {
+      for (let col = -3; col <= 3; col++) {
+        const x = col * hexW + (row % 2) * hexW / 2;
+        const y = row * hexH;
+        const dist = Math.sqrt(x * x + y * y);
+        const fade = Math.max(0, 1 - dist / (hexSize * 5));
+        if (fade > 0) {
+          ctx.strokeStyle = `rgba(${hexToRgb(accent)},${fade * 0.1})`;
+          ctx.lineWidth = 1;
+          drawHex(ctx, x, y, hexSize);
+        }
+      }
+    }
+
+    ctx.restore();
+  }
+
+  function renderFinale(ctx, p, w, h, t, accent) {
+    // Particle convergence — particles fly toward center
+    const cx = w / 2, cy = h / 2;
+    const opacity = Math.min(1, p * 1.5);
+
+    // Background gradient
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.5);
+    grad.addColorStop(0, 'rgba(16,185,129,0.06)');
+    grad.addColorStop(1, 'rgba(8,8,8,0)');
+    ctx.fillStyle = grad;
+    ctx.globalAlpha = opacity;
+    ctx.fillRect(0, 0, w, h);
+
+    // Converging particles
+    ctx.save();
+    ctx.translate(cx, cy);
+    for (let i = 0; i < 40; i++) {
+      const angle = (i / 40) * Math.PI * 2 + t * 0.2;
+      const dist = 200 * (1 - p) + Math.sin(t + i) * 20;
+      const x = Math.cos(angle) * dist;
+      const y = Math.sin(angle) * dist;
+      const size = 1 + (1 - p) * 2;
+      const a = 0.3 + (1 - p) * 0.4;
+      ctx.fillStyle = `rgba(16,185,129,${a * opacity})`;
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Trail
+      ctx.strokeStyle = `rgba(16,185,129,${a * 0.1 * opacity})`;
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x * 0.3, y * 0.3);
+      ctx.stroke();
+    }
+
+    // Central glow
+    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 60 + p * 40);
+    glowGrad.addColorStop(0, `rgba(16,185,129,${0.2 * opacity})`);
+    glowGrad.addColorStop(1, 'rgba(16,185,129,0)');
+    ctx.fillStyle = glowGrad;
+    ctx.beginPath();
+    ctx.arc(0, 0, 60 + p * 40, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  // --- HELPERS ---
+  function drawHex(ctx, x, y, size) {
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      const px = x + Math.cos(a) * size;
+      const py = y + Math.sin(a) * size;
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r},${g},${b}`;
+  }
+
+  // --- SCROLL HANDLER ---
+  let scrollRAF = null;
+  function onScroll() {
+    scrollY = window.scrollY || window.pageYOffset;
+    if (scrollRAF) return;
+    scrollRAF = requestAnimationFrame(() => {
+      scrollRAF = null;
+    });
+  }
+
+  // --- INIT ---
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', resize);
+  resize();
+  initParticles();
+  render();
+
+})();
 </script>
 </body>
 </html>
