@@ -287,3 +287,37 @@
 - **jGPT-Automated:** ✅ LocalCheck_Expo (4 commits in 48h, TestFlight active)
 
 ### Repository Ana
+
+
+## Session 20 — 2026-08-04 10:01 Chicago · Queue Verification + Infrastructure/Portfolio Pass
+
+**Status:** ✅ COMPLETE — 5 verified repos analyzed, 5 analysis files pushed
+
+### Activity Scan (Last 24h)
+- **agenticjess-star:** No new public pushes. Latest remains `instruction-hub` on 2026-07-28.
+- **GenJess:** No new public pushes. Latest remains `GenerativeJesse-LIVE` on 2026-05-26.
+- **jGPT-Automated:** No new public pushes observed in the public events scan.
+
+### Repositories Analyzed
+1. **instruction-hub** — 🟡 ACTIVE INFRASTRUCTURE (4.4 architecture / 3.2 proven production) — full React/Supabase app, MCP OAuth, Telegram webhook, optimizer edge functions; needs end-to-end acceptance proof.
+2. **localcheck** — 🟢 MATURE MVP (4.4/5) — real-time basketball web platform; needs web/native parity and two-device acceptance.
+3. **OMNIVITAL-BUSINESS** — 🔴 DORMANT ARTIFACT (2.6 product / 4.0 integration artifact) — Supabase + ElevenLabs business/voice implementation; canonical repo unresolved.
+4. **GenJess-OS** — ⚪ STRATEGIC SHELL (2.0 software / 3.8 documentation) — no meaningful executable implementation; needs a manifest and health checks.
+5. **GenerativeJesse-LIVE** — 🟡 QUIET PRODUCTION ASSET (4.1/5 asset) — immersive portfolio site; needs mobile/performance/GTM verification.
+
+### Queue Corrections
+- `HingeDatAI` was not available at `agenticjess-star/HingeDatAI` during this run.
+- `JAW` was not available at `agenticjess-star/JAW` during this run.
+- Substituted verified next-priority repos `GenJess-OS` and `GenJess/GenerativeJesse-LIVE`.
+
+### Key Call
+Instruction-hub is still the highest-leverage follow-up, but its next milestone must be a single end-to-end proof: Telegram URL → Firecrawl thread → classifier → human rating → versioned instruction → authorized MCP retrieval. LocalCheck remains the clearest shipping product; OmniVital and GenJess-OS need canonicalization/verification before more feature investment.
+
+### Next Queue (Session 21)
+1. **instruction-hub** — run/verify deployed OAuth, Telegram, Firecrawl, RLS, and idempotency gates.
+2. **LocalCheck_Expo** — confirm TestFlight/App Store status and web/native event parity.
+3. **LocalCheck_WEB / localcheck** — production smoke test and live traction evidence.
+4. **OmniVital canonicalization** — identify source of truth and freeze version drift.
+5. **AgentAgency or mya** — next verified agentic repos if no priority activity appears.
+
+**Session metrics:** 3 accounts scanned; 5 repos deeply analyzed; 5 analysis files pushed.
