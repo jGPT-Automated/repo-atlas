@@ -321,3 +321,73 @@ Instruction-hub is still the highest-leverage follow-up, but its next milestone 
 5. **AgentAgency or mya** — next verified agentic repos if no priority activity appears.
 
 **Session metrics:** 3 accounts scanned; 5 repos deeply analyzed; 5 analysis files pushed.
+
+## Session 21 — 2026-08-05 10:01 Chicago · Backlog System + Honest Deep Dive
+
+**Status:** ✅ COMPLETE — 2 repos deeply analyzed, 7 backlog tasks created
+
+### Activity Scan (Last 24h)
+- **jGPT-Automated/LocalCheck_Expo:** ✅ Pushed 2026-08-04 (build 13 incident docs, version bump to 1.0.1)
+- **agenticjess-star/instruction-hub:** Last push 2026-07-28 (23 days dormant)
+- **GenJess:** Only WatchEvents (starring repos, no code pushes)
+
+### Repos Deeply Analyzed (2 max — real code review, not summaries)
+
+#### 1. LocalCheck_Expo (jGPT-Automated)
+**Status:** 🟢 ACTIVE SHIPPING | Score: 4.8/5.0
+
+Real code verified:
+- 500+ files, 17 screens, 20+ components, 11 services, 5 context providers
+- Auth: email + Apple Sign-In with SecureStore (native) / localStorage (web) — solid
+- Realtime: RealtimeHub with scoped Broadcast channels + JWT auth — implemented correctly
+- EAS: production submit config with appleTeamId + ascAppId — ready for App Store
+- Issue #18: Supabase cutover from old project → LocalCheckProd — still open, the P0 blocker
+
+Real issues found (not from commit messages — from reading actual code):
+1. schedule.tsx is 60KB — unmaintainable single file with all scheduling logic
+2. Add Friend broken in build 9 (documented in SCREEN_MAP.md)
+3. app.config.js references MAPBOX_DOWNLOADS_TOKEN that Issue #18 says is NOT needed
+4. Map has redundant controls Jesse explicitly annotated for removal
+5. Schedule uses single-select; approved direction is multi-select
+6. Add Court form has wasted vertical space
+
+#### 2. instruction-hub (agenticjess-star)
+**Status:** 🟡 DORMANT BUT HIGH-LEVERAGE | Score: 4.0/5.0
+
+Real code verified:
+- 127 files, 17 pages, React/Vite/Supabase/Lovable stack
+- MCP server: 3 read-only tools (list_groups, list_instructions, get_production_instruction)
+- Telegram webhook: URL → Firecrawl scrape → AI classify (Gemini 2.5 Flash) → save thread
+- 6 migrations, no open issues, no PRs
+- Last commit: July 9 — 23 days dormant
+
+Real issues found:
+1. MCP only has READ tools — agents can't create/update instructions (kills the value prop)
+2. Telegram webhook has no idempotency — duplicate updates could create duplicate threads
+3. No retry on Firecrawl failure — if scrape fails, thread is lost
+4. If classification fails, thread is lost (should save with nulls instead)
+5. No health check endpoint
+6. RLS policies not verified — security gate before any public deployment
+7. No error logging to Supabase — failures are silently caught
+
+### Backlog Created
+7 actionable, code-verified tasks pushed to backlog/tasks.json:
+- LC-001: Split schedule.tsx (P1)
+- LC-002: Fix Add Friend broken (P0)
+- LC-003: Map UI cleanup (P1)
+- LC-004: Remove obsolete MAPBOX_DOWNLOADS_TOKEN (P1)
+- IH-001: Add MCP write tools (P1)
+- IH-002: Telegram webhook resilience (P1)
+- IH-003: RLS audit (P0)
+
+### Flow
+- My cron fires daily at 10am Chicago → deep-dive 2 repos → create backlog tasks
+- 12hrs later (10pm): Dev agents read backlog/tasks.json → execute tasks → mark complete
+- Next day 10am: I review completed tasks → approve/comment → add more tasks
+
+### Next Queue (Session 22)
+1. Review any completed backlog tasks from dev agents
+2. Deep-dive: LocalCheck_WEB (production smoke test)
+3. Deep-dive: AgentAgency or mya (next verified repos)
+4. Check for LocalCheck_Expo App Store submission evidence
+
