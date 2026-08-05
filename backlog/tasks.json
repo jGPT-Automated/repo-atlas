@@ -1,0 +1,184 @@
+{
+  "meta": {
+    "created": "2026-08-05",
+    "created_by": "repo-atlas-agent",
+    "description": "Actionable tasks for dev agents. Created during deep-dive analysis. Each task has: repo, priority, acceptance criteria, and context. Dev agents: pick up tasks in priority order, create a branch, work, PR back. The atlas agent will review 12hrs after your work fires.",
+    "flow": "Atlas agent reviews repos → creates tasks → 12hrs later dev agents execute → 12hrs later atlas agent reviews and adds more"
+  },
+  "tasks": [
+    {
+      "id": "LC-001",
+      "repo": "jGPT-Automated/LocalCheck_Expo",
+      "title": "Split schedule.tsx (60KB) into focused components",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "artifacts/mobile/app/(tabs)/schedule.tsx is 60KB — a single file containing the weekly grid, the host-a-run modal, court search field, day/time pickers, and all scheduling logic. This is unmaintainable and blocks safe iteration.",
+      "acceptance_criteria": [
+        "Extract CourtField (court search/select) into components/schedule/CourtField.tsx",
+        "Extract DayTimeGrid into components/schedule/DayTimeGrid.tsx",
+        "Extract HostRunModal into components/schedule/HostRunModal.tsx",
+        "Extract VisitModal into components/schedule/VisitModal.tsx",
+        "schedule.tsx imports the extracted components and is under 15KB",
+        "All existing functionality preserved — no behavior changes",
+        "TypeScript compiles clean (pnpm tsc --noEmit)"
+      ],
+      "files_to_read": [
+        "artifacts/mobile/app/(tabs)/schedule.tsx",
+        "artifacts/mobile/components/sheet/FormSheet.tsx",
+        "artifacts/mobile/constants/data.ts"
+      ],
+      "branch": "refactor/schedule-split"
+    },
+    {
+      "id": "LC-002",
+      "repo": "jGPT-Automated/LocalCheck_Expo",
+      "title": "Fix Add Friend button (broken in build 9)",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "SCREEN_MAP.md documents: 'Add Friend does nothing in build 9; it previously worked.' The button exists on the player profile screen (artifacts/mobile/app/player/[id].tsx) but the friendshipService.ts call appears to not fire or fails silently. This blocks the core social loop.",
+      "acceptance_criteria": [
+        "Identify why Add Friend fails — check friendshipService.createFriendRequest, RLS policies, and error handling",
+        "Fix the root cause (not just surface symptom)",
+        "Add a loading state on the button while the request is pending",
+        "Add error toast on failure",
+        "Add success feedback (either toast or button state change to 'Requested')",
+        "Test with two real accounts if possible, or document the RLS verification needed"
+      ],
+      "files_to_read": [
+        "artifacts/mobile/app/player/[id].tsx",
+        "artifacts/mobile/services/friendshipService.ts",
+        "artifacts/mobile/context/AppContext.tsx"
+      ],
+      "branch": "fix/add-friend-broken"
+    },
+    {
+      "id": "LC-003",
+      "repo": "jGPT-Automated/LocalCheck_Expo",
+      "title": "Map UI cleanup — remove redundant controls per Jesse's annotations",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "Screenshot 18-map-layout-annotations.png shows Jesse's working direction: retain shared Explore header, make List/Map the primary view switch, remove redundant banner, legend, and floating add affordances. The map currently has competing UI elements that reduce clarity.",
+      "acceptance_criteria": [
+        "Remove redundant banner from MapScreen",
+        "Remove floating legend that competes with map content",
+        "Remove floating add-court button (move to header or Explore list)",
+        "List/Map becomes a segmented toggle in the Explore header",
+        "Empty state (screenshot 19) keeps Explore context visible",
+        "No layout overflow on iPhone 14 Pro and iPhone SE"
+      ],
+      "files_to_read": [
+        "artifacts/mobile/components/MapScreen.tsx",
+        "artifacts/mobile/components/MapScreen.web.tsx",
+        "artifacts/mobile/components/CourtsScreen.tsx"
+      ],
+      "branch": "fix/map-ui-cleanup"
+    },
+    {
+      "id": "LC-004",
+      "repo": "jGPT-Automated/LocalCheck_Expo",
+      "title": "Resolve Issue #18 Part A: Remove obsolete MAPBOX_DOWNLOADS_TOKEN config",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "Issue #18 states @rnmapbox/maps@10.3.2 does NOT require a Mapbox downloads secret. But app.config.js still references RNMAPBOX_MAPS_DOWNLOAD_TOKEN and comments say it's required for builds. This is contradictory and will confuse the EAS build.",
+      "acceptance_criteria": [
+        "Remove RNMAPBOX_MAPS_DOWNLOAD_TOKEN references from app.config.js",
+        "Update comments to clarify only EXPO_PUBLIC_MAPBOX_TOKEN (pk.*) is needed",
+        "Check .env.example for stale MAPBOX_DOWNLOADS_TOKEN references",
+        "Check EAS environment variables documentation",
+        "Verify no CI/build scripts reference the download token"
+      ],
+      "files_to_read": [
+        "artifacts/mobile/app.config.js",
+        "artifacts/mobile/app.json",
+        ".env.example",
+        "docs/RELEASE_RUNBOOK.md"
+      ],
+      "branch": "fix/remove-mapbox-download-token"
+    },
+    {
+      "id": "IH-001",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Add MCP tools: create_instruction, update_instruction, delete_instruction",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "The MCP function (supabase/functions/mcp/index.ts) only exposes 3 read-only tools: list_groups, list_instructions, get_production_instruction. An agent connected via MCP cannot create or modify instructions — it can only read. This severely limits the product's value proposition of 'version-controlled instructions managed by agents'.",
+      "acceptance_criteria": [
+        "Add create_instruction tool — creates a new instruction_groups row + first version",
+        "Add update_instruction tool — creates a new instruction_versions row (never mutates existing versions)",
+        "Add delete_instruction tool — soft delete (set archived=true), not a hard delete",
+        "All new tools require authentication (ctx.isAuthenticated())",
+        "All new tools use user-scoped Supabase client (not service role)",
+        "Add Zod input validation matching the DB schema",
+        "Update src/lib/mcp/index.ts (the source file — the function is auto-generated from it)"
+      ],
+      "files_to_read": [
+        "supabase/functions/mcp/index.ts",
+        "src/integrations/supabase/types.ts",
+        "supabase/migrations/"
+      ],
+      "branch": "feat/mcp-write-tools"
+    },
+    {
+      "id": "IH-002",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Add health check endpoint + Telegram webhook resilience",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "The Telegram webhook (supabase/functions/telegram-webhook/index.ts) has no retry logic, no idempotency guard, and errors are silently caught. If Firecrawl or the AI gateway fails, the thread is lost. There's also no health endpoint to verify the service is alive.",
+      "acceptance_criteria": [
+        "Add idempotency: store telegram update_id in a processed_updates table, skip duplicates",
+        "Add retry with exponential backoff for Firecrawl scrape failures (max 3 retries)",
+        "If classification fails, still save the thread with group_id=null and rating=null (don't lose data)",
+        "Add a /health endpoint to the MCP function that returns {status: 'ok', timestamp}",
+        "Log structured errors to Supabase (an error_logs table or similar)",
+        "Telegram send failures should not crash the webhook — catch and log"
+      ],
+      "files_to_read": [
+        "supabase/functions/telegram-webhook/index.ts",
+        "supabase/functions/mcp/index.ts",
+        "supabase/migrations/"
+      ],
+      "branch": "fix/webhook-resilience"
+    },
+    {
+      "id": "IH-003",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "RLS audit — verify all tables have correct policies",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "6 migrations exist but there's no evidence RLS policies were verified. The MCP tools use user-scoped Supabase clients, but if RLS is missing or permissive, any authenticated user could read/modify other users' instructions. This is a security gate before any public deployment.",
+      "acceptance_criteria": [
+        "Read all 6 migration files and document every table + its RLS policies",
+        "For each table, verify: (a) RLS is enabled, (b) SELECT policies restrict to own rows, (c) INSERT/UPDATE/DELETE restrict to own rows",
+        "List any tables with missing or permissive policies",
+        "Create a migration to fix any gaps",
+        "Document the expected RLS policy for each table in a SECURITY.md or similar"
+      ],
+      "files_to_read": [
+        "supabase/migrations/20260307174057_3fba95de-96c5-4591-92ff-a089d60ec7cd.sql",
+        "supabase/migrations/20260310092700_f98cd40d-50bb-41e0-9394-fe6ab297d500.sql",
+        "supabase/migrations/20260310232457_adbb529c-84f0-43f2-baff-ae1720f917ad.sql",
+        "supabase/migrations/20260311003824_8418857a-8383-4dd3-87f8-6d6dd1ecfe77.sql",
+        "supabase/migrations/20260709190732_0132c32b-9d95-4ddd-8ebc-32048857efbc.sql",
+        "supabase/migrations/20260709191932_0e5b93e6-b1bd-457a-99bd-37f6a62336cf.sql"
+      ],
+      "branch": "security/rls-audit"
+    }
+  ],
+  "completed": [],
+  "in_review": []
+}
