@@ -17,7 +17,13 @@
     "off_limits": [
       "jGPT-Automated/LocalCheck_Expo"
     ],
-    "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions."
+    "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
+    "last_deep_dive": "2026-08-05",
+    "last_repos": [
+      "agenticjess-star/instruction-hub",
+      "jGPT-Automated/vox-director"
+    ],
+    "last_run_note": "No in_review items were present. LocalCheck excluded per off_limits."
   },
   "tasks": [
     {
@@ -81,13 +87,13 @@
       "status": "open",
       "assignee": null,
       "created": "2026-08-05",
-      "context": "6 migrations exist but there's no evidence RLS policies were verified. The MCP tools use user-scoped Supabase clients, but if RLS is missing or permissive, any authenticated user could read/modify other users' instructions. This is a security gate before any public deployment.",
+      "context": "Concrete audit finding: supabase/migrations/20260307174057_3fba95de-96c5-4591-92ff-a089d60ec7cd.sql creates the authenticated SELECT policy \"Users can view all profiles\" with USING (true). A later own-profile policy does not neutralize it because permissive policies are ORed. Profiles contain user_id and Telegram-link metadata, so another authenticated user may read other users' profile rows. Preserve service-role webhook lookups while restricting user-scoped access.",
       "acceptance_criteria": [
-        "Read all 6 migration files and document every table + its RLS policies",
-        "For each table, verify: (a) RLS is enabled, (b) SELECT policies restrict to own rows, (c) INSERT/UPDATE/DELETE restrict to own rows",
-        "List any tables with missing or permissive policies",
-        "Create a migration to fix any gaps",
-        "Document the expected RLS policy for each table in a SECURITY.md or similar"
+        "Read all six migration files and document every table, RLS enablement, and effective policy set",
+        "Replace/remove the global profiles SELECT policy so authenticated user-scoped reads require auth.uid() = user_id",
+        "Verify instruction_groups, instruction_versions, threads, thread_comments, categories, and profiles have intended SELECT/INSERT/UPDATE/DELETE restrictions",
+        "Add a migration and a regression test or documented SQL verification proving one user cannot read another user's profile or instruction data",
+        "Document the expected RLS policy for each table in SECURITY.md or similar"
       ],
       "files_to_read": [
         "supabase/migrations/20260307174057_3fba95de-96c5-4591-92ff-a089d60ec7cd.sql",
@@ -98,6 +104,34 @@
         "supabase/migrations/20260709191932_0e5b93e6-b1bd-457a-99bd-37f6a62336cf.sql"
       ],
       "branch": "security/rls-audit",
+      "review_status": "pending_review",
+      "review_notes": null
+    },
+    {
+      "id": "VD-001",
+      "repo": "jGPT-Automated/vox-director",
+      "title": "Add pipeline preflight and fixture-based smoke test",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "scripts/assemble.py and scripts/aroll_assemble.py invoke ffmpeg/ffprobe directly via subprocess.run(check=True), and caption/watermark paths depend on Pillow. There is no test directory or CI workflow in the current tree. Add an offline preflight and a minimal local fixture smoke test so packaged skill failures are caught before expensive Atlas Cloud jobs.",
+      "acceptance_criteria": [
+        "Add a doctor/preflight command that checks Python, Pillow, ffmpeg, ffprobe, and required environment variables without network calls",
+        "Add a fixture-based smoke test for the assembly path using local media only; it must not call Atlas Cloud",
+        "Assert the produced video exists, is probeable with ffprobe, and has non-zero duration",
+        "Return actionable error messages and non-zero exit codes for missing dependencies or invalid fixtures",
+        "Document how to run the preflight and smoke test locally and in CI"
+      ],
+      "files_to_read": [
+        "scripts/assemble.py",
+        "scripts/aroll_assemble.py",
+        "scripts/atlas_cloud.py",
+        "scripts/provider.py",
+        "README.md",
+        "SKILL.md"
+      ],
+      "branch": "test/pipeline-preflight-smoke-test",
       "review_status": "pending_review",
       "review_notes": null
     }
