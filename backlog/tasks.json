@@ -24,7 +24,8 @@
       "jGPT-Automated/vox-director"
     ],
     "last_run_note": "No in_review items were present. LocalCheck excluded per off_limits.",
-    "last_analysis": "2026-08-06"
+    "last_analysis": "2026-08-06",
+    "last_run": "2026-08-07"
   },
   "tasks": [
     {
@@ -107,7 +108,7 @@
       "branch": "security/rls-audit",
       "review_status": "pending_review",
       "review_notes": null,
-      "description": "Audit the live and migration-defined profiles SELECT policies. Remove any permissive policy, verify auth.uid() ownership enforcement, and add a regression test that a user cannot read another user profile. Do not alter unrelated tables."
+      "description": "Confirm the deployed policies do not retain any permissive profiles SELECT policy; add an authenticated cross-user read regression test and document the migration verification."
     },
     {
       "id": "VD-001",
@@ -135,7 +136,8 @@
       ],
       "branch": "test/pipeline-preflight-smoke-test",
       "review_status": "pending_review",
-      "review_notes": null
+      "review_notes": null,
+      "description": "Add a reusable offline preflight for ffmpeg, ffprobe, and Pillow; invoke it before local media stages; add fixture or mocked-subprocess smoke coverage with no Atlas API credentials."
     },
     {
       "id": "IH-004",
@@ -145,7 +147,7 @@
       "review_status": "pending_review",
       "review_notes": null,
       "title": "Harden Telegram webhook authentication and duplicate-update handling",
-      "description": "Require Telegram webhook secret verification before processing. Persist a unique telegram update_id/event key before Firecrawl or LLM work, acknowledge duplicate deliveries without inserting another thread, define edited-message behavior, and add fixture tests for invalid secret and duplicate update delivery. Keep service-role access server-side.",
+      "description": "Validate Telegram webhook secret authentication, durable update_id dedupe before side effects, and an explicit edited_message policy. Add fixture tests for unauthorized, duplicate, and edited updates.",
       "source": "Repo Atlas 2026-08-06 deep dive"
     }
   ],
