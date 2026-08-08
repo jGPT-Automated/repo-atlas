@@ -18,14 +18,14 @@
       "jGPT-Automated/LocalCheck_Expo"
     ],
     "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
-    "last_deep_dive": "2026-08-05",
+    "last_deep_dive": "2026-08-08",
     "last_repos": [
       "agenticjess-star/instruction-hub",
       "jGPT-Automated/vox-director"
     ],
-    "last_run_note": "No in_review items were present. LocalCheck excluded per off_limits.",
-    "last_analysis": "2026-08-06",
-    "last_run": "2026-08-07"
+    "last_run_note": "No in_review items. LocalCheck excluded. Added VD-002 after code-verified curl transfer reliability finding.",
+    "last_analysis": "2026-08-08",
+    "last_run": "2026-08-08"
   },
   "tasks": [
     {
@@ -149,6 +149,30 @@
       "title": "Harden Telegram webhook authentication and duplicate-update handling",
       "description": "Validate Telegram webhook secret authentication, durable update_id dedupe before side effects, and an explicit edited_message policy. Add fixture tests for unauthorized, duplicate, and edited updates.",
       "source": "Repo Atlas 2026-08-06 deep dive"
+    },
+    {
+      "id": "VD-002",
+      "repo": "jGPT-Automated/vox-director",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-08",
+      "review_status": "pending_review",
+      "review_notes": null,
+      "title": "Make Atlas Cloud asset transfers bounded and fail-fast",
+      "context": "scripts/atlas_cloud.py uses curl for upload/download. download() uses -s --retry 3 without --fail, connect timeout, or max time; upload() similarly lacks bounded timeout/error handling. Non-empty HTTP error bodies can be accepted as downloaded assets, and stalled transfers can hang a job.",
+      "acceptance_criteria": [
+        "Add explicit connect and overall timeouts to upload and download without changing the no-retry rule for billable POST generation calls",
+        "Use fail-fast HTTP handling so non-2xx transfers raise AtlasCloudError with status/context instead of accepting an error body",
+        "Preserve the proxy-safe curl approach and existing retry behavior only where safe for downloads",
+        "Add unit tests with mocked subprocess responses for timeout, HTTP failure, empty output, and successful transfer",
+        "Document the transfer timeout behavior and actionable recovery message"
+      ],
+      "files_to_read": [
+        "scripts/atlas_cloud.py",
+        "README.md",
+        "SKILL.md"
+      ]
     }
   ],
   "completed": [],
