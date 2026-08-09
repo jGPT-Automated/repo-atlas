@@ -53,7 +53,8 @@
       ],
       "branch": "feat/mcp-write-tools",
       "review_status": "pending_review",
-      "review_notes": null
+      "review_notes": null,
+      "last_verified": "2026-08-09"
     },
     {
       "id": "IH-002",
@@ -65,12 +66,9 @@
       "created": "2026-08-05",
       "context": "The Telegram webhook (supabase/functions/telegram-webhook/index.ts) has no retry logic, no idempotency guard, and errors are silently caught. If Firecrawl or the AI gateway fails, the thread is lost. There's also no health endpoint to verify the service is alive.",
       "acceptance_criteria": [
-        "Add idempotency: store telegram update_id in a processed_updates table, skip duplicates",
-        "Add retry with exponential backoff for Firecrawl scrape failures (max 3 retries)",
-        "If classification fails, still save the thread with group_id=null and rating=null (don't lose data)",
-        "Add a /health endpoint to the MCP function that returns {status: 'ok', timestamp}",
-        "Log structured errors to Supabase (an error_logs table or similar)",
-        "Telegram send failures should not crash the webhook \u2014 catch and log"
+        "Expose a cheap authenticated/unauthenticated health check that reports dependency readiness without invoking Firecrawl or the LLM.",
+        "Add bounded retry/backoff for transient Firecrawl failures and return a stable response without duplicate inserts.",
+        "Add tests for timeout, non-2xx, and dependency-missing paths."
       ],
       "files_to_read": [
         "supabase/functions/telegram-webhook/index.ts",
@@ -79,7 +77,8 @@
       ],
       "branch": "fix/webhook-resilience",
       "review_status": "pending_review",
-      "review_notes": null
+      "review_notes": null,
+      "last_verified": "2026-08-09"
     },
     {
       "id": "IH-003",
@@ -91,11 +90,9 @@
       "created": "2026-08-05",
       "context": "Concrete audit finding: supabase/migrations/20260307174057_3fba95de-96c5-4591-92ff-a089d60ec7cd.sql creates the authenticated SELECT policy \"Users can view all profiles\" with USING (true). A later own-profile policy does not neutralize it because permissive policies are ORed. Profiles contain user_id and Telegram-link metadata, so another authenticated user may read other users' profile rows. Preserve service-role webhook lookups while restricting user-scoped access.",
       "acceptance_criteria": [
-        "Read all six migration files and document every table, RLS enablement, and effective policy set",
-        "Replace/remove the global profiles SELECT policy so authenticated user-scoped reads require auth.uid() = user_id",
-        "Verify instruction_groups, instruction_versions, threads, thread_comments, categories, and profiles have intended SELECT/INSERT/UPDATE/DELETE restrictions",
-        "Add a migration and a regression test or documented SQL verification proving one user cannot read another user's profile or instruction data",
-        "Document the expected RLS policy for each table in SECURITY.md or similar"
+        "Verify deployed policies, not only migration text.",
+        "Authenticated user A cannot SELECT user B profile rows or sensitive link fields.",
+        "Regression test fails if the permissive historical policy is reintroduced."
       ],
       "files_to_read": [
         "supabase/migrations/20260307174057_3fba95de-96c5-4591-92ff-a089d60ec7cd.sql",
@@ -108,7 +105,8 @@
       "branch": "security/rls-audit",
       "review_status": "pending_review",
       "review_notes": null,
-      "description": "Confirm the deployed policies do not retain any permissive profiles SELECT policy; add an authenticated cross-user read regression test and document the migration verification."
+      "description": "Confirm the deployed policies do not retain any permissive profiles SELECT policy; add an authenticated cross-user read regression test and document the migration verification.",
+      "last_verified": "2026-08-09"
     },
     {
       "id": "VD-001",
@@ -137,7 +135,8 @@
       "branch": "test/pipeline-preflight-smoke-test",
       "review_status": "pending_review",
       "review_notes": null,
-      "description": "Add a reusable offline preflight for ffmpeg, ffprobe, and Pillow; invoke it before local media stages; add fixture or mocked-subprocess smoke coverage with no Atlas API credentials."
+      "description": "Add a reusable offline preflight for ffmpeg, ffprobe, and Pillow; invoke it before local media stages; add fixture or mocked-subprocess smoke coverage with no Atlas API credentials.",
+      "last_verified": "2026-08-09"
     },
     {
       "id": "IH-004",
@@ -148,7 +147,13 @@
       "review_notes": null,
       "title": "Harden Telegram webhook authentication and duplicate-update handling",
       "description": "Validate Telegram webhook secret authentication, durable update_id dedupe before side effects, and an explicit edited_message policy. Add fixture tests for unauthorized, duplicate, and edited updates.",
-      "source": "Repo Atlas 2026-08-06 deep dive"
+      "source": "Repo Atlas 2026-08-06 deep dive",
+      "last_verified": "2026-08-09",
+      "acceptance_criteria": [
+        "Reject POSTs missing or mismatching the configured Telegram secret before any DB/API side effect.",
+        "Atomically claim update_id with a unique constraint; retries return success without repeating side effects.",
+        "Document and test edited_message behavior."
+      ]
     },
     {
       "id": "VD-002",
@@ -162,17 +167,16 @@
       "title": "Make Atlas Cloud asset transfers bounded and fail-fast",
       "context": "scripts/atlas_cloud.py uses curl for upload/download. download() uses -s --retry 3 without --fail, connect timeout, or max time; upload() similarly lacks bounded timeout/error handling. Non-empty HTTP error bodies can be accepted as downloaded assets, and stalled transfers can hang a job.",
       "acceptance_criteria": [
-        "Add explicit connect and overall timeouts to upload and download without changing the no-retry rule for billable POST generation calls",
-        "Use fail-fast HTTP handling so non-2xx transfers raise AtlasCloudError with status/context instead of accepting an error body",
-        "Preserve the proxy-safe curl approach and existing retry behavior only where safe for downloads",
-        "Add unit tests with mocked subprocess responses for timeout, HTTP failure, empty output, and successful transfer",
-        "Document the transfer timeout behavior and actionable recovery message"
+        "Upload and download use explicit connect and overall timeouts plus HTTP fail-fast behavior.",
+        "Retries are bounded and do not retry non-transient 4xx responses.",
+        "Tests prove HTTP error bodies cannot be accepted as successful assets."
       ],
       "files_to_read": [
         "scripts/atlas_cloud.py",
         "README.md",
         "SKILL.md"
-      ]
+      ],
+      "last_verified": "2026-08-09"
     }
   ],
   "completed": [],
