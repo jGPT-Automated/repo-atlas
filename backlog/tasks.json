@@ -25,7 +25,9 @@
     ],
     "last_run_note": "No in_review items. LocalCheck excluded. Added VD-002 after code-verified curl transfer reliability finding.",
     "last_analysis": "2026-08-08",
-    "last_run": "2026-08-08"
+    "last_run": "2026-08-08",
+    "last_analysis_date": "2026-08-10",
+    "last_analysis_note": "Reviewed instruction-hub and vox-director. No in_review items; six existing tasks remain pending_review. LocalCheck untouched and off limits."
   },
   "tasks": [
     {
