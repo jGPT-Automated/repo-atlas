@@ -18,7 +18,7 @@
       "jGPT-Automated/LocalCheck_Expo"
     ],
     "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
-    "last_deep_dive": "2026-08-08",
+    "last_deep_dive": "2026-08-12",
     "last_repos": [
       "agenticjess-star/instruction-hub",
       "jGPT-Automated/vox-director"
@@ -29,7 +29,7 @@
     "last_analysis_date": "2026-08-10",
     "last_analysis_note": "Reviewed instruction-hub and vox-director. No in_review items; six existing tasks remain pending_review. LocalCheck untouched and off limits.",
     "last_reviewed": "2026-08-11",
-    "last_review_summary": "No in_review or completed tasks. Verified existing IH-001..IH-004 and VD-001..VD-002; no duplicate tasks added. LocalCheck remains off limits."
+    "last_review_summary": "No in_review or completed tasks. Verified IH-001 through IH-004 and VD-001 through VD-002; no duplicates added. All remain pending_review."
   },
   "tasks": [
     {
@@ -57,8 +57,8 @@
       ],
       "branch": "feat/mcp-write-tools",
       "review_status": "pending_review",
-      "review_notes": null,
-      "last_verified": "2026-08-11"
+      "review_notes": "2026-08-12: verified MCP source/generated bundle still lacks instruction-group/version CRUD tools; no agent implementation to review.",
+      "last_verified": "2026-08-12"
     },
     {
       "id": "IH-002",
@@ -68,7 +68,7 @@
       "status": "open",
       "assignee": null,
       "created": "2026-08-05",
-      "context": "The Telegram webhook (supabase/functions/telegram-webhook/index.ts) has no retry logic, no idempotency guard, and errors are silently caught. If Firecrawl or the AI gateway fails, the thread is lost. There's also no health endpoint to verify the service is alive.",
+      "context": "The Telegram webhook has no cheap health endpoint and firecrawlScrape() has no bounded retry/backoff: any non-2xx response or exception immediately drops URL ingestion. Keep health/readiness and transient Firecrawl retry behavior here; Telegram secret validation, update_id idempotency, and edited-message semantics are covered by IH-004.",
       "acceptance_criteria": [
         "Expose a cheap authenticated/unauthenticated health check that reports dependency readiness without invoking Firecrawl or the LLM.",
         "Add bounded retry/backoff for transient Firecrawl failures and return a stable response without duplicate inserts.",
@@ -81,8 +81,8 @@
       ],
       "branch": "fix/webhook-resilience",
       "review_status": "pending_review",
-      "review_notes": null,
-      "last_verified": "2026-08-11"
+      "review_notes": "2026-08-12: verified in supabase/functions/telegram-webhook/index.ts; no agent implementation to review.",
+      "last_verified": "2026-08-12"
     },
     {
       "id": "IH-003",
@@ -108,9 +108,9 @@
       ],
       "branch": "security/rls-audit",
       "review_status": "pending_review",
-      "review_notes": null,
+      "review_notes": "2026-08-12: migration history contains the restrictive own-profile policy, but deployed-policy verification and regression coverage remain unverified; no agent implementation to review.",
       "description": "Confirm the deployed policies do not retain any permissive profiles SELECT policy; add an authenticated cross-user read regression test and document the migration verification.",
-      "last_verified": "2026-08-11"
+      "last_verified": "2026-08-12"
     },
     {
       "id": "VD-001",
@@ -138,9 +138,9 @@
       ],
       "branch": "test/pipeline-preflight-smoke-test",
       "review_status": "pending_review",
-      "review_notes": null,
+      "review_notes": "2026-08-12: README lists prerequisites; current tree has no tests/ or CI workflow; no agent implementation to review.",
       "description": "Add a reusable offline preflight for ffmpeg, ffprobe, and Pillow; invoke it before local media stages; add fixture or mocked-subprocess smoke coverage with no Atlas API credentials.",
-      "last_verified": "2026-08-11"
+      "last_verified": "2026-08-12"
     },
     {
       "id": "IH-004",
@@ -148,11 +148,11 @@
       "priority": "P1",
       "status": "open",
       "review_status": "pending_review",
-      "review_notes": null,
+      "review_notes": "2026-08-12: verified missing Telegram secret validation and durable update_id claim in supabase/functions/telegram-webhook/index.ts; no agent implementation to review.",
       "title": "Harden Telegram webhook authentication and duplicate-update handling",
       "description": "Validate Telegram webhook secret authentication, durable update_id dedupe before side effects, and an explicit edited_message policy. Add fixture tests for unauthorized, duplicate, and edited updates.",
       "source": "Repo Atlas 2026-08-06 deep dive",
-      "last_verified": "2026-08-11",
+      "last_verified": "2026-08-12",
       "acceptance_criteria": [
         "Reject POSTs missing or mismatching the configured Telegram secret before any DB/API side effect.",
         "Atomically claim update_id with a unique constraint; retries return success without repeating side effects.",
@@ -167,7 +167,7 @@
       "assignee": null,
       "created": "2026-08-08",
       "review_status": "pending_review",
-      "review_notes": null,
+      "review_notes": "2026-08-12: existing task remains supported by scripts/atlas_cloud.py scope; no agent implementation to review.",
       "title": "Make Atlas Cloud asset transfers bounded and fail-fast",
       "context": "scripts/atlas_cloud.py uses curl for upload/download. download() uses -s --retry 3 without --fail, connect timeout, or max time; upload() similarly lacks bounded timeout/error handling. Non-empty HTTP error bodies can be accepted as downloaded assets, and stalled transfers can hang a job.",
       "acceptance_criteria": [
@@ -180,7 +180,7 @@
         "README.md",
         "SKILL.md"
       ],
-      "last_verified": "2026-08-11"
+      "last_verified": "2026-08-12"
     }
   ],
   "completed": [],
