@@ -18,7 +18,7 @@
       "jGPT-Automated/LocalCheck_Expo"
     ],
     "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
-    "last_deep_dive": "2026-08-12",
+    "last_deep_dive": "2026-08-13",
     "last_repos": [
       "agenticjess-star/instruction-hub",
       "jGPT-Automated/vox-director"
@@ -29,7 +29,8 @@
     "last_analysis_date": "2026-08-10",
     "last_analysis_note": "Reviewed instruction-hub and vox-director. No in_review items; six existing tasks remain pending_review. LocalCheck untouched and off limits.",
     "last_reviewed": "2026-08-11",
-    "last_review_summary": "No in_review or completed tasks. Verified IH-001 through IH-004 and VD-001 through VD-002; no duplicates added. All remain pending_review."
+    "last_review_summary": "No in_review or completed tasks. Verified IH-001 through IH-004 and VD-001 through VD-002; no duplicates added. All remain pending_review.",
+    "last_deep_dive_summary": "Reviewed instruction-hub and GenerativeJesse-LIVE. LocalCheck untouched. No in_review tasks. Added GP-001 for code-only metadata cleanup; custom-domain/DNS work remains a manual Vercel/registrar action, not a dev-agent task."
   },
   "tasks": [
     {
@@ -58,7 +59,8 @@
       "branch": "feat/mcp-write-tools",
       "review_status": "pending_review",
       "review_notes": "2026-08-12: verified MCP source/generated bundle still lacks instruction-group/version CRUD tools; no agent implementation to review.",
-      "last_verified": "2026-08-12"
+      "last_verified": "2026-08-13",
+      "evidence": "Source review 2026-08-13: MCP registers list_groups, list_instructions, get_production_instruction, list_threads, create_thread, add_thread_comment. No instruction-group/version CRUD tools are registered."
     },
     {
       "id": "IH-002",
@@ -82,7 +84,8 @@
       "branch": "fix/webhook-resilience",
       "review_status": "pending_review",
       "review_notes": "2026-08-12: verified in supabase/functions/telegram-webhook/index.ts; no agent implementation to review.",
-      "last_verified": "2026-08-12"
+      "last_verified": "2026-08-13",
+      "evidence": "Source review 2026-08-13: telegram-webhook has no health route and Firecrawl is a single fetch with immediate null/failure handling; no bounded retry/backoff."
     },
     {
       "id": "IH-003",
@@ -110,7 +113,8 @@
       "review_status": "pending_review",
       "review_notes": "2026-08-12: migration history contains the restrictive own-profile policy, but deployed-policy verification and regression coverage remain unverified; no agent implementation to review.",
       "description": "Confirm the deployed policies do not retain any permissive profiles SELECT policy; add an authenticated cross-user read regression test and document the migration verification.",
-      "last_verified": "2026-08-12"
+      "last_verified": "2026-08-13",
+      "evidence": "Source review 2026-08-13: migration 20260709190732 drops the historical profiles USING(true) policy and creates owner-only SELECT. No deployed-policy verification or cross-user regression test is present in the inspected tree."
     },
     {
       "id": "VD-001",
@@ -140,7 +144,8 @@
       "review_status": "pending_review",
       "review_notes": "2026-08-12: README lists prerequisites; current tree has no tests/ or CI workflow; no agent implementation to review.",
       "description": "Add a reusable offline preflight for ffmpeg, ffprobe, and Pillow; invoke it before local media stages; add fixture or mocked-subprocess smoke coverage with no Atlas API credentials.",
-      "last_verified": "2026-08-12"
+      "last_verified": "2026-08-13",
+      "evidence": "No new verification this cycle; remains pending review from prior Vox Director analysis."
     },
     {
       "id": "IH-004",
@@ -152,12 +157,13 @@
       "title": "Harden Telegram webhook authentication and duplicate-update handling",
       "description": "Validate Telegram webhook secret authentication, durable update_id dedupe before side effects, and an explicit edited_message policy. Add fixture tests for unauthorized, duplicate, and edited updates.",
       "source": "Repo Atlas 2026-08-06 deep dive",
-      "last_verified": "2026-08-12",
+      "last_verified": "2026-08-13",
       "acceptance_criteria": [
         "Reject POSTs missing or mismatching the configured Telegram secret before any DB/API side effect.",
         "Atomically claim update_id with a unique constraint; retries return success without repeating side effects.",
         "Document and test edited_message behavior."
-      ]
+      ],
+      "evidence": "Source review 2026-08-13: webhook accepts POST JSON without Telegram secret-token validation or update_id deduplication; edited_message is folded into the same processing path."
     },
     {
       "id": "VD-002",
@@ -180,7 +186,27 @@
         "README.md",
         "SKILL.md"
       ],
-      "last_verified": "2026-08-12"
+      "last_verified": "2026-08-13",
+      "evidence": "No new verification this cycle; remains pending review from prior Vox Director analysis."
+    },
+    {
+      "id": "GP-001",
+      "priority": "P1",
+      "status": "open",
+      "review_status": "pending_review",
+      "review_notes": null,
+      "repo": "GenJess/GenerativeJesse-LIVE",
+      "title": "Replace placeholder portfolio metadata with GenerativeJesse branding",
+      "description": "Update index.html title, description, author, and social metadata so the production Vercel deployment no longer presents as a Lovable-generated project. Do not modify DNS, Vercel settings, or unrelated content.",
+      "acceptance_criteria": [
+        "Production HTML title identifies GenerativeJesse / generativejesse.com",
+        "Description and author metadata are portfolio-specific",
+        "OpenGraph/Twitter metadata has an intentional title, description, and image",
+        "npm run build succeeds"
+      ],
+      "last_verified": "2026-08-13",
+      "evidence": "Live Vercel URL returned HTTP 200, but HTML contains <title>vibrant-motion-canvas</title> and meta description Lovable Generated Project. Repository index.html has the same placeholders.",
+      "source_analysis": "analyses/2026-08-13/portfolio.md"
     }
   ],
   "completed": [],
