@@ -18,18 +18,18 @@
       "jGPT-Automated/LocalCheck_Expo"
     ],
     "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
-    "last_deep_dive": "2026-08-13",
+    "last_deep_dive": "2026-08-14",
     "last_repos": [
-      "agenticjess-star/instruction-hub",
-      "jGPT-Automated/vox-director"
+      "GenJess/PersonalCarousel",
+      "jGPT-Automated/LocalCheck_WEB"
     ],
-    "last_run_note": "No in_review items. LocalCheck excluded. Added VD-002 after code-verified curl transfer reliability finding.",
+    "last_run_note": "Deep-dived PersonalCarousel and LocalCheck_WEB after recent-activity scan. LocalCheck_Expo remained off limits. Added PC-001 and LCW-001 from code-verified findings.",
     "last_analysis": "2026-08-08",
-    "last_run": "2026-08-08",
+    "last_run": "2026-08-14",
     "last_analysis_date": "2026-08-10",
     "last_analysis_note": "Reviewed instruction-hub and vox-director. No in_review items; six existing tasks remain pending_review. LocalCheck untouched and off limits.",
-    "last_reviewed": "2026-08-11",
-    "last_review_summary": "No in_review or completed tasks. Verified IH-001 through IH-004 and VD-001 through VD-002; no duplicates added. All remain pending_review.",
+    "last_reviewed": "2026-08-14",
+    "last_review_summary": "No in_review or completed tasks. Existing open tasks remain pending_review; no dev-agent work was available to approve or request changes.",
     "last_deep_dive_summary": "Reviewed instruction-hub and GenerativeJesse-LIVE. LocalCheck untouched. No in_review tasks. Added GP-001 for code-only metadata cleanup; custom-domain/DNS work remains a manual Vercel/registrar action, not a dev-agent task."
   },
   "tasks": [
@@ -207,6 +207,64 @@
       "last_verified": "2026-08-13",
       "evidence": "Live Vercel URL returned HTTP 200, but HTML contains <title>vibrant-motion-canvas</title> and meta description Lovable Generated Project. Repository index.html has the same placeholders.",
       "source_analysis": "analyses/2026-08-13/portfolio.md"
+    },
+    {
+      "id": "PC-001",
+      "repo": "GenJess/PersonalCarousel",
+      "title": "Replace the v0 Apple carousel demo with a real PersonalCarousel experience",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-14",
+      "review_status": "pending_review",
+      "context": "The only route renders AppleCardsCarouselDemo. Code-verified placeholders include the `Get to know your iSad.` headline, six generic Apple/AI/productivity cards, repeated DummyContent, remote Unsplash images, and an Aceternity MacBook image. The carousel interaction is real, but the public product has no defined audience or real content.",
+      "acceptance_criteria": [
+        "Define and document one concrete audience/use case and rename the page/headline accordingly.",
+        "Replace all demo/iSad/DummyContent copy and stock image URLs with six distinct real entries from a typed content model.",
+        "Use owned/local or explicitly approved assets with meaningful alt text and visible source/credit handling where required.",
+        "Add page metadata and one clear CTA; preserve responsive carousel and keyboard/Escape/outside-click behavior.",
+        "Update README with purpose, local run, and deployment instructions; verify `npm run build` and add a basic rendered/interaction smoke test."
+      ],
+      "files_to_read": [
+        "app/page.tsx",
+        "components/apple-cards-carousel-demo.tsx",
+        "components/ui/apple-cards-carousel.tsx",
+        "package.json",
+        "README.md"
+      ],
+      "branch": "feat/personalcarousel-real-content",
+      "description": "Turn the current v0 component showcase into a deliberate, shippable page rather than adding more generic UI primitives.",
+      "evidence": "Source review 2026-08-14: app/page.tsx only renders AppleCardsCarouselDemo; demo file contains iSad headline, DummyContent, six generic cards, Unsplash URLs, and assets.aceternity.com image."
+    },
+    {
+      "id": "LCW-001",
+      "repo": "jGPT-Automated/LocalCheck_WEB",
+      "title": "Make the court explorer use one live/curated source of truth",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-14",
+      "review_status": "pending_review",
+      "context": "The explorer data layer correctly loads Supabase `courts_with_stats` with a bounded timeout and falls back to the curated launch catalog. However, app/courts/page.tsx always server-renders launchCourts with source=\"curated\" and relies on a later client fetch of /api/courts. Separately, app/page.tsx embeds another hardcoded court array. This creates first-render/stale-catalog drift and duplicate court identity data.",
+      "acceptance_criteria": [
+        "Server-render /courts from loadExplorerCourts() and pass the actual source, while retaining a bounded client refresh if needed.",
+        "Remove or centralize the root-page hardcoded court records so court names/IDs/counts cannot diverge from the canonical catalog.",
+        "Keep the curated fallback explicit in UI and preserve the honest zero-counter behavior.",
+        "Add tests covering Supabase success, timeout/error fallback, source labeling, and the root/explorer shared court identity.",
+        "Verify the public courts_with_stats contract exposes only intended aggregate/public fields and document the deployed RLS/view assumption."
+      ],
+      "files_to_read": [
+        "app/courts/page.tsx",
+        "app/courts/court-explorer-client.tsx",
+        "app/courts/supabase-courts.ts",
+        "app/api/courts/route.ts",
+        "app/page.tsx",
+        "supabase/migrations/202607210001_create_launch_court_catalog.sql",
+        "README.md"
+      ],
+      "branch": "fix/court-catalog-source-of-truth",
+      "description": "Remove the live-vs-curated first-render mismatch and duplicate homepage catalog before adding more growth surfaces.",
+      "evidence": "Source review 2026-08-14: courts/page.tsx passes launchCourts/source curated; client refreshes /api/courts; supabase-courts.ts loads courts_with_stats; root app/page.tsx contains a separate embedded Court[] array."
     }
   ],
   "completed": [],
