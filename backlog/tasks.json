@@ -18,19 +18,19 @@
       "jGPT-Automated/LocalCheck_Expo"
     ],
     "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
-    "last_deep_dive": "2026-08-14",
+    "last_deep_dive": "2026-08-15",
     "last_repos": [
-      "GenJess/PersonalCarousel",
-      "jGPT-Automated/LocalCheck_WEB"
+      "agenticjess-star/instruction-hub",
+      "agenticjess-star/localcheck"
     ],
     "last_run_note": "Deep-dived PersonalCarousel and LocalCheck_WEB after recent-activity scan. LocalCheck_Expo remained off limits. Added PC-001 and LCW-001 from code-verified findings.",
     "last_analysis": "2026-08-08",
-    "last_run": "2026-08-14",
+    "last_run": "2026-08-15",
     "last_analysis_date": "2026-08-10",
     "last_analysis_note": "Reviewed instruction-hub and vox-director. No in_review items; six existing tasks remain pending_review. LocalCheck untouched and off limits.",
-    "last_reviewed": "2026-08-14",
-    "last_review_summary": "No in_review or completed tasks. Existing open tasks remain pending_review; no dev-agent work was available to approve or request changes.",
-    "last_deep_dive_summary": "Reviewed instruction-hub and GenerativeJesse-LIVE. LocalCheck untouched. No in_review tasks. Added GP-001 for code-only metadata cleanup; custom-domain/DNS work remains a manual Vercel/registrar action, not a dev-agent task."
+    "last_reviewed": "2026-08-15",
+    "last_review_summary": "No in_review or completed tasks were available; all existing tasks remain pending_review.",
+    "last_deep_dive_summary": "Deep-dived instruction-hub and agenticjess-star/localcheck after recent-activity scan. Confirmed Instruction OS security/MCP backlog; found LocalCheck public base-table reads, client-authorized ELO mutation, unenforced check-in uniqueness/expiry, and broad realtime scope."
   },
   "tasks": [
     {
@@ -265,6 +265,85 @@
       "branch": "fix/court-catalog-source-of-truth",
       "description": "Remove the live-vs-curated first-render mismatch and duplicate homepage catalog before adding more growth surfaces.",
       "evidence": "Source review 2026-08-14: courts/page.tsx passes launchCourts/source curated; client refreshes /api/courts; supabase-courts.ts loads courts_with_stats; root app/page.tsx contains a separate embedded Court[] array."
+    },
+    {
+      "id": "LC-001",
+      "repo": "agenticjess-star/localcheck",
+      "title": "Replace broad public table reads with safe public projections",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-15",
+      "context": "The reviewed migrations grant SELECT USING(true) on profiles, check_ins, plans, matches_1v1, and run_rsvps. src/lib/db.ts then calls profiles.getAll() and joins full profile rows into public activity. This exposes more than the product needs and makes privacy changes difficult.",
+      "acceptance_criteria": [
+        "Create safe views or column-limited RPCs for public court presence, schedules, leaderboards, and match summaries.",
+        "Remove or narrow base-table SELECT policies for sensitive profile/activity columns while preserving intended public functionality.",
+        "Add authenticated regression tests proving a client cannot read private profile fields or unrelated user metadata.",
+        "Update src/lib/db.ts to consume the safe projection instead of profiles.getAll() joins."
+      ],
+      "files_to_read": [
+        "supabase/migrations/",
+        "src/lib/db.ts",
+        "src/pages/NowPage.tsx",
+        "src/pages/SchedulePage.tsx",
+        "src/pages/CompetePage.tsx"
+      ],
+      "branch": "security/public-projections",
+      "review_status": "pending_review",
+      "description": "Make public presence genuinely public-by-design, not full-row database access.",
+      "evidence": "2026-08-15 source review: profiles and activity tables have permissive SELECT USING(true); adapter fetches all profiles for public joins."
+    },
+    {
+      "id": "LC-002",
+      "repo": "agenticjess-star/localcheck",
+      "title": "Make match submission and ELO application server-authoritative",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-15",
+      "context": "matches_1v1 INSERT/UPDATE policies allow either participant to write, and 20260302043421 attaches rating-changing triggers to INSERT and UPDATE. The client adapter calls direct table inserts. This is vulnerable to forged scores, unauthorized state transitions, and repeated rating changes.",
+      "acceptance_criteria": [
+        "Add a single validated RPC for submitting a match and a separate confirmation/dispute transition.",
+        "Ensure a match result can apply ELO at most once; score/winner fields become immutable after submission except through an explicit dispute flow.",
+        "Validate both participants, court scope, score bounds, and authenticated caller server-side.",
+        "Remove direct client writes that bypass the RPC and add regression tests for replay, forged participant IDs, and unauthorized updates."
+      ],
+      "files_to_read": [
+        "supabase/migrations/20260302043421_1c137b19-2b9a-4983-9d43-f37663940261.sql",
+        "supabase/migrations/20260301061347_29853627-2c51-46f1-afda-d20fe54963ca.sql",
+        "src/lib/db.ts",
+        "src/pages/CompetePage.tsx"
+      ],
+      "branch": "security/server-authoritative-matches",
+      "review_status": "pending_review",
+      "description": "Protect competitive integrity by making the write path and rating side effects authoritative and idempotent.",
+      "evidence": "2026-08-15 source review: either participant can INSERT/UPDATE matches_1v1; AFTER INSERT and AFTER UPDATE triggers mutate profile ratings; client writes directly."
+    },
+    {
+      "id": "LC-003",
+      "repo": "agenticjess-star/localcheck",
+      "title": "Enforce active check-in lifecycle and court-scoped realtime",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-15",
+      "context": "check_ins expire_at is only filtered in client queries; create() directly inserts and defaults courtId to court1. The realtime subscription listens to all check_ins changes with no court filter. This conflicts with the court-scoped architecture and can produce duplicate/stale presence.",
+      "acceptance_criteria": [
+        "Make courtId required for all public adapter mutations and remove sentinel court1 defaults.",
+        "Add a database-enforced active check-in invariant and an atomic check-in/out or upsert path.",
+        "Add cleanup/archive behavior for expired rows and tests for duplicate active check-ins and expiry.",
+        "Scope realtime subscriptions to the selected court and avoid refreshing unrelated courts."
+      ],
+      "files_to_read": [
+        "src/lib/db.ts",
+        "src/pages/NowPage.tsx",
+        "src/components/CourtMap.tsx",
+        "supabase/migrations/20260228034425_1e3923a1-df58-4ece-9b07-0bece0f81229.sql"
+      ],
+      "branch": "fix/checkin-lifecycle",
+      "review_status": "pending_review",
+      "description": "Make presence accurate and cheap at the database boundary, not just in client filters.",
+      "evidence": "2026-08-15 source review: expires_at is client-filtered; create() directly inserts; most adapter methods default to court1; onChanges subscribes table-wide."
     }
   ],
   "completed": [],
