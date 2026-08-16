@@ -18,19 +18,19 @@
       "jGPT-Automated/LocalCheck_Expo"
     ],
     "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
-    "last_deep_dive": "2026-08-15",
+    "last_deep_dive": "2026-08-16",
     "last_repos": [
       "agenticjess-star/instruction-hub",
-      "agenticjess-star/localcheck"
+      "jGPT-Automated/LocalCheck_WEB"
     ],
     "last_run_note": "Deep-dived PersonalCarousel and LocalCheck_WEB after recent-activity scan. LocalCheck_Expo remained off limits. Added PC-001 and LCW-001 from code-verified findings.",
     "last_analysis": "2026-08-08",
-    "last_run": "2026-08-15",
+    "last_run": "2026-08-16",
     "last_analysis_date": "2026-08-10",
     "last_analysis_note": "Reviewed instruction-hub and vox-director. No in_review items; six existing tasks remain pending_review. LocalCheck untouched and off limits.",
-    "last_reviewed": "2026-08-15",
+    "last_reviewed": "2026-08-16",
     "last_review_summary": "No in_review or completed tasks were available; all existing tasks remain pending_review.",
-    "last_deep_dive_summary": "Deep-dived instruction-hub and agenticjess-star/localcheck after recent-activity scan. Confirmed Instruction OS security/MCP backlog; found LocalCheck public base-table reads, client-authorized ELO mutation, unenforced check-in uniqueness/expiry, and broad realtime scope."
+    "last_deep_dive_summary": "Deep-dived instruction-hub and LocalCheck_WEB after recent-activity scan. Confirmed Telegram ingestion lacks cost/abuse guardrails and LocalCheck_WEB public court view exposes c.*; added IH-005 and LCW-002."
   },
   "tasks": [
     {
@@ -344,6 +344,57 @@
       "review_status": "pending_review",
       "description": "Make presence accurate and cheap at the database boundary, not just in client filters.",
       "evidence": "2026-08-15 source review: expires_at is client-filtered; create() directly inserts; most adapter methods default to court1; onChanges subscribes table-wide."
+    },
+    {
+      "id": "IH-005",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Bound Telegram ingestion cost and payload abuse",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-16",
+      "review_status": "pending_review",
+      "source": "Repo Atlas 2026-08-16 deep dive",
+      "context": "supabase/functions/telegram-webhook/index.ts performs synchronous Firecrawl and LLM work from a public POST body, with no request-size cap, URL host/scheme policy, timeout budget, or per-chat rate limit. The handler writes with service role after resolving a linked chat. Add guardrails without duplicating IH-004 secret validation/update_id ownership.",
+      "acceptance_criteria": [
+        "Reject oversized Telegram updates and bound extracted text before external calls.",
+        "Accept only http/https URLs and document any allowed host policy; do not fetch arbitrary local/file/data URLs.",
+        "Enforce bounded external-call timeouts and one bounded retry only for transient Firecrawl failures.",
+        "Add a durable per-chat rate-limit or quota check before Firecrawl/LLM work, with tests for rejection and allowed paths.",
+        "Do not bypass RLS or expose service-role credentials; preserve IH-004 secret and update_id requirements."
+      ],
+      "files_to_read": [
+        "supabase/functions/telegram-webhook/index.ts",
+        "supabase/migrations/"
+      ],
+      "branch": "security/telegram-ingestion-guardrails",
+      "evidence": "Source review 2026-08-16: handler accepts POST JSON after method check, extracts arbitrary https? URL, calls Firecrawl synchronously, and classifies up to 8,000 chars; no visible body cap, timeout, host policy, or rate limit."
+    },
+    {
+      "id": "LCW-002",
+      "repo": "jGPT-Automated/LocalCheck_WEB",
+      "title": "Publish an explicit least-privilege court catalog projection",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-16",
+      "review_status": "pending_review",
+      "source": "Repo Atlas 2026-08-16 deep dive",
+      "context": "supabase/migrations/202607210001_create_launch_court_catalog.sql defines courts_with_stats as select c.* and grants SELECT to anon/authenticated. The explorer only needs a subset, while c.* exposes provenance/operational fields and makes future columns public by default.",
+      "acceptance_criteria": [
+        "Replace c.* in courts_with_stats with an explicit approved public column list and retain only intended aggregate fields.",
+        "Add a response/schema contract test that fails when internal provenance fields such as added_by, geocode_query, detection_source_id, or detection_distance_m are returned.",
+        "Verify anonymous and authenticated reads still support the explorer and preserve archived filtering.",
+        "Document the public projection versus service-role/admin enrichment path."
+      ],
+      "files_to_read": [
+        "supabase/migrations/202607210001_create_launch_court_catalog.sql",
+        "app/courts/supabase-courts.ts",
+        "app/api/courts/route.ts",
+        "tests/rendered-html.test.mjs"
+      ],
+      "branch": "security/public-court-projection",
+      "evidence": "Source review 2026-08-16: courts_with_stats is created with select c.* and granted to anon/authenticated; the client maps a smaller subset."
     }
   ],
   "completed": [],
