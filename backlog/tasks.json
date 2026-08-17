@@ -18,19 +18,19 @@
       "jGPT-Automated/LocalCheck_Expo"
     ],
     "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
-    "last_deep_dive": "2026-08-16",
+    "last_deep_dive": "2026-08-17",
     "last_repos": [
-      "agenticjess-star/instruction-hub",
-      "jGPT-Automated/LocalCheck_WEB"
+      "jGPT-Automated/LocalCheck_WEB",
+      "GenJess/PersonalCarousel"
     ],
-    "last_run_note": "Deep-dived PersonalCarousel and LocalCheck_WEB after recent-activity scan. LocalCheck_Expo remained off limits. Added PC-001 and LCW-001 from code-verified findings.",
+    "last_run_note": "Reviewed LocalCheck_WEB and PersonalCarousel after recent-activity scan. LocalCheck_Expo remained off limits.",
     "last_analysis": "2026-08-08",
-    "last_run": "2026-08-16",
+    "last_run": "2026-08-17",
     "last_analysis_date": "2026-08-10",
     "last_analysis_note": "Reviewed instruction-hub and vox-director. No in_review items; six existing tasks remain pending_review. LocalCheck untouched and off limits.",
-    "last_reviewed": "2026-08-16",
+    "last_reviewed": "2026-08-17",
     "last_review_summary": "No in_review or completed tasks were available; all existing tasks remain pending_review.",
-    "last_deep_dive_summary": "Deep-dived instruction-hub and LocalCheck_WEB after recent-activity scan. Confirmed Telegram ingestion lacks cost/abuse guardrails and LocalCheck_WEB public court view exposes c.*; added IH-005 and LCW-002."
+    "last_deep_dive_summary": "Deep-dived LocalCheck_WEB and PersonalCarousel. Confirmed homepage check-in is a local UI toggle and PersonalCarousel remains an unbranded v0 demo; added LCW-003 and PC-002."
   },
   "tasks": [
     {
@@ -395,6 +395,64 @@
       ],
       "branch": "security/public-court-projection",
       "evidence": "Source review 2026-08-16: courts_with_stats is created with select c.* and granted to anon/authenticated; the client maps a smaller subset."
+    },
+    {
+      "id": "LCW-003",
+      "repo": "jGPT-Automated/LocalCheck_WEB",
+      "title": "Connect the homepage CTA to a real check-in flow and remove the duplicate catalog",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-17",
+      "context": "app/page.tsx defines a duplicate two-court catalog and toggles checkedIn in local React state. The homepage increments the displayed live count without an API/auth/backend response; Log in is also a toast. This makes the main product promise appear functional while not persisting anything.",
+      "acceptance_criteria": [
+        "Use one shared catalog source for homepage and explorer; remove the duplicate hardcoded Court list.",
+        "Make Check in deep-link to the authenticated app or implement a server-side authenticated check-in endpoint with idempotency and expiry.",
+        "Never increment live counts unless the backend confirms success; show loading and error states.",
+        "Add a regression test proving failed or unauthenticated check-in does not report a live presence."
+      ],
+      "files_to_read": [
+        "app/page.tsx",
+        "app/courts/supabase-courts.ts",
+        "app/courts/court-explorer-client.tsx",
+        "app/chatgpt-auth.ts",
+        "app/api/courts/route.ts"
+      ],
+      "branch": "fix/homepage-checkin-cta",
+      "review_status": "pending_review",
+      "description": "Make the marketing homepage honest and connected to the real LocalCheck loop.",
+      "last_verified": "2026-08-17",
+      "evidence": "Source review 2026-08-17: app/page.tsx:40 defines a separate static catalog and :158 only calls setCheckedIn; no backend call or auth path exists."
+    },
+    {
+      "id": "PC-002",
+      "repo": "GenJess/PersonalCarousel",
+      "title": "Replace v0 demo identity with a real, accessible PersonalCarousel portfolio surface",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-17",
+      "context": "The app is still the default v0 Apple carousel demo: README says Open in v0, the heading says Get to know your iSad, all cards reuse DummyContent, copy references Apple/Aceternity, and six images are remote Unsplash assets. There is no product metadata or clear CTA.",
+      "acceptance_criteria": [
+        "Replace all placeholder Apple/v0/DummyContent copy with content for a defined PersonalCarousel audience and use case.",
+        "Add title, description, canonical, Open Graph/Twitter metadata, and brand assets in app/layout.tsx.",
+        "Use local or owned assets with meaningful alt text and document sources/licenses.",
+        "Add a primary CTA and an accessible non-carousel summary.",
+        "Update README with purpose, setup, deployment, and demo information.",
+        "Add a build or lint check that fails on known placeholder strings."
+      ],
+      "files_to_read": [
+        "README.md",
+        "app/layout.tsx",
+        "app/page.tsx",
+        "components/apple-cards-carousel-demo.tsx",
+        "package.json"
+      ],
+      "branch": "feat/personalcarousel-productize",
+      "review_status": "pending_review",
+      "description": "Turn the component demo into a credible, branded portfolio/product surface.",
+      "last_verified": "2026-08-17",
+      "evidence": "Source review 2026-08-17: README and components/apple-cards-carousel-demo.tsx retain v0/Apple template identity, repeated DummyContent, and remote stock assets."
     }
   ],
   "completed": [],
