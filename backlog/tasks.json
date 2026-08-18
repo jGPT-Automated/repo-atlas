@@ -3,7 +3,7 @@
     "created": "2026-08-05",
     "created_by": "repo-atlas-agent",
     "description": "Actionable tasks for dev agents. Created during deep-dive analysis. Each task has: repo, priority, acceptance criteria, and context. Dev agents: pick up tasks in priority order, create a branch, work, PR back. The atlas agent will review 12hrs after your work fires.",
-    "flow": "Atlas agent reviews repos \u2192 creates tasks \u2192 12hrs later dev agents execute \u2192 12hrs later atlas agent reviews and adds more",
+    "flow": "Atlas agent reviews repos → creates tasks → 12hrs later dev agents execute → 12hrs later atlas agent reviews and adds more",
     "safety_review": {
       "description": "Jesse reviews all backlog tasks before dev agents execute. Unsafe tasks are scratched with a note. This hook sits between atlas agent backlog write and dev agent execution.",
       "status_field": "review_status",
@@ -18,19 +18,19 @@
       "jGPT-Automated/LocalCheck_Expo"
     ],
     "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
-    "last_deep_dive": "2026-08-17",
+    "last_deep_dive": "2026-08-18",
     "last_repos": [
-      "jGPT-Automated/LocalCheck_WEB",
-      "GenJess/PersonalCarousel"
+      "agenticjess-star/bright-mind-os",
+      "agenticjess-star/instruction-hub"
     ],
-    "last_run_note": "Reviewed LocalCheck_WEB and PersonalCarousel after recent-activity scan. LocalCheck_Expo remained off limits.",
-    "last_analysis": "2026-08-08",
-    "last_run": "2026-08-17",
-    "last_analysis_date": "2026-08-10",
-    "last_analysis_note": "Reviewed instruction-hub and vox-director. No in_review items; six existing tasks remain pending_review. LocalCheck untouched and off limits.",
-    "last_reviewed": "2026-08-17",
+    "last_run_note": "Recent activity selected bright-mind-os and instruction-hub; LocalCheck_Expo remained off limits.",
+    "last_analysis": "2026-08-18",
+    "last_run": "2026-08-18",
+    "last_analysis_date": "2026-08-18",
+    "last_analysis_note": "Clean test/build/lint validation: instruction-hub test/build pass but lint fails; bright-mind-os npm ci is blocked by stale lockfile.",
+    "last_reviewed": "2026-08-18",
     "last_review_summary": "No in_review or completed tasks were available; all existing tasks remain pending_review.",
-    "last_deep_dive_summary": "Deep-dived LocalCheck_WEB and PersonalCarousel. Confirmed homepage check-in is a local UI toggle and PersonalCarousel remains an unbranded v0 demo; added LCW-003 and PC-002."
+    "last_deep_dive_summary": "Deep-dived bright-mind-os and instruction-hub. Added BM-001, BM-002, and IH-006 for code-verified WebSocket lifecycle and cross-thread authorization defects."
   },
   "tasks": [
     {
@@ -41,15 +41,15 @@
       "status": "open",
       "assignee": null,
       "created": "2026-08-05",
-      "context": "The MCP function (supabase/functions/mcp/index.ts) only exposes 3 read-only tools: list_groups, list_instructions, get_production_instruction. An agent connected via MCP cannot create or modify instructions \u2014 it can only read. This severely limits the product's value proposition of 'version-controlled instructions managed by agents'.",
+      "context": "The MCP function (supabase/functions/mcp/index.ts) only exposes 3 read-only tools: list_groups, list_instructions, get_production_instruction. An agent connected via MCP cannot create or modify instructions — it can only read. This severely limits the product's value proposition of 'version-controlled instructions managed by agents'.",
       "acceptance_criteria": [
-        "Add create_instruction tool \u2014 creates a new instruction_groups row + first version",
-        "Add update_instruction tool \u2014 creates a new instruction_versions row (never mutates existing versions)",
-        "Add delete_instruction tool \u2014 soft delete (set archived=true), not a hard delete",
+        "Add create_instruction tool — creates a new instruction_groups row + first version",
+        "Add update_instruction tool — creates a new instruction_versions row (never mutates existing versions)",
+        "Add delete_instruction tool — soft delete (set archived=true), not a hard delete",
         "All new tools require authentication (ctx.isAuthenticated())",
         "All new tools use user-scoped Supabase client (not service role)",
         "Add Zod input validation matching the DB schema",
-        "Update src/lib/mcp/index.ts (the source file \u2014 the function is auto-generated from it)"
+        "Update src/lib/mcp/index.ts (the source file — the function is auto-generated from it)"
       ],
       "files_to_read": [
         "supabase/functions/mcp/index.ts",
@@ -453,6 +453,81 @@
       "description": "Turn the component demo into a credible, branded portfolio/product surface.",
       "last_verified": "2026-08-17",
       "evidence": "Source review 2026-08-17: README and components/apple-cards-carousel-demo.tsx retain v0/Apple template identity, repeated DummyContent, and remote stock assets."
+    },
+    {
+      "id": "BM-001",
+      "repo": "agenticjess-star/bright-mind-os",
+      "title": "Make Coinbase WebSocket cleanup cancellation-safe",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-18",
+      "context": "Code-verified lifecycle bug: src/hooks/useCoinbasePrice.ts closes the socket during effect cleanup without clearing onclose or guarding reconnect. The intentional close can schedule connect() after unmount; useCoinbasePricesAll.ts has the same pattern and must be audited together.",
+      "acceptance_criteria": [
+        "Unmounting either Coinbase hook never schedules or opens a new socket afterward.",
+        "Add a disposed/connection-generation guard and cleanup-safe timer/socket teardown; do not suppress legitimate reconnects while mounted.",
+        "Add focused tests covering intentional close, reconnect after an unexpected close, and remount without duplicate sockets.",
+        "Keep the existing selected-asset subscription behavior and bounded series buffer."
+      ],
+      "files_to_read": [
+        "src/hooks/useCoinbasePrice.ts",
+        "src/hooks/useCoinbasePricesAll.ts",
+        "src/test/"
+      ],
+      "branch": "fix/coinbase-ws-cleanup",
+      "review_status": "pending_review",
+      "evidence": "Source audit 2026-08-18: cleanup calls ws.close() but leaves ws.onclose active; onclose unconditionally sets reconnectTimer to connect after 3 seconds."
+    },
+    {
+      "id": "BM-002",
+      "repo": "agenticjess-star/bright-mind-os",
+      "title": "Remove stale Polymarket CLOB subscriptions on market changes",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-18",
+      "context": "Code-verified correctness/performance bug: src/hooks/useClobWebSocket.ts sends a fresh market subscription for the next token set but never unsubscribes removed token IDs or clears their quotes. Switching asset/timeframe can therefore keep old markets streaming and retain stale prices.",
+      "acceptance_criteria": [
+        "Track the previous token set and unsubscribe removed IDs using the supported CLOB protocol, or safely recreate the socket when unsubscribe is unavailable.",
+        "Remove quotes for token IDs no longer in the active set and ensure only current IDs can update visible state.",
+        "Add tests for token-set replacement, removal, duplicate IDs, reconnect, and unmount cleanup.",
+        "Document any protocol limitation and keep the 150ms batching behavior."
+      ],
+      "files_to_read": [
+        "src/hooks/useClobWebSocket.ts",
+        "src/hooks/useUpDownMarkets.ts",
+        "src/lib/polymarket.ts",
+        "src/test/"
+      ],
+      "branch": "fix/clob-subscription-lifecycle",
+      "review_status": "pending_review",
+      "evidence": "Source audit 2026-08-18: token-set effect calls subscribe(ws,next) only; no removed-ID unsubscribe or quote eviction exists."
+    },
+    {
+      "id": "IH-006",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Prevent MCP comments on threads owned by another user",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-18",
+      "context": "Code-verified authorization/data-integrity bug: src/lib/mcp/tools/add-thread-comment.ts inserts a caller-owned comment for any supplied thread_id without checking thread ownership. The migration INSERT policy only validates comment.user_id, while the SELECT policy exposes comments on a user-owned thread; a known UUID is enough to contaminate another user’s thread.",
+      "acceptance_criteria": [
+        "A caller can add a comment only when the target thread belongs to that caller.",
+        "Enforce ownership in the database policy and/or handler query; do not rely only on the UI.",
+        "Update the generated supabase/functions/mcp/index.ts bundle together with src/lib/mcp/.",
+        "Add an authenticated two-user regression test proving cross-user insert is rejected and same-user insert succeeds.",
+        "Return a stable not-found/forbidden error without leaking whether another user’s thread exists."
+      ],
+      "files_to_read": [
+        "src/lib/mcp/tools/add-thread-comment.ts",
+        "supabase/functions/mcp/index.ts",
+        "supabase/migrations/20260310092700_f98cd40d-50bb-41e0-9394-fe6ab297d500.sql",
+        "src/test/"
+      ],
+      "branch": "security/mcp-comment-ownership",
+      "review_status": "pending_review",
+      "evidence": "Source and migration audit 2026-08-18: handler accepts arbitrary thread_id; INSERT policy is auth.uid() = user_id and has no EXISTS check on threads.thread_id."
     }
   ],
   "completed": [],
