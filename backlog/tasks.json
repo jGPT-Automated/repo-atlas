@@ -1,0 +1,49 @@
+{
+  "updated_at": "2026-08-19T10:01:00-05:00",
+  "tasks": [
+    {
+      "id": "bright-mind-os-001",
+      "repo": "agenticjess-star/bright-mind-os",
+      "priority": "P0",
+      "status": "todo",
+      "title": "Regenerate and commit a reproducible lockfile",
+      "description": "npm ci currently fails because package-lock.json is out of sync with package.json (missing Vitest transitive packages and version mismatches). Regenerate the lockfile with the supported package manager, commit it, and verify npm ci && npm run build && npm test pass from a clean checkout.",
+      "evidence": ["npm ci --ignore-scripts --no-audit --no-fund fails with missing lock entries and invalid @jridgewell/sourcemap-codec resolution", "npm install followed by npm run build and npm test passes"],
+      "acceptance": ["Clean checkout installs with npm ci without modifying the lockfile", "npm run build exits 0", "npm test exits 0"],
+      "created_at": "2026-08-19T10:01:00-05:00"
+    },
+    {
+      "id": "bright-mind-os-002",
+      "repo": "agenticjess-star/bright-mind-os",
+      "priority": "P1",
+      "status": "todo",
+      "title": "Add deterministic signal and market-discovery tests",
+      "description": "The product's core value is the live SMA/market comparison, but the repo only contains the starter example test. Add unit tests around computeSmaSignal and market slug/discovery parsing, including empty buffers, timeframe window boundaries, neutral threshold, malformed API payloads, and expired-market rotation.",
+      "evidence": ["src/lib/smaSignal.ts and src/lib/polymarket.ts are core active modules", "Only one starter test file was found"],
+      "acceptance": ["At least 10 focused tests cover signal edge cases and discovery parsing", "Tests run without WebSocket/network access", "A malformed or empty API response produces a safe UI state rather than a thrown render error"],
+      "created_at": "2026-08-19T10:01:00-05:00"
+    },
+    {
+      "id": "instruction-hub-001",
+      "repo": "agenticjess-star/instruction-hub",
+      "priority": "P0",
+      "status": "todo",
+      "title": "Make Telegram ingest failure-safe and observable",
+      "description": "Harden supabase/functions/telegram-webhook so Firecrawl, Telegram, AI classification, and database failures return bounded responses, do not create partial thread records, and emit structured correlation-safe logs/metrics. Add tests for URL scrape failure, invalid link code, duplicate update delivery, and unsupported message shapes.",
+      "evidence": ["telegram-webhook is a production edge-function path described in README", "The repo has only the starter example test and no function-level tests"],
+      "acceptance": ["Duplicate Telegram update IDs are idempotent", "Firecrawl/AI failure does not leave an orphan thread", "Webhook returns Telegram-safe status in every tested failure mode", "Tests cover the four named cases"],
+      "created_at": "2026-08-19T10:01:00-05:00"
+    },
+    {
+      "id": "instruction-hub-002",
+      "repo": "agenticjess-star/instruction-hub",
+      "priority": "P1",
+      "status": "todo",
+      "title": "Split the oversized frontend bundle by route",
+      "description": "The production build succeeds but emits a 779.67 kB minified JS chunk. Add route-level lazy loading for dashboard, thread library, optimizer, agent docs, and auth routes, then verify the initial chunk drops materially without breaking protected-route navigation.",
+      "evidence": ["npm run build passes", "Vite reports index-CHTPGsnA.js at 779.67 kB and recommends dynamic import/code splitting"],
+      "acceptance": ["Initial entry chunk is below 500 kB or the repo documents an intentional exception", "All primary routes still load in a production preview", "npm run build and npm test pass"],
+      "created_at": "2026-08-19T10:01:00-05:00"
+    }
+  ]
+}
