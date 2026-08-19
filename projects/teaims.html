@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TEAIMS — Multi-Agent AI OS | Jesse Harrick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/design-system.css">
+<link rel="stylesheet" href="../shared/nav.css">
+<link rel="stylesheet" href="../shared/components.css">
+<link rel="stylesheet" href="../shared/project-page.css">
+<style>
+  .project-badge { color: #818cf8; border: 1px solid rgba(99,102,241,0.2); background: rgba(99,102,241,0.08); }
+  .project-hero-visual { background: linear-gradient(135deg, #0a0a0f 0%, #111118 100%); }
+  .agent-orbit {
+    position: relative;
+    width: 280px; height: 280px;
+    margin: auto;
+  }
+  .agent-core {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(99,102,241,0.3);
+    background: rgba(99,102,241,0.08);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: #818cf8;
+    letter-spacing: 0.08em;
+  }
+  .agent-node {
+    position: absolute;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    color: var(--text-muted);
+  }
+  .agent-ring {
+    position: absolute;
+    inset: 0;
+    border: 1px dashed rgba(99,102,241,0.1);
+    border-radius: 50%;
+  }
+  .agent-ring.r2 { inset: 30px; }
+  .agent-ring.r3 { inset: 60px; }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="../index.html" class="nav-brand"><span class="status-dot"></span>JH</a>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="../roadmap.html">Roadmap</a>
+    <a href="../portal.html">Portal</a>
+  </div>
+  <a href="../index.html" class="nav-back">← Back</a>
+</nav>
+
+<section class="project-hero">
+  <div class="project-hero-grid">
+    <div class="project-hero-left">
+      <div class="project-badge">🛡️ AI · Multi-Agent OS</div>
+      <h1 class="project-title">TEAIMS</h1>
+      <p class="project-tagline">Agent Armory — a multi-agent AI operating system that ships entire startups. Orchestrated agent teams with adversarial debates, red-line enforcement, and persistent decision intelligence.</p>
+      <div class="project-links">
+        <a href="https://github.com/GenJess/TEAIMS" target="_blank" class="project-link primary">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+    <div class="project-hero-visual">
+      <div class="agent-orbit">
+        <div class="agent-ring"></div>
+        <div class="agent-ring r2"></div>
+        <div class="agent-ring r3"></div>
+        <div class="agent-core">HITL</div>
+        <div class="agent-node" style="top:0;left:50%;transform:translateX(-50%);">IDEA</div>
+        <div class="agent-node" style="top:50%;right:0;transform:translateY(-50%);">ARCH</div>
+        <div class="agent-node" style="bottom:0;left:50%;transform:translateX(-50%);">SEC</div>
+        <div class="agent-node" style="top:50%;left:0;transform:translateY(-50%);">DESIGN</div>
+        <div class="agent-node" style="top:15%;right:15%;">GROW</div>
+        <div class="agent-node" style="bottom:15%;left:15%;">LEGAL</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="project-stats" style="margin-top: 40px;">
+  <div class="stat-cell">
+    <div class="num"><span class="accent">9</span></div>
+    <div class="label">Specialized Agents</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num"><span class="accent">139</span></div>
+    <div class="label">Source Files</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">27KB</div>
+    <div class="label">README (Architecture Doc)</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">4.1<span style="color:var(--text-muted);font-size:14px;">/5</span></div>
+    <div class="label">Maturity Score</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num" style="color:#f59e0b;">MVP</div>
+    <div class="label">Status</div>
+  </div>
+</div>
+
+<div class="project-content">
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">01</span>
+      <h2>Architecture</h2>
+    </div>
+    <div class="arch-grid">
+      <div class="arch-card">
+        <div class="layer">Frontend</div>
+        <div class="tech">React 18 · Vite · TypeScript</div>
+        <div class="desc">shadcn/ui + Tailwind CSS + Framer Motion. Debate canvas visualization with animated agent flows.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Agent Orchestration</div>
+        <div class="tech">9 Specialized Agents</div>
+        <div class="desc">Ideation, Architecture, Design, Implementation, Security Audit, Growth Strategy, Compliance, Legal, Launch.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Debate System</div>
+        <div class="tech">Adversarial Rounds</div>
+        <div class="desc">Agents debate in structured rounds before decisions finalize. Pro/con positions with red-line enforcement.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Judgement Framework</div>
+        <div class="tech">Human-in-the-Loop</div>
+        <div class="desc">Captures uncertain decisions and codifies user judgement into reusable rules. HITL checkpoint components.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Context System</div>
+        <div class="tech">Soul.md · Skills.md · Judgements.md</div>
+        <div class="desc">Persistent operating identity. Shareable via secure tokenized URLs. Shared state management across agents.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Pipeline</div>
+        <div class="tech">Animated Pipeline Flow</div>
+        <div class="desc">Visual execution flow: raw idea → market validation → architecture → design → implementation → audit → launch.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">02</span>
+      <h2>Agent Teams</h2>
+    </div>
+    <div class="feature-list">
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9.66 6L6 12l3.66 6h6.68L20 12l-3.66-6z"/><path d="M9 12h6"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Ideation Agent</div>
+          <div class="detail">Raw idea → market validation. Identifies problem-solution fit, TAM, and competitive landscape before any code is written.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Architecture Agent</div>
+          <div class="detail">System design, tech stack selection, data flow. Produces concrete architecture diagrams and component breakdowns.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 1a4 4 0 014 4c0 2-4 6-4 6s-4-4-4-6a4 4 0 014-4z"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Design Agent</div>
+          <div class="detail">UI/UX, design system, component patterns. Informed by the 44KB design specification from GenJess_OS skills library.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10c0 5 8 5 10 5s10 0 10-5V7L12 2z"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Security Audit Agent</div>
+          <div class="detail">Red-line enforcement. Identifies vulnerabilities, compliance gaps, and enforces non-negotiable security constraints.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 5-5"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Growth + Compliance Agents</div>
+          <div class="detail">GTM strategy and regulatory compliance. Ensures launch readiness with proper legal, compliance, and growth frameworks.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">03</span>
+      <h2>Key Components</h2>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>File</th>
+          <th>Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Debate Canvas</td>
+          <td class="mono">squad/DebateCanvas.tsx</td>
+          <td>17KB — Visual arena where agents present pro/con positions</td>
+        </tr>
+        <tr>
+          <td>HITL Checkpoints</td>
+          <td class="mono">HITLCheckpoints.tsx</td>
+          <td>10KB — Human-in-the-loop decision capture + rule codification</td>
+        </tr>
+        <tr>
+          <td>Agent Activity Feed</td>
+          <td class="mono">startup/AgentActivityFeed.tsx</td>
+          <td>Real-time stream of agent actions and decisions</td>
+        </tr>
+        <tr>
+          <td>Shared State</td>
+          <td class="mono">SharedState.tsx</td>
+          <td>7.5KB — Cross-agent context synchronization</td>
+        </tr>
+        <tr>
+          <td>Pipeline Flow</td>
+          <td class="mono">AnimatedPipelineFlow.tsx</td>
+          <td>Visual execution pipeline from idea to launch</td>
+        </tr>
+        <tr>
+          <td>Repo Map</td>
+          <td class="mono">RepoMap.tsx</td>
+          <td>Repository structure analysis + codebase mapping</td>
+        </tr>
+        <tr>
+          <td>Agent Drawer</td>
+          <td class="mono">AgentDrawer.tsx</td>
+          <td>15KB — Detailed agent profile, red lines, flexible areas</td>
+        </tr>
+        <tr>
+          <td>LangGraph Mapping</td>
+          <td class="mono">LangGraphMapping.tsx</td>
+          <td>Maps agent orchestration to LangGraph execution graph</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">04</span>
+      <h2>Project Status</h2>
+    </div>
+    <div class="status-panel">
+      <div class="status-cell">
+        <div class="key">Phase</div>
+        <div class="val"><span class="amber">● MVP Complete</span> — 139 files, full frontend built. 4-month build gap (last commit ~March 2026).</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Next Step</div>
+        <div class="val">Wire actual LLM calls to agent orchestration. Currently UI-complete with mock debate flows.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">TAM</div>
+        <div class="val">$50B+ startup tools market. Positioned as the "AI team" layer above single-agent tools.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Differentiator</div>
+        <div class="val">Adversarial debates + HITL judgement codification. Not another chatbot — an organizational simulation.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">05</span>
+      <h2>Tech Stack</h2>
+    </div>
+    <div class="tech-bar">
+      <span class="tech-pill">React 18</span>
+      <span class="tech-pill">Vite</span>
+      <span class="tech-pill">TypeScript</span>
+      <span class="tech-pill">shadcn/ui</span>
+      <span class="tech-pill">Tailwind CSS</span>
+      <span class="tech-pill">Framer Motion</span>
+      <span class="tech-pill">LangGraph</span>
+      <span class="tech-pill">Bun</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="left">TEAIMS · Multi-Agent AI OS</div>
+  <div class="right">Jesse Harrick · 2026</div>
+</footer>
+
+<script src="../shared/utils.js"></script>
+<script>
+  initNavScroll({ navId: 'navbar' });
+  initScrollReveal();
+</script>
+</body>
+</html>

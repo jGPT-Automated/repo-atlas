@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniVital — AI Wellness Platform | Jesse Harrick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/design-system.css">
+<link rel="stylesheet" href="../shared/nav.css">
+<link rel="stylesheet" href="../shared/components.css">
+<link rel="stylesheet" href="../shared/project-page.css">
+<style>
+  .project-badge { color: #10b981; border: 1px solid rgba(16,185,129,0.2); background: rgba(16,185,129,0.08); }
+  .project-hero-visual { background: linear-gradient(135deg, #080808 0%, #0a1410 100%); }
+  .vital-ring {
+    position: relative;
+    width: 200px; height: 200px;
+    margin: auto;
+  }
+  .vital-circle {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 3px solid transparent;
+  }
+  .vital-circle.r1 { border-top-color: #10b981; border-right-color: rgba(16,185,129,0.3); transform: rotate(-90deg); }
+  .vital-circle.r2 { inset: 20px; border-top-color: #34d399; border-left-color: rgba(52,211,153,0.2); transform: rotate(45deg); }
+  .vital-circle.r3 { inset: 40px; border-top-color: #6ee7b7; border-right-color: rgba(110,231,183,0.15); transform: rotate(180deg); }
+  .vital-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .vital-center .num {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: #34d399;
+    letter-spacing: -0.03em;
+  }
+  .vital-center .label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="../index.html" class="nav-brand"><span class="status-dot"></span>JH</a>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="../roadmap.html">Roadmap</a>
+    <a href="../portal.html">Portal</a>
+  </div>
+  <a href="../index.html" class="nav-back">← Back</a>
+</nav>
+
+<section class="project-hero">
+  <div class="project-hero-grid">
+    <div class="project-hero-left">
+      <div class="project-badge">🏥 Health Tech · AI</div>
+      <h1 class="project-title">OmniVital</h1>
+      <p class="project-tagline">AI-powered wellness platform that reinvents the supplement experience. Voice-first AI consultant guides onboarding, recommends routines, and tracks biometric trends over time.</p>
+      <div class="project-links">
+        <a href="https://github.com/GenJess/omnivital-v3" target="_blank" class="project-link primary">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+          GitHub
+        </a>
+        <a href="https://omnivital.lovable.app" target="_blank" class="project-link">
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+          Live Demo
+        </a>
+      </div>
+    </div>
+    <div class="project-hero-visual">
+      <div class="vital-ring">
+        <div class="vital-circle r1"></div>
+        <div class="vital-circle r2"></div>
+        <div class="vital-circle r3"></div>
+        <div class="vital-center">
+          <div class="num">92</div>
+          <div class="label">Vitality Score</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="project-stats" style="margin-top: 40px;">
+  <div class="stat-cell">
+    <div class="num"><span class="accent">11K+</span></div>
+    <div class="label">Lines of Code</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">6</div>
+    <div class="label">Precision Formulas</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">4.2<span style="color:var(--text-muted);font-size:14px;">/5</span></div>
+    <div class="label">Maturity Score</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num" style="color:#f59e0b;">Beta</div>
+    <div class="label">Status</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num" style="color:#34d399;">Live</div>
+    <div class="label">Deployed on Vercel</div>
+  </div>
+</div>
+
+<div class="project-content">
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">01</span>
+      <h2>Architecture</h2>
+    </div>
+    <div class="arch-grid">
+      <div class="arch-card">
+        <div class="layer">AI Consultant</div>
+        <div class="tech">GPT-4.1 · Voice-First</div>
+        <div class="desc">"OV" — the AI consultant. Guides onboarding via voice, recommends supplement routines, guides checkout. Optimizes for re-subscription while genuinely helping.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Voice Layer</div>
+        <div class="tech">ElevenLabs WebRTC</div>
+        <div class="desc">Real-time voice interaction. Users talk to OV naturally — no forms, no friction. WebRTC for low-latency conversation.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Backend</div>
+        <div class="tech">FastAPI · Supabase</div>
+        <div class="desc">Postgres for user profiles, supplement tracking, biometric data. FastAPI handles AI orchestration and supplement matching.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Dashboard</div>
+        <div class="tech">React · Real-time Trends</div>
+        <div class="desc">Post-purchase dashboard: track supplements, biometrics (Apple Watch integration), and trend visualization over time.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Community</div>
+        <div class="tech">Privacy-First Matching</div>
+        <div class="desc">Color-gradient matching of supplement stacks. Users see who has similar routines without revealing personal health data.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Monetization</div>
+        <div class="tech">Freemium → Premium AI</div>
+        <div class="desc">Free tier: basic tracking. Premium: AI consultant, trend analysis, personalized optimization. Affiliate revenue from supplement partners.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">02</span>
+      <h2>Product Vision</h2>
+    </div>
+    <div class="feature-list">
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Voice-First Onboarding</div>
+          <div class="detail">Users describe their wellness goals via voice. OV interprets intent, asks clarifying questions, and recommends a personalized supplement routine — no questionnaires.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        <div class="feature-text">
+          <div class="name">6 Precision Formulas</div>
+          <div class="detail">Curated supplement formulations targeting specific wellness vectors. Each formula has a documented mechanism, expected outcomes, and tracking metrics.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Biometric Tracking + Apple Watch</div>
+          <div class="detail">Post-purchase dashboard tracks supplement adherence and biometric trends. Apple Watch integration for heart rate, sleep, and activity data correlation.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><circle cx="17" cy="7" r="4" opacity="0.5"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Privacy-First Community</div>
+          <div class="detail">Color-gradient matching shows users who share similar supplement stacks. No personal health data exposed — only the gradient pattern. Creates social accountability without privacy violation.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Stealth Retention Engine</div>
+          <div class="detail">Agent quietly optimizes for re-subscription and upsell while providing genuine value. Balances user benefit with business sustainability — the retention mechanic that traditional dropshipping lacks.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">03</span>
+      <h2>Project Status</h2>
+    </div>
+    <div class="status-panel">
+      <div class="status-cell">
+        <div class="key">Phase</div>
+        <div class="val"><span class="green">● Deployed</span> — 11K+ lines, live on Vercel with Supabase backend.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Blocker</div>
+        <div class="val"><span class="amber">● Legal review</span> — Supplement claims compliance. Pricing page needs finalization. Payment testing pending.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Next Milestone</div>
+        <div class="val">Beta cohort activation. Ritual app launch. Influencer partnerships for community seeding.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Market</div>
+        <div class="val">$1.5T wellness market. Reinvents low-retention dropshipping with AI-guided, ritual-based supplement routines.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">04</span>
+      <h2>Tech Stack</h2>
+    </div>
+    <div class="tech-bar">
+      <span class="tech-pill">React 18</span>
+      <span class="tech-pill">FastAPI</span>
+      <span class="tech-pill">Supabase</span>
+      <span class="tech-pill">Postgres</span>
+      <span class="tech-pill">GPT-4.1</span>
+      <span class="tech-pill">ElevenLabs</span>
+      <span class="tech-pill">WebRTC</span>
+      <span class="tech-pill">Apple Watch</span>
+      <span class="tech-pill">Vercel</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="left">OmniVital · AI Wellness Platform</div>
+  <div class="right">Jesse Harrick · 2026</div>
+</footer>
+
+<script src="../shared/utils.js"></script>
+<script>
+  initNavScroll({ navId: 'navbar' });
+  initScrollReveal();
+</script>
+</body>
+</html>

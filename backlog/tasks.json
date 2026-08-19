@@ -1,49 +1,604 @@
 {
-  "updated_at": "2026-08-19T10:01:00-05:00",
+  "meta": {
+    "created": "2026-08-05",
+    "created_by": "repo-atlas-agent",
+    "description": "Actionable tasks for dev agents. Created during deep-dive analysis. Each task has: repo, priority, acceptance criteria, and context. Dev agents: pick up tasks in priority order, create a branch, work, PR back. The atlas agent will review 12hrs after your work fires.",
+    "flow": "Atlas agent reviews repos \u2192 creates tasks \u2192 12hrs later dev agents execute \u2192 12hrs later atlas agent reviews and adds more",
+    "safety_review": {
+      "description": "Jesse reviews all backlog tasks before dev agents execute. Unsafe tasks are scratched with a note. This hook sits between atlas agent backlog write and dev agent execution.",
+      "status_field": "review_status",
+      "values": [
+        "pending_review",
+        "approved",
+        "scratched",
+        "needs_revision"
+      ]
+    },
+    "off_limits": [
+      "jGPT-Automated/LocalCheck_Expo"
+    ],
+    "atlas_agent_scope": "Only writes to jGPT-Automated/repo-atlas. Analysis is read-only on all other repos. Backlog tasks are recommendations for dev agents, not atlas agent actions.",
+    "last_deep_dive": "2026-08-19",
+    "last_repos": [
+      "agenticjess-star/bright-mind-os",
+      "agenticjess-star/instruction-hub"
+    ],
+    "last_run_note": "Recent activity selected bright-mind-os and instruction-hub; LocalCheck_Expo remained off limits.",
+    "last_analysis": "2026-08-18",
+    "last_run": "2026-08-19",
+    "last_analysis_date": "2026-08-19",
+    "last_analysis_note": "Clean test/build/lint validation: instruction-hub test/build pass but lint fails; bright-mind-os npm ci is blocked by stale lockfile.",
+    "last_reviewed": "2026-08-19",
+    "last_review_summary": "No in_review items were available; no approvals or change requests issued. Existing pending_review tasks remain pending review.",
+    "last_deep_dive_summary": "Deep-dived bright-mind-os and instruction-hub. Verified builds/tests, identified bright-mind-os lockfile reproducibility defect, and added BM-003, BM-004, IH-007, IH-008."
+  },
   "tasks": [
     {
-      "id": "bright-mind-os-001",
-      "repo": "agenticjess-star/bright-mind-os",
+      "id": "IH-001",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Add MCP tools: create_instruction, update_instruction, delete_instruction",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "The MCP function (supabase/functions/mcp/index.ts) only exposes 3 read-only tools: list_groups, list_instructions, get_production_instruction. An agent connected via MCP cannot create or modify instructions \u2014 it can only read. This severely limits the product's value proposition of 'version-controlled instructions managed by agents'.",
+      "acceptance_criteria": [
+        "Add create_instruction tool \u2014 creates a new instruction_groups row + first version",
+        "Add update_instruction tool \u2014 creates a new instruction_versions row (never mutates existing versions)",
+        "Add delete_instruction tool \u2014 soft delete (set archived=true), not a hard delete",
+        "All new tools require authentication (ctx.isAuthenticated())",
+        "All new tools use user-scoped Supabase client (not service role)",
+        "Add Zod input validation matching the DB schema",
+        "Update src/lib/mcp/index.ts (the source file \u2014 the function is auto-generated from it)"
+      ],
+      "files_to_read": [
+        "supabase/functions/mcp/index.ts",
+        "src/integrations/supabase/types.ts",
+        "supabase/migrations/"
+      ],
+      "branch": "feat/mcp-write-tools",
+      "review_status": "pending_review",
+      "review_notes": "2026-08-12: verified MCP source/generated bundle still lacks instruction-group/version CRUD tools; no agent implementation to review.",
+      "last_verified": "2026-08-13",
+      "evidence": "Source review 2026-08-13: MCP registers list_groups, list_instructions, get_production_instruction, list_threads, create_thread, add_thread_comment. No instruction-group/version CRUD tools are registered."
+    },
+    {
+      "id": "IH-002",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Add health check endpoint + Telegram webhook resilience",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "The Telegram webhook has no cheap health endpoint and firecrawlScrape() has no bounded retry/backoff: any non-2xx response or exception immediately drops URL ingestion. Keep health/readiness and transient Firecrawl retry behavior here; Telegram secret validation, update_id idempotency, and edited-message semantics are covered by IH-004.",
+      "acceptance_criteria": [
+        "Expose a cheap authenticated/unauthenticated health check that reports dependency readiness without invoking Firecrawl or the LLM.",
+        "Add bounded retry/backoff for transient Firecrawl failures and return a stable response without duplicate inserts.",
+        "Add tests for timeout, non-2xx, and dependency-missing paths."
+      ],
+      "files_to_read": [
+        "supabase/functions/telegram-webhook/index.ts",
+        "supabase/functions/mcp/index.ts",
+        "supabase/migrations/"
+      ],
+      "branch": "fix/webhook-resilience",
+      "review_status": "pending_review",
+      "review_notes": "2026-08-12: verified in supabase/functions/telegram-webhook/index.ts; no agent implementation to review.",
+      "last_verified": "2026-08-13",
+      "evidence": "Source review 2026-08-13: telegram-webhook has no health route and Firecrawl is a single fetch with immediate null/failure handling; no bounded retry/backoff."
+    },
+    {
+      "id": "IH-003",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Verify deployed profiles RLS blocks cross-user reads and add regression coverage",
       "priority": "P0",
-      "status": "todo",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "Concrete audit finding: supabase/migrations/20260307174057_3fba95de-96c5-4591-92ff-a089d60ec7cd.sql creates the authenticated SELECT policy \"Users can view all profiles\" with USING (true). A later own-profile policy does not neutralize it because permissive policies are ORed. Profiles contain user_id and Telegram-link metadata, so another authenticated user may read other users' profile rows. Preserve service-role webhook lookups while restricting user-scoped access.",
+      "acceptance_criteria": [
+        "Verify deployed policies, not only migration text.",
+        "Authenticated user A cannot SELECT user B profile rows or sensitive link fields.",
+        "Regression test fails if the permissive historical policy is reintroduced."
+      ],
+      "files_to_read": [
+        "supabase/migrations/20260307174057_3fba95de-96c5-4591-92ff-a089d60ec7cd.sql",
+        "supabase/migrations/20260310092700_f98cd40d-50bb-41e0-9394-fe6ab297d500.sql",
+        "supabase/migrations/20260310232457_adbb529c-84f0-43f2-baff-ae1720f917ad.sql",
+        "supabase/migrations/20260311003824_8418857a-8383-4dd3-87f8-6d6dd1ecfe77.sql",
+        "supabase/migrations/20260709190732_0132c32b-9d95-4ddd-8ebc-32048857efbc.sql",
+        "supabase/migrations/20260709191932_0e5b93e6-b1bd-457a-99bd-37f6a62336cf.sql"
+      ],
+      "branch": "security/rls-audit",
+      "review_status": "pending_review",
+      "review_notes": "2026-08-12: migration history contains the restrictive own-profile policy, but deployed-policy verification and regression coverage remain unverified; no agent implementation to review.",
+      "description": "Confirm the deployed policies do not retain any permissive profiles SELECT policy; add an authenticated cross-user read regression test and document the migration verification.",
+      "last_verified": "2026-08-13",
+      "evidence": "Source review 2026-08-13: migration 20260709190732 drops the historical profiles USING(true) policy and creates owner-only SELECT. No deployed-policy verification or cross-user regression test is present in the inspected tree."
+    },
+    {
+      "id": "VD-001",
+      "repo": "jGPT-Automated/vox-director",
+      "title": "Add pipeline preflight and fixture-based smoke test",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-05",
+      "context": "scripts/assemble.py and scripts/aroll_assemble.py invoke ffmpeg/ffprobe directly via subprocess.run(check=True), and caption/watermark paths depend on Pillow. There is no test directory or CI workflow in the current tree. Add an offline preflight and a minimal local fixture smoke test so packaged skill failures are caught before expensive Atlas Cloud jobs.",
+      "acceptance_criteria": [
+        "Add a doctor/preflight command that checks Python, Pillow, ffmpeg, ffprobe, and required environment variables without network calls",
+        "Add a fixture-based smoke test for the assembly path using local media only; it must not call Atlas Cloud",
+        "Assert the produced video exists, is probeable with ffprobe, and has non-zero duration",
+        "Return actionable error messages and non-zero exit codes for missing dependencies or invalid fixtures",
+        "Document how to run the preflight and smoke test locally and in CI"
+      ],
+      "files_to_read": [
+        "scripts/assemble.py",
+        "scripts/aroll_assemble.py",
+        "scripts/atlas_cloud.py",
+        "scripts/provider.py",
+        "README.md",
+        "SKILL.md"
+      ],
+      "branch": "test/pipeline-preflight-smoke-test",
+      "review_status": "pending_review",
+      "review_notes": "2026-08-12: README lists prerequisites; current tree has no tests/ or CI workflow; no agent implementation to review.",
+      "description": "Add a reusable offline preflight for ffmpeg, ffprobe, and Pillow; invoke it before local media stages; add fixture or mocked-subprocess smoke coverage with no Atlas API credentials.",
+      "last_verified": "2026-08-13",
+      "evidence": "No new verification this cycle; remains pending review from prior Vox Director analysis."
+    },
+    {
+      "id": "IH-004",
+      "repo": "agenticjess-star/instruction-hub",
+      "priority": "P1",
+      "status": "open",
+      "review_status": "pending_review",
+      "review_notes": "2026-08-12: verified missing Telegram secret validation and durable update_id claim in supabase/functions/telegram-webhook/index.ts; no agent implementation to review.",
+      "title": "Harden Telegram webhook authentication and duplicate-update handling",
+      "description": "Validate Telegram webhook secret authentication, durable update_id dedupe before side effects, and an explicit edited_message policy. Add fixture tests for unauthorized, duplicate, and edited updates.",
+      "source": "Repo Atlas 2026-08-06 deep dive",
+      "last_verified": "2026-08-13",
+      "acceptance_criteria": [
+        "Reject POSTs missing or mismatching the configured Telegram secret before any DB/API side effect.",
+        "Atomically claim update_id with a unique constraint; retries return success without repeating side effects.",
+        "Document and test edited_message behavior."
+      ],
+      "evidence": "Source review 2026-08-13: webhook accepts POST JSON without Telegram secret-token validation or update_id deduplication; edited_message is folded into the same processing path."
+    },
+    {
+      "id": "VD-002",
+      "repo": "jGPT-Automated/vox-director",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-08",
+      "review_status": "pending_review",
+      "review_notes": "2026-08-12: existing task remains supported by scripts/atlas_cloud.py scope; no agent implementation to review.",
+      "title": "Make Atlas Cloud asset transfers bounded and fail-fast",
+      "context": "scripts/atlas_cloud.py uses curl for upload/download. download() uses -s --retry 3 without --fail, connect timeout, or max time; upload() similarly lacks bounded timeout/error handling. Non-empty HTTP error bodies can be accepted as downloaded assets, and stalled transfers can hang a job.",
+      "acceptance_criteria": [
+        "Upload and download use explicit connect and overall timeouts plus HTTP fail-fast behavior.",
+        "Retries are bounded and do not retry non-transient 4xx responses.",
+        "Tests prove HTTP error bodies cannot be accepted as successful assets."
+      ],
+      "files_to_read": [
+        "scripts/atlas_cloud.py",
+        "README.md",
+        "SKILL.md"
+      ],
+      "last_verified": "2026-08-13",
+      "evidence": "No new verification this cycle; remains pending review from prior Vox Director analysis."
+    },
+    {
+      "id": "GP-001",
+      "priority": "P1",
+      "status": "open",
+      "review_status": "pending_review",
+      "review_notes": null,
+      "repo": "GenJess/GenerativeJesse-LIVE",
+      "title": "Replace placeholder portfolio metadata with GenerativeJesse branding",
+      "description": "Update index.html title, description, author, and social metadata so the production Vercel deployment no longer presents as a Lovable-generated project. Do not modify DNS, Vercel settings, or unrelated content.",
+      "acceptance_criteria": [
+        "Production HTML title identifies GenerativeJesse / generativejesse.com",
+        "Description and author metadata are portfolio-specific",
+        "OpenGraph/Twitter metadata has an intentional title, description, and image",
+        "npm run build succeeds"
+      ],
+      "last_verified": "2026-08-13",
+      "evidence": "Live Vercel URL returned HTTP 200, but HTML contains <title>vibrant-motion-canvas</title> and meta description Lovable Generated Project. Repository index.html has the same placeholders.",
+      "source_analysis": "analyses/2026-08-13/portfolio.md"
+    },
+    {
+      "id": "PC-001",
+      "repo": "GenJess/PersonalCarousel",
+      "title": "Replace the v0 Apple carousel demo with a real PersonalCarousel experience",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-14",
+      "review_status": "pending_review",
+      "context": "The only route renders AppleCardsCarouselDemo. Code-verified placeholders include the `Get to know your iSad.` headline, six generic Apple/AI/productivity cards, repeated DummyContent, remote Unsplash images, and an Aceternity MacBook image. The carousel interaction is real, but the public product has no defined audience or real content.",
+      "acceptance_criteria": [
+        "Define and document one concrete audience/use case and rename the page/headline accordingly.",
+        "Replace all demo/iSad/DummyContent copy and stock image URLs with six distinct real entries from a typed content model.",
+        "Use owned/local or explicitly approved assets with meaningful alt text and visible source/credit handling where required.",
+        "Add page metadata and one clear CTA; preserve responsive carousel and keyboard/Escape/outside-click behavior.",
+        "Update README with purpose, local run, and deployment instructions; verify `npm run build` and add a basic rendered/interaction smoke test."
+      ],
+      "files_to_read": [
+        "app/page.tsx",
+        "components/apple-cards-carousel-demo.tsx",
+        "components/ui/apple-cards-carousel.tsx",
+        "package.json",
+        "README.md"
+      ],
+      "branch": "feat/personalcarousel-real-content",
+      "description": "Turn the current v0 component showcase into a deliberate, shippable page rather than adding more generic UI primitives.",
+      "evidence": "Source review 2026-08-14: app/page.tsx only renders AppleCardsCarouselDemo; demo file contains iSad headline, DummyContent, six generic cards, Unsplash URLs, and assets.aceternity.com image."
+    },
+    {
+      "id": "LCW-001",
+      "repo": "jGPT-Automated/LocalCheck_WEB",
+      "title": "Make the court explorer use one live/curated source of truth",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-14",
+      "review_status": "pending_review",
+      "context": "The explorer data layer correctly loads Supabase `courts_with_stats` with a bounded timeout and falls back to the curated launch catalog. However, app/courts/page.tsx always server-renders launchCourts with source=\"curated\" and relies on a later client fetch of /api/courts. Separately, app/page.tsx embeds another hardcoded court array. This creates first-render/stale-catalog drift and duplicate court identity data.",
+      "acceptance_criteria": [
+        "Server-render /courts from loadExplorerCourts() and pass the actual source, while retaining a bounded client refresh if needed.",
+        "Remove or centralize the root-page hardcoded court records so court names/IDs/counts cannot diverge from the canonical catalog.",
+        "Keep the curated fallback explicit in UI and preserve the honest zero-counter behavior.",
+        "Add tests covering Supabase success, timeout/error fallback, source labeling, and the root/explorer shared court identity.",
+        "Verify the public courts_with_stats contract exposes only intended aggregate/public fields and document the deployed RLS/view assumption."
+      ],
+      "files_to_read": [
+        "app/courts/page.tsx",
+        "app/courts/court-explorer-client.tsx",
+        "app/courts/supabase-courts.ts",
+        "app/api/courts/route.ts",
+        "app/page.tsx",
+        "supabase/migrations/202607210001_create_launch_court_catalog.sql",
+        "README.md"
+      ],
+      "branch": "fix/court-catalog-source-of-truth",
+      "description": "Remove the live-vs-curated first-render mismatch and duplicate homepage catalog before adding more growth surfaces.",
+      "evidence": "Source review 2026-08-14: courts/page.tsx passes launchCourts/source curated; client refreshes /api/courts; supabase-courts.ts loads courts_with_stats; root app/page.tsx contains a separate embedded Court[] array."
+    },
+    {
+      "id": "LC-001",
+      "repo": "agenticjess-star/localcheck",
+      "title": "Replace broad public table reads with safe public projections",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-15",
+      "context": "The reviewed migrations grant SELECT USING(true) on profiles, check_ins, plans, matches_1v1, and run_rsvps. src/lib/db.ts then calls profiles.getAll() and joins full profile rows into public activity. This exposes more than the product needs and makes privacy changes difficult.",
+      "acceptance_criteria": [
+        "Create safe views or column-limited RPCs for public court presence, schedules, leaderboards, and match summaries.",
+        "Remove or narrow base-table SELECT policies for sensitive profile/activity columns while preserving intended public functionality.",
+        "Add authenticated regression tests proving a client cannot read private profile fields or unrelated user metadata.",
+        "Update src/lib/db.ts to consume the safe projection instead of profiles.getAll() joins."
+      ],
+      "files_to_read": [
+        "supabase/migrations/",
+        "src/lib/db.ts",
+        "src/pages/NowPage.tsx",
+        "src/pages/SchedulePage.tsx",
+        "src/pages/CompetePage.tsx"
+      ],
+      "branch": "security/public-projections",
+      "review_status": "pending_review",
+      "description": "Make public presence genuinely public-by-design, not full-row database access.",
+      "evidence": "2026-08-15 source review: profiles and activity tables have permissive SELECT USING(true); adapter fetches all profiles for public joins."
+    },
+    {
+      "id": "LC-002",
+      "repo": "agenticjess-star/localcheck",
+      "title": "Make match submission and ELO application server-authoritative",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-15",
+      "context": "matches_1v1 INSERT/UPDATE policies allow either participant to write, and 20260302043421 attaches rating-changing triggers to INSERT and UPDATE. The client adapter calls direct table inserts. This is vulnerable to forged scores, unauthorized state transitions, and repeated rating changes.",
+      "acceptance_criteria": [
+        "Add a single validated RPC for submitting a match and a separate confirmation/dispute transition.",
+        "Ensure a match result can apply ELO at most once; score/winner fields become immutable after submission except through an explicit dispute flow.",
+        "Validate both participants, court scope, score bounds, and authenticated caller server-side.",
+        "Remove direct client writes that bypass the RPC and add regression tests for replay, forged participant IDs, and unauthorized updates."
+      ],
+      "files_to_read": [
+        "supabase/migrations/20260302043421_1c137b19-2b9a-4983-9d43-f37663940261.sql",
+        "supabase/migrations/20260301061347_29853627-2c51-46f1-afda-d20fe54963ca.sql",
+        "src/lib/db.ts",
+        "src/pages/CompetePage.tsx"
+      ],
+      "branch": "security/server-authoritative-matches",
+      "review_status": "pending_review",
+      "description": "Protect competitive integrity by making the write path and rating side effects authoritative and idempotent.",
+      "evidence": "2026-08-15 source review: either participant can INSERT/UPDATE matches_1v1; AFTER INSERT and AFTER UPDATE triggers mutate profile ratings; client writes directly."
+    },
+    {
+      "id": "LC-003",
+      "repo": "agenticjess-star/localcheck",
+      "title": "Enforce active check-in lifecycle and court-scoped realtime",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-15",
+      "context": "check_ins expire_at is only filtered in client queries; create() directly inserts and defaults courtId to court1. The realtime subscription listens to all check_ins changes with no court filter. This conflicts with the court-scoped architecture and can produce duplicate/stale presence.",
+      "acceptance_criteria": [
+        "Make courtId required for all public adapter mutations and remove sentinel court1 defaults.",
+        "Add a database-enforced active check-in invariant and an atomic check-in/out or upsert path.",
+        "Add cleanup/archive behavior for expired rows and tests for duplicate active check-ins and expiry.",
+        "Scope realtime subscriptions to the selected court and avoid refreshing unrelated courts."
+      ],
+      "files_to_read": [
+        "src/lib/db.ts",
+        "src/pages/NowPage.tsx",
+        "src/components/CourtMap.tsx",
+        "supabase/migrations/20260228034425_1e3923a1-df58-4ece-9b07-0bece0f81229.sql"
+      ],
+      "branch": "fix/checkin-lifecycle",
+      "review_status": "pending_review",
+      "description": "Make presence accurate and cheap at the database boundary, not just in client filters.",
+      "evidence": "2026-08-15 source review: expires_at is client-filtered; create() directly inserts; most adapter methods default to court1; onChanges subscribes table-wide."
+    },
+    {
+      "id": "IH-005",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Bound Telegram ingestion cost and payload abuse",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-16",
+      "review_status": "pending_review",
+      "source": "Repo Atlas 2026-08-16 deep dive",
+      "context": "supabase/functions/telegram-webhook/index.ts performs synchronous Firecrawl and LLM work from a public POST body, with no request-size cap, URL host/scheme policy, timeout budget, or per-chat rate limit. The handler writes with service role after resolving a linked chat. Add guardrails without duplicating IH-004 secret validation/update_id ownership.",
+      "acceptance_criteria": [
+        "Reject oversized Telegram updates and bound extracted text before external calls.",
+        "Accept only http/https URLs and document any allowed host policy; do not fetch arbitrary local/file/data URLs.",
+        "Enforce bounded external-call timeouts and one bounded retry only for transient Firecrawl failures.",
+        "Add a durable per-chat rate-limit or quota check before Firecrawl/LLM work, with tests for rejection and allowed paths.",
+        "Do not bypass RLS or expose service-role credentials; preserve IH-004 secret and update_id requirements."
+      ],
+      "files_to_read": [
+        "supabase/functions/telegram-webhook/index.ts",
+        "supabase/migrations/"
+      ],
+      "branch": "security/telegram-ingestion-guardrails",
+      "evidence": "Source review 2026-08-16: handler accepts POST JSON after method check, extracts arbitrary https? URL, calls Firecrawl synchronously, and classifies up to 8,000 chars; no visible body cap, timeout, host policy, or rate limit."
+    },
+    {
+      "id": "LCW-002",
+      "repo": "jGPT-Automated/LocalCheck_WEB",
+      "title": "Publish an explicit least-privilege court catalog projection",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-16",
+      "review_status": "pending_review",
+      "source": "Repo Atlas 2026-08-16 deep dive",
+      "context": "supabase/migrations/202607210001_create_launch_court_catalog.sql defines courts_with_stats as select c.* and grants SELECT to anon/authenticated. The explorer only needs a subset, while c.* exposes provenance/operational fields and makes future columns public by default.",
+      "acceptance_criteria": [
+        "Replace c.* in courts_with_stats with an explicit approved public column list and retain only intended aggregate fields.",
+        "Add a response/schema contract test that fails when internal provenance fields such as added_by, geocode_query, detection_source_id, or detection_distance_m are returned.",
+        "Verify anonymous and authenticated reads still support the explorer and preserve archived filtering.",
+        "Document the public projection versus service-role/admin enrichment path."
+      ],
+      "files_to_read": [
+        "supabase/migrations/202607210001_create_launch_court_catalog.sql",
+        "app/courts/supabase-courts.ts",
+        "app/api/courts/route.ts",
+        "tests/rendered-html.test.mjs"
+      ],
+      "branch": "security/public-court-projection",
+      "evidence": "Source review 2026-08-16: courts_with_stats is created with select c.* and granted to anon/authenticated; the client maps a smaller subset."
+    },
+    {
+      "id": "LCW-003",
+      "repo": "jGPT-Automated/LocalCheck_WEB",
+      "title": "Connect the homepage CTA to a real check-in flow and remove the duplicate catalog",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-17",
+      "context": "app/page.tsx defines a duplicate two-court catalog and toggles checkedIn in local React state. The homepage increments the displayed live count without an API/auth/backend response; Log in is also a toast. This makes the main product promise appear functional while not persisting anything.",
+      "acceptance_criteria": [
+        "Use one shared catalog source for homepage and explorer; remove the duplicate hardcoded Court list.",
+        "Make Check in deep-link to the authenticated app or implement a server-side authenticated check-in endpoint with idempotency and expiry.",
+        "Never increment live counts unless the backend confirms success; show loading and error states.",
+        "Add a regression test proving failed or unauthenticated check-in does not report a live presence."
+      ],
+      "files_to_read": [
+        "app/page.tsx",
+        "app/courts/supabase-courts.ts",
+        "app/courts/court-explorer-client.tsx",
+        "app/chatgpt-auth.ts",
+        "app/api/courts/route.ts"
+      ],
+      "branch": "fix/homepage-checkin-cta",
+      "review_status": "pending_review",
+      "description": "Make the marketing homepage honest and connected to the real LocalCheck loop.",
+      "last_verified": "2026-08-17",
+      "evidence": "Source review 2026-08-17: app/page.tsx:40 defines a separate static catalog and :158 only calls setCheckedIn; no backend call or auth path exists."
+    },
+    {
+      "id": "PC-002",
+      "repo": "GenJess/PersonalCarousel",
+      "title": "Replace v0 demo identity with a real, accessible PersonalCarousel portfolio surface",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-17",
+      "context": "The app is still the default v0 Apple carousel demo: README says Open in v0, the heading says Get to know your iSad, all cards reuse DummyContent, copy references Apple/Aceternity, and six images are remote Unsplash assets. There is no product metadata or clear CTA.",
+      "acceptance_criteria": [
+        "Replace all placeholder Apple/v0/DummyContent copy with content for a defined PersonalCarousel audience and use case.",
+        "Add title, description, canonical, Open Graph/Twitter metadata, and brand assets in app/layout.tsx.",
+        "Use local or owned assets with meaningful alt text and document sources/licenses.",
+        "Add a primary CTA and an accessible non-carousel summary.",
+        "Update README with purpose, setup, deployment, and demo information.",
+        "Add a build or lint check that fails on known placeholder strings."
+      ],
+      "files_to_read": [
+        "README.md",
+        "app/layout.tsx",
+        "app/page.tsx",
+        "components/apple-cards-carousel-demo.tsx",
+        "package.json"
+      ],
+      "branch": "feat/personalcarousel-productize",
+      "review_status": "pending_review",
+      "description": "Turn the component demo into a credible, branded portfolio/product surface.",
+      "last_verified": "2026-08-17",
+      "evidence": "Source review 2026-08-17: README and components/apple-cards-carousel-demo.tsx retain v0/Apple template identity, repeated DummyContent, and remote stock assets."
+    },
+    {
+      "id": "BM-001",
+      "repo": "agenticjess-star/bright-mind-os",
+      "title": "Make Coinbase WebSocket cleanup cancellation-safe",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-18",
+      "context": "Code-verified lifecycle bug: src/hooks/useCoinbasePrice.ts closes the socket during effect cleanup without clearing onclose or guarding reconnect. The intentional close can schedule connect() after unmount; useCoinbasePricesAll.ts has the same pattern and must be audited together.",
+      "acceptance_criteria": [
+        "Unmounting either Coinbase hook never schedules or opens a new socket afterward.",
+        "Add a disposed/connection-generation guard and cleanup-safe timer/socket teardown; do not suppress legitimate reconnects while mounted.",
+        "Add focused tests covering intentional close, reconnect after an unexpected close, and remount without duplicate sockets.",
+        "Keep the existing selected-asset subscription behavior and bounded series buffer."
+      ],
+      "files_to_read": [
+        "src/hooks/useCoinbasePrice.ts",
+        "src/hooks/useCoinbasePricesAll.ts",
+        "src/test/"
+      ],
+      "branch": "fix/coinbase-ws-cleanup",
+      "review_status": "pending_review",
+      "evidence": "Source audit 2026-08-18: cleanup calls ws.close() but leaves ws.onclose active; onclose unconditionally sets reconnectTimer to connect after 3 seconds."
+    },
+    {
+      "id": "BM-002",
+      "repo": "agenticjess-star/bright-mind-os",
+      "title": "Remove stale Polymarket CLOB subscriptions on market changes",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-18",
+      "context": "Code-verified correctness/performance bug: src/hooks/useClobWebSocket.ts sends a fresh market subscription for the next token set but never unsubscribes removed token IDs or clears their quotes. Switching asset/timeframe can therefore keep old markets streaming and retain stale prices.",
+      "acceptance_criteria": [
+        "Track the previous token set and unsubscribe removed IDs using the supported CLOB protocol, or safely recreate the socket when unsubscribe is unavailable.",
+        "Remove quotes for token IDs no longer in the active set and ensure only current IDs can update visible state.",
+        "Add tests for token-set replacement, removal, duplicate IDs, reconnect, and unmount cleanup.",
+        "Document any protocol limitation and keep the 150ms batching behavior."
+      ],
+      "files_to_read": [
+        "src/hooks/useClobWebSocket.ts",
+        "src/hooks/useUpDownMarkets.ts",
+        "src/lib/polymarket.ts",
+        "src/test/"
+      ],
+      "branch": "fix/clob-subscription-lifecycle",
+      "review_status": "pending_review",
+      "evidence": "Source audit 2026-08-18: token-set effect calls subscribe(ws,next) only; no removed-ID unsubscribe or quote eviction exists."
+    },
+    {
+      "id": "IH-006",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Prevent MCP comments on threads owned by another user",
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-18",
+      "context": "Code-verified authorization/data-integrity bug: src/lib/mcp/tools/add-thread-comment.ts inserts a caller-owned comment for any supplied thread_id without checking thread ownership. The migration INSERT policy only validates comment.user_id, while the SELECT policy exposes comments on a user-owned thread; a known UUID is enough to contaminate another user\u2019s thread.",
+      "acceptance_criteria": [
+        "A caller can add a comment only when the target thread belongs to that caller.",
+        "Enforce ownership in the database policy and/or handler query; do not rely only on the UI.",
+        "Update the generated supabase/functions/mcp/index.ts bundle together with src/lib/mcp/.",
+        "Add an authenticated two-user regression test proving cross-user insert is rejected and same-user insert succeeds.",
+        "Return a stable not-found/forbidden error without leaking whether another user\u2019s thread exists."
+      ],
+      "files_to_read": [
+        "src/lib/mcp/tools/add-thread-comment.ts",
+        "supabase/functions/mcp/index.ts",
+        "supabase/migrations/20260310092700_f98cd40d-50bb-41e0-9394-fe6ab297d500.sql",
+        "src/test/"
+      ],
+      "branch": "security/mcp-comment-ownership",
+      "review_status": "pending_review",
+      "evidence": "Source and migration audit 2026-08-18: handler accepts arbitrary thread_id; INSERT policy is auth.uid() = user_id and has no EXISTS check on threads.thread_id."
+    },
+    {
+      "id": "BM-003",
+      "repo": "agenticjess-star/bright-mind-os",
       "title": "Regenerate and commit a reproducible lockfile",
-      "description": "npm ci currently fails because package-lock.json is out of sync with package.json (missing Vitest transitive packages and version mismatches). Regenerate the lockfile with the supported package manager, commit it, and verify npm ci && npm run build && npm test pass from a clean checkout.",
-      "evidence": ["npm ci --ignore-scripts --no-audit --no-fund fails with missing lock entries and invalid @jridgewell/sourcemap-codec resolution", "npm install followed by npm run build and npm test passes"],
-      "acceptance": ["Clean checkout installs with npm ci without modifying the lockfile", "npm run build exits 0", "npm test exits 0"],
-      "created_at": "2026-08-19T10:01:00-05:00"
-    },
-    {
-      "id": "bright-mind-os-002",
-      "repo": "agenticjess-star/bright-mind-os",
-      "priority": "P1",
-      "status": "todo",
-      "title": "Add deterministic signal and market-discovery tests",
-      "description": "The product's core value is the live SMA/market comparison, but the repo only contains the starter example test. Add unit tests around computeSmaSignal and market slug/discovery parsing, including empty buffers, timeframe window boundaries, neutral threshold, malformed API payloads, and expired-market rotation.",
-      "evidence": ["src/lib/smaSignal.ts and src/lib/polymarket.ts are core active modules", "Only one starter test file was found"],
-      "acceptance": ["At least 10 focused tests cover signal edge cases and discovery parsing", "Tests run without WebSocket/network access", "A malformed or empty API response produces a safe UI state rather than a thrown render error"],
-      "created_at": "2026-08-19T10:01:00-05:00"
-    },
-    {
-      "id": "instruction-hub-001",
-      "repo": "agenticjess-star/instruction-hub",
       "priority": "P0",
-      "status": "todo",
-      "title": "Make Telegram ingest failure-safe and observable",
-      "description": "Harden supabase/functions/telegram-webhook so Firecrawl, Telegram, AI classification, and database failures return bounded responses, do not create partial thread records, and emit structured correlation-safe logs/metrics. Add tests for URL scrape failure, invalid link code, duplicate update delivery, and unsupported message shapes.",
-      "evidence": ["telegram-webhook is a production edge-function path described in README", "The repo has only the starter example test and no function-level tests"],
-      "acceptance": ["Duplicate Telegram update IDs are idempotent", "Firecrawl/AI failure does not leave an orphan thread", "Webhook returns Telegram-safe status in every tested failure mode", "Tests cover the four named cases"],
-      "created_at": "2026-08-19T10:01:00-05:00"
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-19",
+      "context": "npm ci fails because package-lock.json is out of sync: missing Vitest transitive entries and a sourcemap-codec mismatch. npm install followed by build/test passes, so this is a reproducibility defect rather than a source compile defect.",
+      "acceptance_criteria": [
+        "Clean checkout installs with npm ci without modifying the lockfile",
+        "npm run build exits 0",
+        "npm test exits 0"
+      ],
+      "review_status": "pending_review",
+      "review_notes": "2026-08-19: verified against a fresh tarball; npm ci failed, npm install/build/test passed."
     },
     {
-      "id": "instruction-hub-002",
-      "repo": "agenticjess-star/instruction-hub",
+      "id": "BM-004",
+      "repo": "agenticjess-star/bright-mind-os",
+      "title": "Add deterministic tests for SMA signal and market discovery",
       "priority": "P1",
-      "status": "todo",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-19",
+      "context": "Core modules src/lib/smaSignal.ts and src/lib/polymarket.ts have no focused tests; only the starter example test exists. Cover empty buffers, timeframe windows, neutral threshold, malformed API payloads, and expiry rotation without network/WebSocket access.",
+      "acceptance_criteria": [
+        "At least 10 focused tests cover signal edge cases and discovery parsing",
+        "Tests run without WebSocket/network access",
+        "Malformed or empty API responses produce safe state"
+      ],
+      "review_status": "pending_review",
+      "review_notes": "2026-08-19: code-verified; only src/test/example.test.ts exists."
+    },
+    {
+      "id": "IH-007",
+      "repo": "agenticjess-star/instruction-hub",
+      "title": "Add Telegram ingest failure-path tests and observability",
+      "priority": "P0",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-19",
+      "context": "telegram-webhook is a multi-system boundary (Telegram, Firecrawl, AI classification, persistence), but the repo has no function-level tests. Add correlation-safe structured logs and tests for scrape failure, invalid link code, duplicate delivery, and unsupported message shapes; prevent partial/orphan thread records.",
+      "acceptance_criteria": [
+        "Duplicate Telegram update IDs are idempotent",
+        "External failure does not leave an orphan thread",
+        "Webhook returns a stable Telegram-safe status for tested failures",
+        "Four named cases are covered by tests"
+      ],
+      "review_status": "pending_review",
+      "review_notes": "2026-08-19: code-verified; supabase/functions/telegram-webhook exists and only starter test is present."
+    },
+    {
+      "id": "IH-008",
+      "repo": "agenticjess-star/instruction-hub",
       "title": "Split the oversized frontend bundle by route",
-      "description": "The production build succeeds but emits a 779.67 kB minified JS chunk. Add route-level lazy loading for dashboard, thread library, optimizer, agent docs, and auth routes, then verify the initial chunk drops materially without breaking protected-route navigation.",
-      "evidence": ["npm run build passes", "Vite reports index-CHTPGsnA.js at 779.67 kB and recommends dynamic import/code splitting"],
-      "acceptance": ["Initial entry chunk is below 500 kB or the repo documents an intentional exception", "All primary routes still load in a production preview", "npm run build and npm test pass"],
-      "created_at": "2026-08-19T10:01:00-05:00"
+      "priority": "P1",
+      "status": "open",
+      "assignee": null,
+      "created": "2026-08-19",
+      "context": "Production build passes but emits a 779.67 kB minified entry chunk. Add route-level lazy loading for dashboard, thread library, optimizer, agent docs, and auth routes.",
+      "acceptance_criteria": [
+        "Initial entry chunk is below 500 kB or exception is documented",
+        "Primary routes load in production preview",
+        "npm run build and npm test pass"
+      ],
+      "review_status": "pending_review",
+      "review_notes": "2026-08-19: verified npm run build pass; Vite emitted 779.67 kB entry chunk."
     }
-  ]
+  ],
+  "completed": [],
+  "in_review": []
 }
