@@ -97,6 +97,28 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font-sans);ov
   #route-dots{right:12px}
   #orb-canvas{width:48px;height:48px}
 }
+
+/* Gallery View */
+#gallery-overlay{position:fixed;inset:0;z-index:20;background:rgba(10,10,10,.98);backdrop-filter:blur(20px);opacity:0;pointer-events:none;transition:opacity .4s;overflow-y:auto}
+#gallery-overlay.visible{opacity:1;pointer-events:auto}
+#gallery-header{padding:80px 32px 40px;text-align:center}
+#gallery-header h2{font-size:clamp(24px,4vw,42px);font-weight:500;letter-spacing:-.04em;margin-bottom:8px}
+#gallery-header p{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.18em;text-transform:uppercase}
+#gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;padding:0 32px 60px;max-width:1200px;margin:0 auto}
+.gallery-card{background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:24px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden}
+.gallery-card:hover{border-color:#333;transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.gallery-card .card-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px;display:inline-flex;align-items:center;gap:8px}
+.gallery-card .card-label::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.gallery-card .card-title{font-size:22px;font-weight:500;letter-spacing:-.03em;margin-bottom:8px}
+.gallery-card .card-desc{font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:16px}
+.gallery-card .card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.gallery-card .card-tag{font-size:10px;color:var(--text-dim);padding:4px 8px;border:1px solid #1f1f1f;border-radius:3px}
+.gallery-card .card-visual{position:absolute;top:0;right:0;width:120px;height:120px;opacity:.06;pointer-events:none}
+#gallery-close{position:fixed;top:20px;right:20px;z-index:21;background:#1a1a1a;border:1px solid #2a2a2a;color:var(--text);width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s}
+#gallery-close:hover{background:#2a2a2a;border-color:#444}
+.gallery-toggle{cursor:pointer !important}
+@media(max-width:768px){#gallery-grid{grid-template-columns:1fr;padding:0 16px 40px}#gallery-header{padding:60px 16px 30px}}
+
 </style>
 </head>
 <body>
@@ -104,6 +126,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font-sans);ov
 <div id="topbar">
   <a href="#" class="brand"><span class="dot"></span>Jesse Harrick</a>
   <div class="nav-links">
+    <a href="#" class="gallery-toggle" id="gallery-open-btn">Gallery</a>
     <a href="https://github.com/GenJess">GitHub</a>
     <a href="https://generativejesse.com">Portfolio</a>
     <a href="https://github.com/jGPT-Automated/repo-atlas">Atlas</a>
@@ -123,6 +146,15 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font-sans);ov
 <div id="orb-toast">
   <div class="toast-label">Agent</div>
   <div id="orb-toast-text">Navigating...</div>
+</div>
+
+<div id="gallery-overlay">
+  <div id="gallery-close">✕</div>
+  <div id="gallery-header">
+    <h2>All Projects</h2>
+    <p>Click to explore</p>
+  </div>
+  <div id="gallery-grid"></div>
 </div>
 
 <div id="spacer"></div>
@@ -292,6 +324,18 @@ const SCENES=[
     text:{type:'project',label:'Fintech',title:'Alpha-Gauge',
       desc:'Real-time Polymarket dashboard. Particle filter probability models. Monte Carlo analysis.',
       links:[{label:'GitHub',href:'https://github.com/agenticjess-star/alpha-gauge'},{label:'Details',href:'projects/alpha-gauge.html'}]}},
+  {id:'instruction-os',label:'Instruction OS',orbState:'solving',accent:'#a78bfa',
+    text:{type:'project',label:'AI / Tools',title:'Instruction OS',
+      desc:'Version-controlled instruction management across LLM platforms. Sync prompts to Gemini, Claude, GPT. MCP-integrated.',
+      links:[{label:'GitHub',href:'https://github.com/agenticjess-star/instruction-hub'},{label:'Details',href:'projects/instruction-os.html'}]}},
+  {id:'sage-search',label:'Sage Search',orbState:'searching',accent:'#06b6d4',
+    text:{type:'project',label:'PKM / Search',title:'Sage Search',
+      desc:'Vectorize URLs, repos, transcripts, images. Auto-tag. Search raw + actionable outputs. Telegram-native.',
+      links:[{label:'GitHub',href:'https://github.com/GenJess/file-chat-sage'},{label:'Live',href:'https://file-chat-sage.vercel.app'},{label:'Details',href:'projects/sage-search.html'}]}},
+  {id:'outreach-os',label:'Outreach OS',orbState:'working',accent:'#f43f5e',
+    text:{type:'project',label:'SMB / Automation',title:'Outreach OS',
+      desc:'Small business outreach automation. Multi-agent outbound studio. Deploy pipeline + MCP comms.',
+      links:[{label:'GitHub',href:'https://github.com/agenticjess-star/GenJess-OS'},{label:'Details',href:'projects/outreach-os.html'}]}},
   {id:'contact',label:'Contact',orbState:'composing',
     text:{type:'finale',title:"Let's build\nsomething real.",
       desc:'Open to roles, contract work, founding engineer positions.',
@@ -454,6 +498,46 @@ function renderProjectVisual(id,t,color){
       bgCtx.fillStyle='rgba(30,30,30,.4)';bgCtx.fillRect(x,y,bw-8,3);
       bgCtx.fillStyle=bar.up?'rgba(16,185,129,.12)':'rgba(244,63,94,.12)';bgCtx.fillRect(x,y,(bw-8)*fill,3)
     })
+  }else if(id==='instruction-os'){
+    // Code blocks floating
+    for(let i=0;i<8;i++){
+      const x=cx+Math.cos(t*.3+i)*Math.min(W,H)*0.2;
+      const y=cy+Math.sin(t*.2+i*.8)*Math.min(W,H)*0.15;
+      const s=40+Math.sin(t+i)*8;
+      bgCtx.strokeStyle=`rgba(${c},${.04+.03*Math.sin(t+i)})`;
+      bgCtx.lineWidth=1;
+      bgCtx.strokeRect(x-s/2,y-s/2,s,s);
+      bgCtx.fillStyle=`rgba(${c},.02)`;
+      bgCtx.fillRect(x-s/2,y-s/2,s,s);
+    }
+  }else if(id==='sage-search'){
+    // Search pulse waves
+    for(let i=0;i<5;i++){
+      const r=((t*.15+i/5)%1)*Math.min(W,H)*0.3;
+      bgCtx.strokeStyle=`rgba(${c},${(1-((t*.15+i/5)%1))*.06})`;
+      bgCtx.lineWidth=1.5;
+      bgCtx.beginPath();
+      bgCtx.arc(cx,cy,r,0,Math.PI*2);
+      bgCtx.stroke();
+    }
+  }else if(id==='outreach-os'){
+    // Network nodes radiating outward
+    const nodes=6;
+    for(let i=0;i<nodes;i++){
+      const a=(i/nodes)*Math.PI*2+t*.05;
+      const r=Math.min(W,H)*0.15*(1+.1*Math.sin(t+i));
+      const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;
+      bgCtx.strokeStyle=`rgba(${c},.04)`;
+      bgCtx.lineWidth=.5;
+      bgCtx.beginPath();bgCtx.moveTo(cx,cy);bgCtx.lineTo(x,y);bgCtx.stroke();
+      bgCtx.fillStyle='rgba(20,20,20,.6)';bgCtx.strokeStyle=`rgba(${c},.1)`;
+      bgCtx.beginPath();bgCtx.arc(x,y,10,0,Math.PI*2);bgCtx.fill();bgCtx.stroke();
+      // Outward pulse
+      const pr=r+((t*.3+i*.2)%1)*60;
+      const px=cx+Math.cos(a)*pr,py=cy+Math.sin(a)*pr;
+      bgCtx.fillStyle=`rgba(${c},${(1-((t*.3+i*.2)%1))*.1})`;
+      bgCtx.beginPath();bgCtx.arc(px,py,3,0,Math.PI*2);bgCtx.fill();
+    }
   }
 }
 
@@ -501,6 +585,89 @@ document.getElementById('orb-container').addEventListener('click',()=>{
   stateIdx=(stateIdx+1)%states.length;
   setOrbState(states[stateIdx]);
 });
+
+// ============================================
+// GALLERY VIEW
+// ============================================
+const galleryOverlay=document.getElementById('gallery-overlay');
+const galleryGrid=document.getElementById('gallery-grid');
+
+function buildGallery(){
+  galleryGrid.innerHTML='';
+  SCENES.forEach((scene,i)=>{
+    if(scene.text.type==='hero'||scene.text.type==='finale')return;
+    const card=document.createElement('div');
+    card.className='gallery-card';
+    const c=scene.accent||'#10b981';
+    card.innerHTML=`<div class="card-label" style="color:${c}">${scene.text.label}</div><h3 class="card-title">${scene.text.title}</h3><p class="card-desc">${scene.text.desc}</p><div class="card-tags">${(scene.text.links||[]).map(l=>`<span class="card-tag">${l.label}</span>`).join('')}</div>`;
+    card.addEventListener('click',()=>{
+      galleryOverlay.classList.remove('visible');
+      setTimeout(()=>window.scrollTo({top:i*SCENE_SCROLL*H,behavior:'smooth'}),300);
+    });
+    galleryGrid.appendChild(card);
+  });
+}
+
+document.getElementById('gallery-open-btn').addEventListener('click',(e)=>{
+  e.preventDefault();
+  buildGallery();
+  galleryOverlay.classList.add('visible');
+});
+document.getElementById('gallery-close').addEventListener('click',()=>{
+  galleryOverlay.classList.remove('visible');
+});
+galleryOverlay.addEventListener('click',(e)=>{
+  if(e.target===galleryOverlay)galleryOverlay.classList.remove('visible');
+});
+
+// Agent can open gallery via URL hash #gallery
+if(window.location.hash==='#gallery'){
+  setTimeout(()=>{buildGallery();galleryOverlay.classList.add('visible');},500);
+}
+
+
+
+// ============================================
+// ORB ENHANCEMENT — Persistent + Clickable
+// ============================================
+// Ensure orb is always visible and rendering
+const orbContainer=document.getElementById('orb-container');
+orbContainer.style.display='block';
+orbContainer.style.opacity='1';
+orbContainer.style.zIndex='8';
+
+// Orb pulse on state change
+function pulseOrb(){
+  orbContainer.style.transform='scale(1.3)';
+  setTimeout(()=>{orbContainer.style.transform='scale(1.08)'},200);
+  setTimeout(()=>{orbContainer.style.transform='scale(1)'},400);
+}
+
+// Override the existing click handler to also pulse
+orbContainer.addEventListener('click',()=>{
+  pulseOrb();
+  // Show toast with current state
+  const toast=document.getElementById('orb-toast');
+  const toastText=document.getElementById('orb-toast-text');
+  toastText.textContent='Orb state: '+currentOrbState;
+  toast.classList.add('visible');
+  setTimeout(()=>toast.classList.remove('visible'),2000);
+});
+
+// Agent navigation via hash — support all scene IDs + gallery
+const originalHandleHash=handleHash;
+function enhancedHashHandler(){
+  const hash=window.location.hash.slice(1);
+  if(hash==='gallery'){
+    buildGallery();
+    galleryOverlay.classList.add('visible');
+    return;
+  }
+  originalHandleHash();
+}
+window.removeEventListener('hashchange',handleHash);
+window.addEventListener('hashchange',enhancedHashHandler);
+
 </script>
 </body>
 </html>
