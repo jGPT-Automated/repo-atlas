@@ -371,7 +371,7 @@ const ORB_SIZE=64;
 const orbDpr=Math.min(window.devicePixelRatio||1,2);
 orbCanvas.width=ORB_SIZE*orbDpr;orbCanvas.height=ORB_SIZE*orbDpr;
 orbCtx.scale(orbDpr,orbDpr);
-let orbTime=0;let currentOrbState='listening';let resolvedPreset=null;
+let orbTime=0;let currentOrbState='';let resolvedPreset=null;
 
 function setOrbState(state){
   if(state===currentOrbState)return;
