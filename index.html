@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Jesse — Builder</title>
+<title>/ Jesse — Systems Architect</title>
 <meta name="description" content="Scroll to explore. Or talk to the orb.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -124,7 +124,7 @@ html,body{background:var(--bg);color:var(--text);font-family:var(--font-sans);ov
 <body>
 
 <div id="topbar">
-  <a href="#" class="brand"><span class="dot"></span>Jesse Harrick</a>
+  <a href="#" class="brand"><span class="dot"></span>/ Jesse</a>
   <div class="nav-links">
     <a href="#" class="gallery-toggle" id="gallery-open-btn">Gallery</a>
     <a href="https://github.com/GenJess">GitHub</a>
@@ -196,7 +196,7 @@ const PRESETS={
   ribbon:{64:{speed:2.34,count:.25,size:.85,extra:{spin:0,bandMul:3.9,wobMul:1}},20:{speed:3.12,count:.051,size:1.073,extra:{spin:0,bandMul:4.94,wobMul:1}}},
   morph:{64:{speed:2.405,count:.54,size:.395,extra:{spread:1.45}},20:{speed:2.08,count:.53,size:1.011,extra:{spread:1.45}}}
 };
-function resolvePreset(state,size){const mode=STATE_TO_MODE[state];const preset=PRESETS[mode][size];let opts={...BASE_PROFILES[mode]};if(preset.count!==1)opts=scaleCounts(opts,preset.count);if(preset.size!==1)opts=scaleRadii(opts,preset.size);if(preset.extra)opts={...opts,...preset.extra};return{mode,speed:preset.speed,opts}}
+function resolvePreset(state,size){const mode=STATE_TO_MODE[state];if(!mode||!PRESETS[mode])return null;const preset=PRESETS[mode][size];if(!preset)return null;let opts={...BASE_PROFILES[mode]};if(preset.count!==1)opts=scaleCounts(opts,preset.count);if(preset.size!==1)opts=scaleRadii(opts,preset.size);if(preset.extra)opts={...opts,...preset.extra};return{mode,speed:preset.speed,opts}}
 
 // --- lattice.ts: drawGlobe, drawRubik, drawWave ---
 function solveCycle(time,count,slotDur,rest){const cyc=2*count*slotDur+rest;const tc=time%cyc;const amount=new Array(count).fill(0);let active=-1;if(tc<2*count*slotDur){const slot=Math.floor(tc/slotDur);const p=(tc-slot*slotDur)/slotDur;const cl=Math.min(1,p/.7);const ep=1-Math.pow(1-cl,3);if(slot<count){for(let i=0;i<slot;i++)amount[i]=1;amount[slot]=ep;active=slot}else{const u=2*count-1-slot;for(let i=0;i<u;i++)amount[i]=1;amount[u]=1-ep;active=u}}return{amount,active}}
@@ -307,7 +307,7 @@ const MODE_DRAW={globe:drawGlobe,rubik:drawRubik,wave:drawWave,morph:drawMorph,o
 // ============================================
 const SCENES=[
   {id:'intro',label:'Intro',orbState:'listening',
-    text:{type:'hero',title:'Jesse builds\nthings that ship.',subtitle:'Scroll or talk to the orb'}},
+    text:{type:'hero',title:'Architecting\nsystems across\ndomains.',subtitle:'Scroll or talk to the orb'}},
   {id:'localcheck',label:'LocalCheck',orbState:'working',accent:'#f97316',
     text:{type:'project',label:'Sports · Mobile',title:'LocalCheck',
       desc:'Find active courts. Check in. Play. Rank up. 5,700+ courts mapped. Shipping to App Store.',
@@ -383,7 +383,7 @@ setOrbState('listening');
 function renderOrb(){
   orbCtx.clearRect(0,0,ORB_SIZE,ORB_SIZE);
   const r=resolvedPreset;
-  if(r){const t=orbTime*r.speed;MODE_DRAW[r.mode](orbCtx,ORB_SIZE,t,true,r.opts)}
+  if(r){try{const t=orbTime*r.speed;MODE_DRAW[r.mode](orbCtx,ORB_SIZE,t,true,r.opts)}catch(e){}}
   orbTime+=0.016;
   requestAnimationFrame(renderOrb);
 }
@@ -428,8 +428,7 @@ function renderBg(){
   }
 
   // Update orb state based on scene
-  const orbState=SCENES[scene].orbState;
-  setOrbState(orbState);
+  try{setOrbState(SCENES[scene].orbState||'listening')}catch(e){}
 
   // Text visibility
   textEls.forEach((el,i)=>{
