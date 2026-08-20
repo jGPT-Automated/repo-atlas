@@ -434,8 +434,8 @@ function renderBg(){
   // Text visibility
   textEls.forEach((el,i)=>{
     const start=i*SCENE_SCROLL*H;
-    const mid=i===0?start:start+SCENE_SCROLL*H*.4;
-    const dist=Math.abs(scrollY-mid);const range=SCENE_SCROLL*H*.35;
+    const mid=start+SCENE_SCROLL*H*.15;
+    const dist=Math.abs(scrollY-mid);const range=SCENE_SCROLL*H*.5;
     el.classList.toggle('visible',dist<range)
   });
 
