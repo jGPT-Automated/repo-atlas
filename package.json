@@ -1,0 +1,7 @@
+{
+  "name": "repo-atlas",
+  "private": true,
+  "dependencies": {
+    "@google/genai": "^1.0.0"
+  }
+}
