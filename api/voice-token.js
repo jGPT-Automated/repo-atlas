@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_KEY;
   if (!apiKey) {
     console.error('voice-token: GEMINI_API_KEY is not set');
     res.status(500).json({ error: 'Server is not configured for voice sessions.' });

@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_KEY;
   if (!apiKey) {
     res.status(500).json({ error: 'Server is not configured for agent turns.' });
     return;
