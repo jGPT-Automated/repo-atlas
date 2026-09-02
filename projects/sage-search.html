@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sage Search — Post-Organization Knowledge Tool | Jesse Harrick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/design-system.css">
+<link rel="stylesheet" href="../shared/nav.css">
+<link rel="stylesheet" href="../shared/components.css">
+<link rel="stylesheet" href="../shared/project-page.css">
+<style>
+  .project-badge { color: #06b6d4; border: 1px solid rgba(6,182,212,0.2); background: rgba(6,182,212,0.08); }
+  .project-hero-visual { background: linear-gradient(135deg, #0d1113 0%, #0a1a1f 100%); }
+  .sage-orb {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    border: 1px solid rgba(6,182,212,0.4);
+    background: radial-gradient(circle at 32% 28%, rgba(6,182,212,0.35), transparent 60%);
+    box-shadow: 0 0 32px rgba(6,182,212,0.25), inset 0 0 20px rgba(6,182,212,0.12);
+    margin: 0 auto;
+    position: relative;
+  }
+  .sage-orb::after {
+    content: '';
+    position: absolute; inset: -16px;
+    border: 1px solid rgba(6,182,212,0.12);
+    border-radius: 50%;
+  }
+  .loop-display {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: #f2f2f6;
+    letter-spacing: -0.02em;
+  }
+  .loop-label { font-family: var(--font-mono); font-size: 10px; color: #72728a; letter-spacing: 0.12em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="../index.html" class="nav-brand"><span class="status-dot"></span>JH</a>
+  <div class="nav-links">
+    <a href="../index.html">Home</a>
+    <a href="../roadmap.html">Roadmap</a>
+    <a href="../portal.html">Portal</a>
+  </div>
+  <a href="../index.html" class="nav-back">← Back</a>
+</nav>
+
+<section class="project-hero">
+  <div class="project-hero-grid">
+    <div class="project-hero-left">
+      <div class="project-badge">🔍 PKM · Post-Organization Search</div>
+      <h1 class="project-title">Sage Search</h1>
+      <p class="project-tagline">Share anything to a Telegram bot — text, images, URLs, PDFs, video. It's auto-processed and embedded. Search it back in natural language. No folders, no tags, no manual filing, ever.</p>
+      <div class="project-links">
+        <a href="https://github.com/GenJess/file-chat-sage" target="_blank" class="project-link primary">
+          <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+          GitHub
+        </a>
+        <a href="https://file-chat-sage.vercel.app" target="_blank" class="project-link">
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Live
+        </a>
+      </div>
+    </div>
+    <div class="project-hero-visual">
+      <div style="text-align:center;">
+        <div class="sage-orb"></div>
+        <div class="loop-display" style="margin-top:24px;">Save → Forget → Query → Delight</div>
+        <div class="loop-label">The Core Loop</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="project-stats" style="margin-top: 40px;">
+  <div class="stat-cell">
+    <div class="num"><span class="accent">8</span>/10</div>
+    <div class="label">Market Validation Score</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">4</div>
+    <div class="label">Content Types Ingested</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num">0</div>
+    <div class="label">Folders Required</div>
+  </div>
+  <div class="stat-cell">
+    <div class="num" style="color:#fbbf24;">Pre-MVP</div>
+    <div class="label">Status</div>
+  </div>
+</div>
+
+<div class="project-content">
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">01</span>
+      <h2>The Thesis</h2>
+    </div>
+    <p style="color:#a0a0b8; line-height:1.7; max-width: 680px;">Everyone has thousands of bookmarks, screenshots, saved links, and random content scattered across devices. Finding anything is impossible, and manual organization is dead — nobody actually files things into folders. Sage Search's bet is that people don't want <em>better</em> organization; they want organization removed as a task entirely. Share it the way you already share things — a screenshot, a link, a forward — and let the system do the rest.</p>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">02</span>
+      <h2>Architecture</h2>
+    </div>
+    <div class="arch-grid">
+      <div class="arch-card">
+        <div class="layer">Ingestion</div>
+        <div class="tech">Telegram Bot API</div>
+        <div class="desc">Reuses the share-sheet gesture people already do — no new app or workflow to learn.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Content Processing</div>
+        <div class="tech">Gemini · pdf.js-extract · Mammoth</div>
+        <div class="desc">Text, images (vision-described), URLs (scraped), PDFs and DOCX (text-extracted), video (frame-described).</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Embeddings</div>
+        <div class="tech">Gemini Embeddings</div>
+        <div class="desc">Every processed item converted to a vector for semantic — not keyword — search.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Storage</div>
+        <div class="tech">Firestore · Cloud Storage</div>
+        <div class="desc">Structured metadata in Firestore, media files in Cloud Storage, per-user collections.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Search</div>
+        <div class="tech">Cosine Similarity</div>
+        <div class="desc">Natural-language queries ranked against stored embeddings — "that article about AI" just works.</div>
+      </div>
+      <div class="arch-card">
+        <div class="layer">Web Scraping</div>
+        <div class="tech">Cheerio · Axios</div>
+        <div class="desc">A shared URL is fetched, parsed, and its meaningful content extracted before embedding.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">03</span>
+      <h2>Core Loop</h2>
+    </div>
+    <div class="feature-list">
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Save</div>
+          <div class="detail">Share anything to @sagesearch_bot. No categorization, no tagging, no decisions at capture time.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 6-6"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Forget</div>
+          <div class="detail">The whole point — you don't have to remember where you put it, or that you filed it at all.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Query</div>
+          <div class="detail">"Show me that funny meme from last week" or "what did I save about startups" — plain language, not search operators.</div>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+        <div class="feature-text">
+          <div class="name">Delight</div>
+          <div class="detail">The moment the right thing surfaces instantly, from a pile you never organized — that's the product.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">04</span>
+      <h2>Market Position</h2>
+    </div>
+    <div class="status-panel">
+      <div class="status-cell">
+        <div class="key">Validation</div>
+        <div class="val">Scored <span class="accent">8/10</span> in market research — the competitive field (Notion, Obsidian, Rewind, Mem) is fragmented, and every incumbent trades off usability, privacy, or performance to get their features.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Why Telegram First</div>
+        <div class="val">Fast to build (simple bot API, no app store approval), fast to validate with real users and real usage patterns, and fast to iterate directly on feedback.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">MVP Scope</div>
+        <div class="val">Receive messages, process text/images/URLs, store with embeddings, search via bot commands, return relevant results — deliberately nothing more.</div>
+      </div>
+      <div class="status-cell">
+        <div class="key">Next Milestone</div>
+        <div class="val">3-5 early adopters testing the core save/search cycle, then expanding to 10-15 users for a week of real daily usage.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="project-section">
+    <div class="section-heading">
+      <span class="num">05</span>
+      <h2>Tech Stack</h2>
+    </div>
+    <div class="tech-bar">
+      <span class="tech-pill">Telegram Bot API</span>
+      <span class="tech-pill">Gemini</span>
+      <span class="tech-pill">Firestore</span>
+      <span class="tech-pill">Firebase Storage</span>
+      <span class="tech-pill">Cloud Functions</span>
+      <span class="tech-pill">pdf.js-extract</span>
+      <span class="tech-pill">Mammoth</span>
+      <span class="tech-pill">Cheerio</span>
+      <span class="tech-pill">Fluent-ffmpeg</span>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="left">Sage Search · Post-Organization Knowledge Tool</div>
+  <div class="right">Jesse Harrick · 2026</div>
+</footer>
+
+<script src="../shared/utils.js"></script>
+<script>
+  initNavScroll({ navId: 'navbar' });
+  initScrollReveal();
+</script>
+</body>
+</html>
