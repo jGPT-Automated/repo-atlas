@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const apiKey = process.env.DEEPGRAM_API_KEY;
+  const apiKey = process.env.DEEPGRAM_KEY;
   if (!apiKey) {
     res.status(500).json({ error: 'Fallback voice path is not configured.' });
     return;
