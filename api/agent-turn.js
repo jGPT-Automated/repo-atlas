@@ -53,7 +53,7 @@ module.exports = async (req, res) => {
   try {
     const ai = new GoogleGenAI({ apiKey });
     const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.6-flash',
       contents: [{ role: 'user', parts: [{ text: message }] }],
       config: {
         systemInstruction: systemInstruction || undefined,
@@ -75,6 +75,6 @@ module.exports = async (req, res) => {
     });
   } catch (err) {
     console.error('agent-turn error:', err);
-    res.status(502).json({ error: 'Agent turn failed.' });
+    res.status(502).json({ error: 'Agent turn failed.', detail: err.message || String(err) });
   }
 };
